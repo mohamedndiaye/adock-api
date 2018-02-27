@@ -1,6 +1,7 @@
 -- Download the Sirene CSV from
 -- https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/
 -- It takes 6 minutes to import the full sirene DB on my laptop with SSD
+-- almost 11 millions of records.
 
 begin;
 
@@ -93,7 +94,7 @@ create table sirene (
   -- https://www.sirene.fr/sirene/public/variable/rpen
   rpen varchar(2),
   -- Département et commune de localisation du siège de l'entreprise
-  -- ERREUR signalée à sirene.fr sur la longueur du champ
+  -- ERREUR signalée à sirene.fr sur la longueur du champ (2 -> 5)
   depcomen varchar(5),
   adr_mail varchar(80),
   -- Nature juridique de l'entreprise
