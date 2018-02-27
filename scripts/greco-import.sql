@@ -69,3 +69,9 @@ select count(*) from duplicated_siren;
 
 -- Zip code inconsistency with county code
 select siren, zip_code, county_code from greco where zip_code::char(2) != county_code::char(2);
+
+-- Company not active anymore (closed) but still present in GRECO
+select siren
+  from greco
+       left join sirene using(siren)
+  where sirene.siren is null;
