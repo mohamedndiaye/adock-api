@@ -140,6 +140,8 @@ create table sirene (
 \copy sirene FROM 'sirene.csv' with csv header delimiter ';' null '' encoding 'ISO-8859-1';
 commit;
 
+create unique index sirene_siret_idx on sirene(siren, nic);
+
 -- Too long 'enseigne'
 -- select max(char_length(enseigne)) from sirene;
 -- The max size is 50
