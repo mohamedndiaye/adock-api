@@ -45,11 +45,26 @@ alter table greco
      type license_type
     using replace(license, 'Pas de titre', '')::license_type,
 
+    alter activity_start
+     type date
+    using to_date(activity_start, 'DD/MM/YYYY')::date,
 
+    alter last_balance_sheet
+     type date
+    using to_date(last_balance_sheet, 'DD/MM/YYYY')::date,
+
+    alter validity_end
+     type date
+    using to_date(validity_end, 'DD/MM/YYYY')::date
+;
 commit;
 
 -- Not unique SIREN
-select siren, count(siren) from greco group by siren having count(siren) > 1;
+with duplicated_siren as
+(
+    select siren, count(siren) from greco group by siren having count(siren) > 1
+)
+select count(*) from duplicated_siren;
 
 -- Zip code inconsistency with county code
 select siren, zip_code, county_code from greco where zip_code::char(2) != county_code::char(2);
