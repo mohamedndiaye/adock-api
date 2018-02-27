@@ -28,6 +28,8 @@ create table greco (
     invalid_copies int
 );
 
+create index siren_idx on greco(siren);
+
 create type license_type AS ENUM ('LCV', 'LCM', 'LTIM', 'LTIV', '');
 
 \copy greco from 'greco.csv' with csv header delimiter '|' null '';
