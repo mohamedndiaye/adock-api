@@ -29,7 +29,7 @@ create table greco (
     invalid_copies int
 );
 
-create index siren_idx on greco(siren);
+create index greco_siren_idx on greco(siren);
 
 create type license_type AS ENUM ('LCV', 'LCM', 'LTIM', 'LTIV', '');
 
