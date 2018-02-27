@@ -12,7 +12,7 @@ create table greco (
     siren integer,
     name text,
     street text,
-    zip_code int,
+    zip_code varchar(5),
     city text,
     county_code int,
     phone text,
@@ -76,3 +76,9 @@ select siren
   from greco
        left join sirene using(siren)
   where sirene.siren is null;
+
+-- Inconsistencies on zip code (code postal)
+-- select siren, zip_code, codpos
+--   from greco
+--   join sirene using(siren)
+--  where zip_code != codpos;
