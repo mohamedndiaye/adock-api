@@ -1,0 +1,144 @@
+-- Download the Sirene CSV from
+-- https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/
+-- It takes 6 minutes to import the full sirene DB on my laptop with SSD
+
+begin;
+
+drop table if exists sirene;
+
+create table sirene (
+  siren char(9),
+  nic char(5),
+  l1_normalisee varchar(38),
+  l2_normalisee varchar(38),
+  l3_normalisee varchar(38),
+  l4_normalisee varchar(38),
+  l5_normalisee varchar(38),
+  l6_normalisee varchar(38),
+  l7_normalisee varchar(38),
+  l1_declaree varchar(38),
+  l2_declaree varchar(38),
+  l3_declaree varchar(38),
+  l4_declaree varchar(38),
+  l5_declaree varchar(38),
+  l6_declaree varchar(38),
+  l7_declaree varchar(38),
+  numvoie varchar(4),
+  -- B (bis), T (ter), Q (quarter), etc
+  indrep varchar(1),
+  typevoie varchar(4),
+  libvoie varchar(32),
+  codpos varchar(5),
+  cedex varchar(5),
+  rpet varchar(2),
+  libreg varchar(70),
+  depet varchar(2),
+  arronet varchar(2),
+  ctonet varchar(3),
+  comet varchar(3),
+  libcom varchar(32),
+  du varchar(2),
+  -- Taille de l'unité urbaine
+  tu varchar(1),
+  uu varchar(2),
+  epci varchar(9),
+  -- Tranche de commune détaillée
+  tcd varchar(2),
+  -- Zone d'empoloi
+  zemet varchar(4),
+  -- Etablissement siège 1 ou non siège 0
+  siege varchar(1),
+  -- ERREUR La documentation indique 40
+  enseigne varchar(50),
+  ind_publipo varchar(1),
+  diffcom varchar(1),
+  -- Année, mois introduction dans la base AAAAMM
+  amintret varchar(6),
+  -- Nature de l'établissement https://www.sirene.fr/sirene/public/variable/natetab
+  natetab varchar(1),
+  libnatetab varchar(30),
+  apet700 varchar(5),
+  libapet varchar(65),
+  -- année de validité de l'activité principale de l'établissement AAAA
+  dapet varchar(5),
+  -- tranche effectif salarié de l'établissement
+  tefet varchar(2),
+  libtefet varchar(23),
+  efetcent varchar(6),
+  -- Année de validité de l'effectif salarié de l'établissement
+  defet varchar(4),
+  origine varchar(2),
+  -- Date de création de l'établissement AAAAMMJJ
+  dcret varchar(8),
+  ddebact varchar(8),
+  activnat varchar(2),
+  lieuact varchar(2),
+  actisurf varchar(2),
+  saisonat varchar(2),
+  modet varchar(1),
+  prodet varchar(1),
+  prodpart varchar(1),
+  auxilt varchar(1),
+  -- Nom ou raison sociale de l'entreprise
+  nomen_long varchar(131),
+  sigle varchar(30),
+  -- Nom de naissance
+  nom varchar(100),
+  prenom varchar(30),
+  -- 1 Monsieur, 2 Madame
+  civilite varchar(1),
+  rna varchar(10),
+  nicsiege varchar(5),
+  -- région de localisation de l'enreprise
+  -- https://www.sirene.fr/sirene/public/variable/rpen
+  rpen varchar(2),
+  -- Département et commune de localisation du siège de l'entreprise
+  -- ERREUR signalée à sirene.fr sur la longueur du champ
+  depcomen varchar(5),
+  adr_mail varchar(80),
+  -- Nature juridique de l'entreprise
+  nj varchar(4),
+  libnj varchar(100),
+  apen700 varchar(5),
+  libapen varchar(65),
+  -- AAAA
+  dapen varchar(4),
+  aprm varchar(6),
+  ess varchar(1),
+  dateess varchar(8),
+  tefen varchar(2),
+  libtefen varchar(23),
+  efencent varchar(6),
+  defen varchar(4),
+  categorie varchar(5),
+  dcren varchar(8),
+  amintren varchar(6),
+  monoact varchar(1),
+  moden varchar(1),
+  proden varchar(1),
+  esaann varchar(4),
+  tca varchar(1),
+  esaapen varchar(5),
+  esasec1n varchar(5),
+  esasec2n varchar(5),
+  esasec3n varchar(5),
+  esasec4n varchar(5),
+  vmaj varchar(1),
+  vmaj1 varchar(1),
+  vmaj2 varchar(1),
+  vmaj3 varchar(1),
+  -- AAAA-MM-JJTHH:MM:SS
+  -- - AAAA est l'année,
+  -- - MM le mois,
+  -- - JJ le jour,
+  -- - T (time) séparateur de la date par rapport à l'heure,
+  -- - HH l'heure, MM les minutes et SS les secondes.
+  datemaj varchar(19)
+);
+
+\copy sirene FROM 'sirene.csv' with csv header delimiter ';' null '' encoding 'ISO-8859-1';
+commit;
+
+-- Too long 'enseigne'
+-- select max(char_length(enseigne)) from sirene;
+-- The max size is 50

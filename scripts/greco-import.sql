@@ -29,6 +29,7 @@ create table greco (
 );
 
 create type license_type AS ENUM ('LCV', 'LCM', 'LTIM', 'LTIV', '');
+
 \copy greco from 'greco.csv' with csv header delimiter '|' null '';
 alter table greco
     drop _register,
