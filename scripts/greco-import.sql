@@ -1,7 +1,5 @@
--- The CSV file should be UTF-8 (tested with Unix format)
--- psql -d adock -v csv_file="greco.csv" -f greco-import.sql
-
-\set csv_file 'greco.csv'
+-- The CSV file should be UTF-8
+-- psql -d adock -f greco-import.sql
 
 begin;
 
