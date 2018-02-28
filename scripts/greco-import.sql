@@ -77,6 +77,13 @@ select siren
        left join sirene using(siren)
   where sirene.siren is null;
 
+--- List of APET700 of companies in GRECO
+-- select apet700
+--   from greco
+--   join sirene using(siren)
+--  group by apet700
+--  order by apet700 asc;
+
 -- Inconsistencies on zip code (code postal)
 -- select siren, zip_code, codpos
 --   from greco
