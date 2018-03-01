@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'adock.sirene'
+    'adock.core',
+    'adock.sirene',
 ]
 
 MIDDLEWARE = [

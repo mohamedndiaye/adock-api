@@ -6,7 +6,6 @@ SIREN_LENGTH = 9
 SIRET_LENGTH = 14
 
 
-# Create your views here.
 def search(request):
     try:
         raw_siren = request.GET['siren']
