@@ -16,6 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from .sirene import views as sirene_views
+
 urlpatterns = [
+    path('sirene/search', sirene_views.search, name='sirene_search'),
     path('admin/', admin.site.urls),
 ]
