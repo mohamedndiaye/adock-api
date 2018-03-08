@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class SireneConfig(AppConfig):
-    name = 'sirene'
+    name = 'adock.sirene'
+    verbose_name = 'Sirene'
