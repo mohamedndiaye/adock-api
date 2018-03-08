@@ -134,7 +134,39 @@ CORS_ORIGIN_WHITELIST = (
     'adock.beta.gouv.fr',
 )
 
+USE_DEBUG_CONSOLE = DEBUG
+
 try:
     from .settings_local import *  # noqa
 except ImportError:
     pass
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(asctime)s %(message)s'
+        },
+    },
+    'handlers': {
+        'output': {
+            'class': 'logging.FileHandler',
+            'level': 'INFO',
+            'filename': '/var/log/' + PROJECT + '/django.log',
+            'formatter': 'simple'
+        },
+    },
+    'loggers': {
+        PROJECT: {
+            'handlers': ['output'],
+            'level': 'DEBUG',
+        }
+    },
+}
+
+if USE_DEBUG_CONSOLE:
+    LOGGING['handlers']['output'] = {
+        'class': 'logging.StreamHandler',
+        'level': 'DEBUG'
+    }
