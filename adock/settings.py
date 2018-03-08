@@ -28,9 +28,6 @@ SECRET_KEY = 'ikc26ecc!xo8kck_8+_il6)m-^px@weoi6tq_1t+(50ar896h3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -127,9 +124,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_CREDENTIALS = False
 CORS_ORIGIN_WHITELIST = (
-    'localhost:8080',
+    'adock.beta.gouv.fr',
 )
 
 try:
