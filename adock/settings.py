@@ -80,7 +80,11 @@ WSGI_APPLICATION = 'adock.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'adock',
+        'NAME': PROJECT,
+        # For logs
+        'OPTIONS': {
+            'application_name': PROJECT
+        },
     }
 }
 
