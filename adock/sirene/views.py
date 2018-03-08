@@ -10,8 +10,12 @@ def search(request):
     try:
         raw_siren = request.GET['siren']
     except datastructures.MultiValueDictKeyError:
+        if len(request.GET) == 0:
+            message = 'Empty query.'
+        else:
+            message = 'Required parameter not found.'
         return JsonResponse({
-            'message': 'Empty query.'
+            'message': message
         }, status=400)
 
     # Allows SIREN instead of SIRET
