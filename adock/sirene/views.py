@@ -28,7 +28,7 @@ def search(request):
         nic = raw_siren[SIREN_LENGTH:]
     else:
         return JsonResponse({
-            'message': 'Invalid SIREN/SIRET'
+            'message': 'Invalid SIREN/SIRET.'
         }, status=400)
 
     with connection.cursor() as cursor:
