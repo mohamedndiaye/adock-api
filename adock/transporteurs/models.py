@@ -2,6 +2,18 @@ from django.db import models
 
 from . import validators as transporteurs_validators
 
+LICENCE_LCM = 'LCM'
+LICENCE_LTIM = 'LTIM'
+LICENCE_LCV = 'LCV'
+LICENSE_LTIV = 'LTIV'
+
+# LICENSE_CHOICES = (
+#     (LICENCE_LCM, "Licence communautaire marchandise, camion > 3,5 tonnes"),
+#     (LICENCE_LTIM, "Licence de transport intérieur de marchandise : VUL < 3,5 tonnes"),
+#     # Not used
+#     (LICENCE_LCV, "Licence communautaire voyageurs, car > 9 places"),
+#     (LICENSE_LTIV, "Licence de transport intérieur de voyageurs : < 9 places."),
+# )
 
 class Transporteur(models.Model):
     siret = models.CharField(max_length=transporteurs_validators.SIRET_LENGTH,
@@ -25,9 +37,8 @@ class Transporteur(models.Model):
     debut_activite = models.DateField()
     code_ape = models.CharField(max_length=5)
     libelle_ape = models.CharField(max_length=65)
-    # TODO licenses (type + number)
-    # license_total (DN)
-    # is_above_3500_kg
+    lower_than_35t_licenses = models.IntegerField(default=0)
+    greater_than_35t_licenses = models.IntegerField(default=0)
     # working_area (FRANCE or DEPARTEMENT)
     # working_area_departments = array of zip code
     # type_marchandise = categories from FNTR
