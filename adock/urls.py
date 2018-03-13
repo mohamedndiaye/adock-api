@@ -16,11 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from .carriers import views as carriers_views
+from .transporteurs import views as transporteurs_views
 from .sirene import views as sirene_views
 
 urlpatterns = [
-    path('carriers/subscribe/', carriers_views.subscribe, name='subscribe'),
-    path('sirene/search/', sirene_views.search, name='sirene_search'),
+    path('transporteurs/inscription/', transporteurs_views.subscribe, name='transporteurs_inscription'),
+    path('sirene/recherche/', sirene_views.search, name='sirene_recherche'),
     path('admin/', admin.site.urls),
 ]

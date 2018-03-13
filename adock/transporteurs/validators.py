@@ -1,5 +1,4 @@
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
 
 SIREN_LENGTH = 9
 NIC_LENGTH = 5
@@ -8,7 +7,7 @@ SIRET_LENGTH = SIREN_LENGTH + NIC_LENGTH
 def validate_administrative_number(value, length, name):
     if len(value) != length:
         raise ValidationError(
-            _('%(value)s is not a valid %(name)s number'),
+            "%(value)s n'est pas un numéro %(name)s valide",
             params={'value': value, 'name': name},
         )
 

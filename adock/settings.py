@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'adock.carriers.apps.CarriersConfig',
+    'adock.transporteurs.apps.TransporteursConfig',
     'adock.sirene.apps.SireneConfig',
 ]
 
