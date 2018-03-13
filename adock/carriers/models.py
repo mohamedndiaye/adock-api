@@ -1,10 +1,17 @@
 from django.db import models
 
+from . import validators as carriers_validators
+
 
 class Carrier(models.Model):
-    siret = models.CharField(max_length=15, db_index=True, unique=True, editable=False)
-    siren = models.CharField(max_length=9, db_index=True, editable=False)
-    nic = models.CharField(max_length=5, editable=False)
+    siret = models.CharField(max_length=carriers_validators.SIRET_LENGTH,
+        db_index=True, unique=True, editable=False)
+    siren = models.CharField(max_length=carriers_validators.SIREN_LENGTH,
+        db_index=True, editable=False,
+        validators=[carriers_validators.validate_siren])
+    nic = models.CharField(max_length=carriers_validators.NIC_LENGTH,
+        editable=False,
+        validators=[carriers_validators.validate_nic])
     phone = models.CharField(max_length=10, blank=True)
     email = models.EmailField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
