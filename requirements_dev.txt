@@ -1,5 +1,7 @@
 -r requirements.txt
+django-extensions
+factory_boy
+faker
 ipdb
 pytest
 pytest-django
-django-extensions
