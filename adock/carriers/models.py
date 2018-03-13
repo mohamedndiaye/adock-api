@@ -5,8 +5,8 @@ class Carrier(models.Model):
     siret = models.CharField(max_length=15, db_index=True, unique=True, editable=False)
     siren = models.CharField(max_length=9, db_index=True, editable=False)
     nic = models.CharField(max_length=5, editable=False)
-    phone = models.CharField(max_length=10)
-    email = models.EmailField()
+    phone = models.CharField(max_length=10, blank=True)
+    email = models.EmailField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
