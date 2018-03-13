@@ -11,8 +11,7 @@ class TransporteurFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Transporteur
 
-    siren = fuzzy.FuzzyText(length=validators.SIREN_LENGTH, chars=string.digits)
-    nic = fuzzy.FuzzyText(length=validators.NIC_LENGTH, chars=string.digits)
+    siret = fuzzy.FuzzyText(length=validators.SIRET_LENGTH, chars=string.digits)
     raison_sociale = factory.Faker('company', locale='fr_FR')
     adresse = factory.Faker('street_address', locale='fr_FR')
     code_postal = factory.Faker('zipcode')

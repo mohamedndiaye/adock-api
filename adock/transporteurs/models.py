@@ -5,13 +5,8 @@ from . import validators as transporteurs_validators
 
 class Transporteur(models.Model):
     siret = models.CharField(max_length=transporteurs_validators.SIRET_LENGTH,
+        validators=[transporteurs_validators.validate_siret],
         db_index=True, unique=True, editable=False)
-    siren = models.CharField(max_length=transporteurs_validators.SIREN_LENGTH,
-        db_index=True, editable=False,
-        validators=[transporteurs_validators.validate_siren])
-    nic = models.CharField(max_length=transporteurs_validators.NIC_LENGTH,
-        editable=False,
-        validators=[transporteurs_validators.validate_nic])
     # raison_sociale in GRECO and enseigne ou l1_normalisee in Sirene
     raison_sociale = models.CharField(max_length=38)
     # localisation in GRECO
@@ -41,11 +36,13 @@ class Transporteur(models.Model):
     def __str__(self):
         return self.siret
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.siret = self.siren + self.nic
-        super().save(*args, **kwargs)
+    def get_siren(self):
+        return self.siret[:transporteurs_validators.SIREN_LENGTH]
+
+    def get_nic(self):
+        return self.siret[transporteurs_validators.SIREN_LENGTH:]
 
     def get_vat_number(self):
-        key = (12 + 3 * (int(self.siren) % 97)) % 97
-        return 'FR%d%s' % (key, self.siren)
+        siren = self.get_siren()
+        key = (12 + 3 * (int(siren) % 97)) % 97
+        return 'FR%d%s' % (key, siren)
