@@ -16,14 +16,14 @@ class Transporteur(models.Model):
     raison_sociale = models.CharField(max_length=38)
     # localisation in GRECO
     # numvoie, typevoie, libvoie in Sirene
-    adresse = models.TextField()
+    adresse = models.CharField(max_length=126)
     # code_postal in GRECO and codpos in Sirene
     code_postal = models.CharField(max_length=5)
     #
     # telephone in GRECO used as default (changed)
-    telephone = models.CharField(max_length=10, blank=True)
+    telephone = models.CharField(max_length=63, blank=True, default='')
     # mail in GRECO used as default (changed)
-    email = models.EmailField(blank=True)
+    email = models.EmailField(blank=True, default='')
     # dcret from Sirene
     date_creation = models.DateField()
     # ddebact from Sirene
