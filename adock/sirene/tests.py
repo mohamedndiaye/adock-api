@@ -22,23 +22,23 @@ class SireneTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.content)
         self.assertTrue('message' in data)
-        self.assertEquals(data['message'], 'Required parameter not found.')
+        self.assertEquals(data['message'], 'Invalid search query.')
 
     def test_invalid_siren(self):
-        response = self.client.get(self.search_url, {'siren': '123'})
+        response = self.client.get(self.search_url, {'q': '123'})
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.content)
         self.assertTrue('message' in data)
-        self.assertEquals(data['message'], 'Invalid SIREN/SIRET.')
+        self.assertEquals(data['message'], 'Invalid search query.')
 
     def test_empty_results_with_siren(self):
-        response = self.client.get(self.search_url, {'siren': '123456789'})
+        response = self.client.get(self.search_url, {'q': '123456789'})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual(len(data['results']), 0)
 
     def test_empty_results_with_siret(self):
-        response = self.client.get(self.search_url, {'siren': '12345678912345'})
+        response = self.client.get(self.search_url, {'q': '12345678912345'})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual(len(data['results']), 0)
@@ -49,7 +49,7 @@ class SireneTestCase(TestCase):
             nic='12345',
             l1_normalisee='company'
         )
-        response = self.client.get(self.search_url, {'siren': '12345678912345'})
+        response = self.client.get(self.search_url, {'q': '12345678912345'})
         data = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data['results']), 1)
