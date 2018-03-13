@@ -135,6 +135,7 @@ CORS_ORIGIN_WHITELIST = (
 )
 
 USE_DEBUG_CONSOLE = DEBUG
+USE_DJANGO_EXTENSIONS = DEBUG
 
 try:
     from .settings_local import *  # noqa
@@ -170,3 +171,6 @@ if USE_DEBUG_CONSOLE:
         'class': 'logging.StreamHandler',
         'level': 'DEBUG'
     }
+
+if USE_DJANGO_EXTENSIONS:
+    INSTALLED_APPS += ('django_extensions',)
