@@ -84,8 +84,14 @@ select siren
 --  group by s.apet700
 --  order by s.apet700 asc;
 
--- Inconsistencies on zip code
+--- Inconsistencies on zip code
 -- select siren, g.code_postal, s.codpos
 --   from greco g
 --   join sirene s using(siren)
 --  where g.code_postal != s.codpos;
+
+--- More than one license type by siren
+-- select siren, licence, count(licence)
+--   from greco
+-- group by siren, licence
+-- having count(licence) > 1;
