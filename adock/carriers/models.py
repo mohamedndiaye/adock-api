@@ -22,5 +22,8 @@ class Carrier(models.Model):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.siret = self.siren + self.nic
-
         super().save(*args, **kwargs)
+
+    def get_vat_number(self):
+        key = (12 + 3 * (int(self.siren) % 97)) % 97
+        return 'FR%d%s' % (key, self.siren)

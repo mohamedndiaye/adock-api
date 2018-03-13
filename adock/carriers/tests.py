@@ -17,3 +17,7 @@ class CarrierTestCase(TestCase):
         messages = cm.exception.message_dict
         self.assertEqual(messages['siren'][0], '12345678 is not a valid SIREN number')
         self.assertEqual(messages['nic'][0], '123 is not a valid NIC number')
+
+    def test_vat_number(self):
+        carrier = carriers_models.Carrier.objects.create(siren='750017097', nic='00015')
+        self.assertEqual(carrier.get_vat_number(), 'FR18750017097')
