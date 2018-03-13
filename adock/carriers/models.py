@@ -20,7 +20,7 @@ class Carrier(models.Model):
         return self.siret
 
     def save(self, *args, **kwargs):
-        if self.pk is None:
+        if not self.pk:
             self.siret = self.siren + self.nic
 
         super().save(*args, **kwargs)
