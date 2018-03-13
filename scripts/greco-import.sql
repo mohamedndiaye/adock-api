@@ -5,37 +5,37 @@
 begin;
 
 drop table if exists greco;
-drop type if exists license_type;
+drop type if exists licence_type;
 
 create table greco (
-    _register char,
+    _registre char,
     siren integer,
-    name text,
-    street text,
-    zip_code varchar(5),
-    city text,
-    county_code int,
-    phone text,
+    raison_sociale text,
+    localisation text,
+    code_postal varchar(5),
+    ville text,
+    _numero_departement int,
+    telephone text,
     email text,
-    activity_start text,
-    last_balance_sheet text,
-    equity int,
+    inscription_activite text,
+    date_dernier_bilan text,
+    capitaux_propres int,
     _import_finance text,
     _regime_derogatoire text,
     _motif_derogation text,
-    license text,
-    validity_end text,
-    valid_copies int,
-    invalid_copies int
+    licence text,
+    fin_validite text,
+    copies_valides int,
+    copies_non_valides int
 );
 
 create index greco_siren_idx on greco(siren);
 
-create type license_type AS ENUM ('LCV', 'LCM', 'LTIM', 'LTIV', '');
+create type licence_type AS ENUM ('LCV', 'LCM', 'LTIM', 'LTIV', '');
 
 \copy greco from 'greco.csv' with csv header delimiter '|' null '';
 alter table greco
-    drop _register,
+    drop _registre,
     drop _import_finance,
     drop _regime_derogatoire,
     drop _motif_derogation,
@@ -43,21 +43,21 @@ alter table greco
     alter siren
      type char(9),
 
-    alter license
-     type license_type
-    using replace(license, 'Pas de titre', '')::license_type,
+    alter licence
+     type licence_type
+    using replace(licence, 'Pas de titre', '')::licence_type,
 
-    alter activity_start
+    alter inscription_activite
      type date
-    using to_date(activity_start, 'DD/MM/YYYY')::date,
+    using to_date(inscription_activite, 'DD/MM/YYYY')::date,
 
-    alter last_balance_sheet
+    alter date_dernier_bilan
      type date
-    using to_date(last_balance_sheet, 'DD/MM/YYYY')::date,
+    using to_date(date_dernier_bilan, 'DD/MM/YYYY')::date,
 
-    alter validity_end
+    alter fin_validite
      type date
-    using to_date(validity_end, 'DD/MM/YYYY')::date
+    using to_date(fin_validite, 'DD/MM/YYYY')::date
 ;
 commit;
 
@@ -69,7 +69,7 @@ with duplicated_siren as
 select count(*) from duplicated_siren;
 
 -- Zip code inconsistency with county code
-select siren, zip_code, county_code from greco where zip_code::char(2) != county_code::char(2);
+select siren, code_postal, _numero_departement from greco where code_postal::char(2) != _numero_departement::char(2);
 
 -- Company not active anymore (closed) but still present in GRECO
 select siren
@@ -80,12 +80,12 @@ select siren
 --- List of APET700 of companies in GRECO
 -- select apet700
 --   from greco
---   join sirene using(siren)
---  group by apet700
---  order by apet700 asc;
+--   join sirene s using(siren)
+--  group by s.apet700
+--  order by s.apet700 asc;
 
--- Inconsistencies on zip code (code postal)
--- select siren, zip_code, codpos
---   from greco
---   join sirene using(siren)
---  where zip_code != codpos;
+-- Inconsistencies on zip code
+-- select siren, g.code_postal, s.codpos
+--   from greco g
+--   join sirene s using(siren)
+--  where g.code_postal != s.codpos;
