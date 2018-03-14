@@ -69,7 +69,9 @@ with duplicated_siren as
 select count(*) from duplicated_siren;
 
 -- Zip code inconsistency with county code
-select siren, code_postal, _numero_departement from greco where code_postal::char(2) != _numero_departement::char(2);
+select siren, code_postal, _numero_departement
+  from greco
+ where code_postal::char(2) != _numero_departement::char(2);
 
 -- Company not active anymore (closed) but still present in GRECO
 select siren
