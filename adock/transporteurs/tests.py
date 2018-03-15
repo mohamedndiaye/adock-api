@@ -8,6 +8,7 @@ from . import factories
 
 VALID_SIRET = '12345678912345'
 
+
 class TransporteurTestCase(TestCase):
     def test_validators_too_short(self):
         transporteur = factories.TransporteurFactory(siret='1234567891234')
@@ -82,11 +83,27 @@ class TransporteurSearchTestCase(TestCase):
 
 
 class TransporteurDetailTestCase(TestCase):
-    def test_detail(self):
-        transporteur = factories.TransporteurFactory(siret=VALID_SIRET)
+    def setUp(self):
+        self.transporteur = factories.TransporteurFactory(siret=VALID_SIRET)
         self.detail_url = reverse('transporteurs_detail',
             kwargs={'transporteur_siret': VALID_SIRET})
+
+    def test_detail(self):
         response = self.client.get(self.detail_url)
         data = json.loads(response.content)
         self.assertEqual(data['siret'], VALID_SIRET)
-        self.assertEqual(data['raison_sociale'], transporteur.raison_sociale)
+        self.assertEqual(data['raison_sociale'], self.transporteur.raison_sociale)
+
+    def test_detail_update(self):
+        NEW_PHONE = '+33240424546'
+        NEW_EMAIL = 'foo@example.com'
+        self.assertNotEqual(self.transporteur.telephone, NEW_PHONE)
+        self.assertNotEqual(self.transporteur.email, NEW_EMAIL)
+        response = self.client.post(self.detail_url, json.dumps({
+            'telephone': NEW_PHONE,
+            'email': NEW_EMAIL,
+        }), 'json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(data['email'], NEW_EMAIL)
+        self.assertEqual(data['telephone'], NEW_PHONE)
