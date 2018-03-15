@@ -1,22 +1,28 @@
 import json
 
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.utils import datastructures
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 
 from . import models
 from . import forms
 from . import validators
 
-TRANSPORTEUR_SEARCH_FIELDS = (
-    'siret', 'raison_sociale', 'adresse', 'code_postal', 'ville',
-    'telephone', 'email', 'code_ape', 'libelle_ape'
+TRANSPORTEUR_LIST_FIELDS = (
+    'siret', 'raison_sociale', 'adresse', 'code_postal', 'ville'
 )
 
-def get_transporteur_as_json(transporteur):
+TRANSPORTEUR_DETAIL_FIELDS = (
+    'siret', 'raison_sociale', 'adresse', 'code_postal', 'ville',
+    'telephone', 'email',
+    'debut_activite', 'code_ape', 'libelle_ape',
+    'lower_than_3_5_licenses', 'greater_than_3_5_licenses'
+)
+
+def get_transporteur_as_json(transporteur, fields):
     transporteur_json = {}
-    for field in TRANSPORTEUR_SEARCH_FIELDS:
+    for field in fields:
         transporteur_json[field] = getattr(transporteur, field)
     return transporteur_json
 
@@ -52,21 +58,21 @@ def search(request):
         }, status=400)
 
     transporteurs_json = [
-        get_transporteur_as_json(transporteur) for transporteur in transporteurs
+        get_transporteur_as_json(transporteur, TRANSPORTEUR_LIST_FIELDS) for transporteur in transporteurs
     ]
     return JsonResponse({'results': transporteurs_json})
 
 @csrf_exempt
-@require_POST
-def subscribe(request):
-    payload = json.loads(request.body.decode("utf-8"))
+def transporteur_detail(request, transporteur_siret):
     # Get existing transporteur if any
-    transporteur = models.Transporteur.objects.filter(siret=payload['siret']).first()
-    form = forms.SubscriptionForm(payload, instance=transporteur)
-    if form.is_valid():
+    transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
+    if request.method == 'POST':
+        payload = json.loads(request.body.decode('utf-8'))
+        form = forms.SubscriptionForm(payload, instance=transporteur)
+        if not form.is_valid():
+            return JsonResponse(form.errors, status=400)
+        # Valid
         transporteur = form.save()
-        return JsonResponse({
-            'id': transporteur.id,
-        })
-    else:
-        return JsonResponse(form.errors, status=400)
+
+    transporteur_as_json = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
+    return JsonResponse(transporteur_as_json)

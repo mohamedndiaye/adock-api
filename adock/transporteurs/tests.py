@@ -6,11 +6,9 @@ from django.urls import reverse
 
 from . import factories
 
-class TransporteurTestCase(TestCase):
-    def setUp(self):
-        super().setUp()
-        self.search_url = reverse('transporteurs_recherche')
+VALID_SIRET = '12345678912345'
 
+class TransporteurTestCase(TestCase):
     def test_validators_too_short(self):
         transporteur = factories.TransporteurFactory(siret='1234567891234')
         with self.assertRaises(ValidationError) as cm:
@@ -30,9 +28,15 @@ class TransporteurTestCase(TestCase):
         self.assertEqual(transporteur.get_vat_number(), 'FR18750017097')
 
     def test_get_siren_nic(self):
-        transporteur = factories.TransporteurFactory(siret='12345678912345')
+        transporteur = factories.TransporteurFactory(siret=VALID_SIRET)
         self.assertEqual(transporteur.get_siren(), '123456789')
         self.assertEqual(transporteur.get_nic(), '12345')
+
+
+class TransporteurSearchTestCase(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.search_url = reverse('transporteurs_recherche')
 
     def test_empty_search(self):
         response = self.client.get(self.search_url)
@@ -62,17 +66,27 @@ class TransporteurTestCase(TestCase):
         self.assertEqual(len(data['results']), 0)
 
     def test_empty_results_with_siret(self):
-        response = self.client.get(self.search_url, {'q': '12345678912345'})
+        response = self.client.get(self.search_url, {'q': VALID_SIRET})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual(len(data['results']), 0)
 
     def test_one_result(self):
-        siret = '12345678912345'
-        factories.TransporteurFactory(siret=siret)
-        response = self.client.get(self.search_url, {'q': siret})
+        factories.TransporteurFactory(siret=VALID_SIRET)
+        response = self.client.get(self.search_url, {'q': VALID_SIRET})
         data = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
         transporteurs = data['results']
         self.assertEqual(len(transporteurs), 1)
-        self.assertEqual(transporteurs[0]['siret'], siret)
+        self.assertEqual(transporteurs[0]['siret'], VALID_SIRET)
+
+
+class TransporteurDetailTestCase(TestCase):
+    def test_detail(self):
+        transporteur = factories.TransporteurFactory(siret=VALID_SIRET)
+        self.detail_url = reverse('transporteurs_detail',
+            kwargs={'transporteur_siret': VALID_SIRET})
+        response = self.client.get(self.detail_url)
+        data = json.loads(response.content)
+        self.assertEqual(data['siret'], VALID_SIRET)
+        self.assertEqual(data['raison_sociale'], transporteur.raison_sociale)
