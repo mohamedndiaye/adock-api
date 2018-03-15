@@ -67,7 +67,13 @@ def transporteur_detail(request, transporteur_siret):
     # Get existing transporteur if any
     transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
     if request.method == 'POST':
-        payload = json.loads(request.body.decode('utf-8'))
+        try:
+            payload = json.loads(request.body.decode('utf-8'))
+        except json.decoder.JSONDecodeError:
+            return JsonResponse({
+                'message': "Les données ne sont pas valides.",
+            }, status=400)
+
         form = forms.SubscriptionForm(payload, instance=transporteur)
         if not form.is_valid():
             return JsonResponse(form.errors, status=400)
