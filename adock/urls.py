@@ -14,13 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-
-from .transporteurs import views as transporteurs_views
-from .sirene import views as sirene_views
+from django.urls import include, path
 
 urlpatterns = [
-    path('transporteurs/inscription/', transporteurs_views.subscribe, name='transporteurs_inscription'),
-    path('sirene/recherche/', sirene_views.search, name='sirene_recherche'),
+    path('transporteurs/', include('adock.transporteurs.urls')),
     path('admin/', admin.site.urls),
 ]
