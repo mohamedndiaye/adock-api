@@ -94,12 +94,12 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(data['siret'], VALID_SIRET)
         self.assertEqual(data['raison_sociale'], self.transporteur.raison_sociale)
 
-    def test_detail_update(self):
+    def test_detail_patch(self):
         NEW_PHONE = '+33240424546'
         NEW_EMAIL = 'foo@example.com'
         self.assertNotEqual(self.transporteur.telephone, NEW_PHONE)
         self.assertNotEqual(self.transporteur.email, NEW_EMAIL)
-        response = self.client.post(self.detail_url, json.dumps({
+        response = self.client.patch(self.detail_url, json.dumps({
             'telephone': NEW_PHONE,
             'email': NEW_EMAIL,
         }), 'json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -109,7 +109,7 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(data['telephone'], NEW_PHONE)
 
     def test_detail_invalid_update(self):
-        response = self.client.post(self.detail_url, {'foo': 'foo'})
+        response = self.client.patch(self.detail_url, {'foo': 'foo'})
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.content)
         self.assertEqual(data['message'], 'Seules les requêtes POST en JSON sont prises en charge.')

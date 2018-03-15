@@ -66,7 +66,7 @@ def search(request):
 def transporteur_detail(request, transporteur_siret):
     # Get existing transporteur if any
     transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
-    if request.method == 'POST':
+    if request.method == 'PATCH':
         if not request.is_ajax():
             return JsonResponse({
                 'message': 'Seules les requêtes POST en JSON sont prises en charge.'
