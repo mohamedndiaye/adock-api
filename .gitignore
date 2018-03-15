@@ -6,3 +6,5 @@ _build/
 /media/
 /static/
 *.csv
+# conf specific to the instance
+adock/settings_local.py
