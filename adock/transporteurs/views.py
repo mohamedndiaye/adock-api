@@ -9,11 +9,16 @@ from . import models
 from . import forms
 from . import validators
 
-def serialize_transporteur(transporteur):
-    return {
-        'siret': transporteur.siret,
-        'raison_sociale': transporteur.raison_sociale
-    }
+TRANSPORTEUR_SEARCH_FIELDS = (
+    'siret', 'raison_sociale', 'adresse', 'code_postal', 'ville',
+    'telephone', 'email', 'code_ape', 'libelle_ape'
+)
+
+def get_transporteur_as_json(transporteur):
+    transporteur_json = {}
+    for field in TRANSPORTEUR_SEARCH_FIELDS:
+        transporteur_json[field] = getattr(transporteur, field)
+    return transporteur_json
 
 def search(request):
     try:
@@ -46,7 +51,9 @@ def search(request):
             'message': "Le paramètre de recherche n'est pas valide."
         }, status=400)
 
-    transporteurs_json = [serialize_transporteur(transporteur) for transporteur in transporteurs]
+    transporteurs_json = [
+        get_transporteur_as_json(transporteur) for transporteur in transporteurs
+    ]
     return JsonResponse({'results': transporteurs_json})
 
 @csrf_exempt

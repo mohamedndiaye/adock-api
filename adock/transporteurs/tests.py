@@ -68,8 +68,11 @@ class TransporteurTestCase(TestCase):
         self.assertEqual(len(data['results']), 0)
 
     def test_one_result(self):
-        factories.TransporteurFactory(siret='12345678912345')
-        response = self.client.get(self.search_url, {'q': '12345678912345'})
+        siret = '12345678912345'
+        factories.TransporteurFactory(siret=siret)
+        response = self.client.get(self.search_url, {'q': siret})
         data = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data['results']), 1)
+        transporteurs = data['results']
+        self.assertEqual(len(transporteurs), 1)
+        self.assertEqual(transporteurs[0]['siret'], siret)
