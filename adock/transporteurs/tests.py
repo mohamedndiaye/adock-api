@@ -102,7 +102,7 @@ class TransporteurDetailTestCase(TestCase):
         response = self.client.patch(self.detail_url, json.dumps({
             'telephone': NEW_PHONE,
             'email': NEW_EMAIL,
-        }), 'json', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        }), 'application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual(data['email'], NEW_EMAIL)
@@ -112,4 +112,4 @@ class TransporteurDetailTestCase(TestCase):
         response = self.client.patch(self.detail_url, {'foo': 'foo'})
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.content)
-        self.assertEqual(data['message'], 'Seules les requêtes POST en JSON sont prises en charge.')
+        self.assertEqual(data['message'], 'Seules les requêtes PATCH en JSON sont prises en charge.')

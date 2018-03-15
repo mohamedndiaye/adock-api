@@ -68,9 +68,9 @@ def transporteur_detail(request, transporteur_siret):
     # Get existing transporteur if any
     transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
     if request.method == 'PATCH':
-        if not request.is_ajax():
+        if not request.content_type == 'application/json':
             return JsonResponse({
-                'message': 'Seules les requêtes POST en JSON sont prises en charge.'
+                'message': 'Seules les requêtes PATCH en JSON sont prises en charge.'
             }, status=400)
 
         try:
