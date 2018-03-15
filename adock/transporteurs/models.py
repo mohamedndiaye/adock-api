@@ -58,7 +58,8 @@ class Transporteur(models.Model):
     def get_nic(self):
         return self.siret[transporteurs_validators.SIREN_LENGTH:]
 
-    def get_vat_number(self):
+    @property
+    def vat_number(self):
         siren = self.get_siren()
         key = (12 + 3 * (int(siren) % 97)) % 97
         return 'FR%d%s' % (key, siren)

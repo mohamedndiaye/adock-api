@@ -26,7 +26,7 @@ class TransporteurTestCase(TestCase):
 
     def test_vat_number(self):
         transporteur = factories.TransporteurFactory(siret='75001709700015')
-        self.assertEqual(transporteur.get_vat_number(), 'FR18750017097')
+        self.assertEqual(transporteur.vat_number, 'FR18750017097')
 
     def test_get_siren_nic(self):
         transporteur = factories.TransporteurFactory(siret=VALID_SIRET)
