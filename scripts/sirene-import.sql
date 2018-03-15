@@ -160,7 +160,3 @@ create table sirene (
 commit;
 
 create unique index sirene_siret_idx on sirene(siren, nic);
-
--- Too long 'enseigne'
--- select max(char_length(enseigne)) from sirene;
--- The max size is 50
