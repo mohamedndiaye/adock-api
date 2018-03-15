@@ -64,23 +64,25 @@ alter table greco
 ;
 commit;
 
+--- Results to show in a future admin dashboard
+
 -- Not unique SIREN
-with duplicated_siren as
-(
-    select siren, count(siren) from greco group by siren having count(siren) > 1
-)
-select count(*) from duplicated_siren;
+-- with duplicated_siren as
+-- (
+--     select siren, count(siren) from greco group by siren having count(siren) > 1
+-- )
+-- select count(*) from duplicated_siren;
 
 -- Zip code inconsistency with county code
-select siren, code_postal, _numero_departement
-  from greco
- where code_postal::char(2) != _numero_departement::char(2);
+-- select siren, code_postal, _numero_departement
+--   from greco
+--  where code_postal::char(2) != _numero_departement::char(2);
 
 -- Company not active anymore (closed) but still present in GRECO
-select siren
-  from greco
-       left join sirene using(siren)
-  where sirene.siren is null;
+-- select siren
+--   from greco
+--        left join sirene using(siren)
+--   where sirene.siren is null;
 
 --- List of APET700 of companies in GRECO
 -- select apet700
