@@ -4,7 +4,7 @@
 
 begin;
 
-drop table if exists greco;
+drop table if exists greco cascade;
 drop type if exists licence_type;
 
 create table greco (
