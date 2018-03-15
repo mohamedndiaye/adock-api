@@ -8,6 +8,7 @@ drop table if exists greco;
 drop type if exists licence_type;
 
 create table greco (
+    id serial primary key,
     _registre char,
     siren integer,
     raison_sociale text,
@@ -33,7 +34,9 @@ create index greco_siren_idx on greco(siren);
 
 create type licence_type AS ENUM ('LCV', 'LCM', 'LTIM', 'LTIV', '');
 
-\copy greco from 'greco.csv' with csv header delimiter '|' null '';
+-- Don't know how to split this line :(
+\copy greco (_registre, siren, raison_sociale, localisation, code_postal, ville, _numero_departement, telephone, email, inscription_activite, date_dernier_bilan, capitaux_propres, _import_finance, _regime_derogatoire, _motif_derogation, licence, fin_validite, copies_valides, copies_non_valides) from 'greco.csv' with csv header delimiter as '|' null as '';
+
 alter table greco
     drop _registre,
     drop _import_finance,
