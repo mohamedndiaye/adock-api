@@ -107,3 +107,9 @@ class TransporteurDetailTestCase(TestCase):
         data = json.loads(response.content)
         self.assertEqual(data['email'], NEW_EMAIL)
         self.assertEqual(data['telephone'], NEW_PHONE)
+
+    def test_detail_invalid_update(self):
+        response = self.client.post(self.detail_url, {'foo': 'foo'})
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.content)
+        self.assertEqual(data['message'], 'Seules les requêtes POST en JSON sont prises en charge.')

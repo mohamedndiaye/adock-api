@@ -67,6 +67,11 @@ def transporteur_detail(request, transporteur_siret):
     # Get existing transporteur if any
     transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
     if request.method == 'POST':
+        if not request.is_ajax():
+            return JsonResponse({
+                'message': 'Seules les requêtes POST en JSON sont prises en charge.'
+            }, status=400)
+
         try:
             payload = json.loads(request.body.decode('utf-8'))
         except json.decoder.JSONDecodeError:
