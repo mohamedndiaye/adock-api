@@ -1,4 +1,5 @@
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 
 from . import validators as transporteurs_validators
 
@@ -29,7 +30,7 @@ class Transporteur(models.Model):
     # libcom from Sirene
     ville = models.CharField(max_length=32)
     # telephone from GRECO used as default (changed)
-    telephone = models.CharField(max_length=63, blank=True, default='')
+    telephone = PhoneNumberField()
     # mail from GRECO used as default (changed)
     email = models.EmailField(blank=True, default='')
     # dcret from Sirene (inscription_activite from GRECO)

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'phonenumber_field',
     'adock.transporteurs.apps.TransporteursConfig',
     'adock.sirene.apps.SireneConfig',
 ]
@@ -133,6 +134,9 @@ CORS_ALLOW_CREDENTIALS = False
 CORS_ORIGIN_WHITELIST = (
     'adock.beta.gouv.fr',
 )
+
+PHONENUMBER_DB_FORMAT = 'NATIONAL'
+PHONENUMBER_DEFAULT_REGION = 'FR'
 
 USE_DEBUG_CONSOLE = DEBUG
 USE_DJANGO_EXTENSIONS = DEBUG

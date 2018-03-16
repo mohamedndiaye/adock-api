@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import datastructures
@@ -24,7 +25,12 @@ TRANSPORTEUR_DETAIL_FIELDS = (
 def get_transporteur_as_json(transporteur, fields):
     transporteur_json = {}
     for field in fields:
-        transporteur_json[field] = getattr(transporteur, field)
+        if field == 'telephone':
+            # Exception for PhoneNumberField
+            value = '0' + transporteur.telephone.format_as(settings.PHONENUMBER_DEFAULT_REGION)
+        else:
+            value = getattr(transporteur, field)
+        transporteur_json[field] = value
     return transporteur_json
 
 def search(request):

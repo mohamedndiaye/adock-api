@@ -88,13 +88,13 @@ class TransporteurDetailTestCase(TestCase):
         self.detail_url = reverse('transporteurs_detail',
             kwargs={'transporteur_siret': VALID_SIRET})
 
-    def test_detail(self):
+    def test_get(self):
         response = self.client.get(self.detail_url)
         data = json.loads(response.content)
         self.assertEqual(data['siret'], VALID_SIRET)
         self.assertEqual(data['raison_sociale'], self.transporteur.raison_sociale)
 
-    def test_detail_patch(self):
+    def test_patch(self):
         NEW_PHONE = '+33240424546'
         NEW_EMAIL = 'foo@example.com'
         self.assertNotEqual(self.transporteur.telephone, NEW_PHONE)
@@ -105,11 +105,21 @@ class TransporteurDetailTestCase(TestCase):
         }), 'application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
+        self.assertEqual(data['telephone'], '02 40 42 45 46')
         self.assertEqual(data['email'], NEW_EMAIL)
-        self.assertEqual(data['telephone'], NEW_PHONE)
 
-    def test_detail_invalid_update(self):
+    def test_invalid_patch_request(self):
         response = self.client.patch(self.detail_url, {'foo': 'foo'})
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.content)
         self.assertEqual(data['message'], 'Seules les requêtes PATCH en JSON sont prises en charge.')
+
+    def test_invalid_phone(self):
+        response = self.client.patch(self.detail_url, json.dumps({
+            'telephone': '11223344556',
+            'email': self.transporteur.email,
+        }), 'application/json')
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.content)
+        # Wrong French translation will be fixed in django-phonenumber-field > 2.0 (my patch)
+        self.assertEqual(data['telephone'][0], "Entrez un numéro de téléphone valide.")
