@@ -25,7 +25,7 @@ TRANSPORTEUR_DETAIL_FIELDS = (
 def get_transporteur_as_json(transporteur, fields):
     transporteur_json = {}
     for field in fields:
-        if field == 'telephone':
+        if field == 'telephone' and not isinstance(transporteur.telephone, str):
             # Exception for PhoneNumberField
             value = '0' + transporteur.telephone.format_as(settings.PHONENUMBER_DEFAULT_REGION)
         else:

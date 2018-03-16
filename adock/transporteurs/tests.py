@@ -94,6 +94,13 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(data['siret'], VALID_SIRET)
         self.assertEqual(data['raison_sociale'], self.transporteur.raison_sociale)
 
+    def test_get_empty_phone(self):
+        self.transporteur.telephone = ''
+        self.transporteur.save()
+        response = self.client.get(self.detail_url)
+        data = json.loads(response.content)
+        self.assertEqual(data['telephone'], '')
+
     def test_patch(self):
         NEW_PHONE = '+33240424546'
         NEW_EMAIL = 'foo@example.com'
