@@ -1,5 +1,6 @@
 DEBUG = False
 USE_DEBUG_CONSOLE = False
+USE_DJANGO_EXTENSIONS = False
 
 DATABASES = {
     'default': {
@@ -23,7 +24,7 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
-SERVER_NAME = 'foo.example.com'
+SERVER_NAME = 'adock.beta.gouv.fr'
 SERVER_EMAIL = 'no-reply@' + SERVER_NAME
 
 CORS_ORIGIN_WHITELIST = (
