@@ -3,6 +3,7 @@ import json
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from . import factories
 
@@ -130,3 +131,19 @@ class TransporteurDetailTestCase(TestCase):
         data = json.loads(response.content)
         # Wrong French translation will be fixed in django-phonenumber-field > 2.0 (my patch)
         self.assertEqual(data['telephone'][0], "Entrez un numéro de téléphone valide.")
+
+    def test_completeness(self):
+        # The default factory sets telephone and email
+        self.assertEqual(self.transporteur.completeness, 40 + 15 + 15)
+
+        # No telephone
+        self.transporteur.telephone = ''
+        self.assertEqual(self.transporteur.completeness, 40 + 15)
+
+        # email x 2
+        self.transporteur.updated_at = timezone.now()
+        self.assertEqual(self.transporteur.completeness, 40 + 30)
+
+        # Fully defined
+        self.transporteur.telephone = '02 40 41 42 43'
+        self.assertEqual(self.transporteur.completeness, 40 + 60)

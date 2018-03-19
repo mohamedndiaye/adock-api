@@ -49,6 +49,8 @@ class Transporteur(models.Model):
     # working_area_departments = array of zip code
     # type_marchandise = categories from FNTR
     created_at = models.DateTimeField(auto_now_add=True)
+    # Updated when the form is submitted
+    updated_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.siret
@@ -64,3 +66,18 @@ class Transporteur(models.Model):
         siren = self.get_siren()
         key = (12 + 3 * (int(siren) % 97)) % 97
         return 'FR%d%s' % (key, siren)
+
+    @property
+    def completeness(self):
+        PERCENT_MAX = 100
+        PERCENT_MIN = 40
+        EARNED_POINTS_MAX = 4
+
+        earned_points = 0
+        original_fields_weight = 1 if self.updated_at is None else 2
+        if self.telephone:
+            earned_points += original_fields_weight
+        if self.email:
+            earned_points += original_fields_weight
+
+        return PERCENT_MIN + ((PERCENT_MAX - PERCENT_MIN) / EARNED_POINTS_MAX) * earned_points
