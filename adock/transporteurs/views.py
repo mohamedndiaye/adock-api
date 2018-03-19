@@ -11,14 +11,15 @@ from . import forms
 from . import validators
 
 TRANSPORTEUR_LIST_FIELDS = (
-    'siret', 'raison_sociale', 'adresse', 'code_postal', 'ville'
+    'siret', 'raison_sociale', 'adresse', 'code_postal', 'ville',
+    'completeness'
 )
 
 TRANSPORTEUR_DETAIL_FIELDS = (
     'siret', 'raison_sociale', 'adresse', 'code_postal', 'ville',
     'telephone', 'email',
     'debut_activite', 'code_ape', 'libelle_ape',
-    'vat_number',
+    'vat_number', 'completeness',
     'lower_than_3_5_licenses', 'greater_than_3_5_licenses'
 )
 
