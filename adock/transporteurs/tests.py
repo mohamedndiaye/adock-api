@@ -117,6 +117,7 @@ class TransporteurDetailTestCase(TestCase):
         data = json.loads(response.content)
         self.assertEqual(data['telephone'], '02 40 42 45 46')
         self.assertEqual(data['email'], NEW_EMAIL)
+        self.assertEqual(data['completeness'], 100)
 
     def test_invalid_patch_request(self):
         response = self.client.patch(self.detail_url, {'foo': 'foo'})
@@ -140,17 +141,20 @@ class TransporteurDetailTestCase(TestCase):
 
         # No telephone
         self.transporteur.telephone = ''
+        # No save call to not set updated_at field
         self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN + models.EARNED_POINT_VALUE)
 
         # No email
         self.transporteur.email = ''
+        # No save call to not set updated_at field
         self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN)
 
         # Updated email
         self.transporteur.email = 'foo@example.com'
-        self.transporteur.updated_at = timezone.now()
+        self.transporteur.save()
         self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE)
 
         # Fully defined 100%
         self.transporteur.telephone = '02 40 41 42 43'
+        self.transporteur.save()
         self.assertEqual(self.transporteur.completeness, 100)

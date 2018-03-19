@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 
 from . import validators as transporteurs_validators
@@ -86,3 +87,10 @@ class Transporteur(models.Model):
             earned_points += original_fields_weight
 
         return COMPLETENESS_PERCENT_MIN + EARNED_POINT_VALUE * earned_points
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            # Update
+            self.updated_at = timezone.now()
+
+        super().save(*args, **kwargs)
