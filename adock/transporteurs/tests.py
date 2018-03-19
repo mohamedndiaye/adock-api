@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from . import models
 from . import factories
 
 VALID_SIRET = '12345678912345'
@@ -134,16 +135,21 @@ class TransporteurDetailTestCase(TestCase):
 
     def test_completeness(self):
         # The default factory sets telephone and email
-        self.assertEqual(self.transporteur.completeness, 40 + 15 + 15)
+        self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE)
 
         # No telephone
         self.transporteur.telephone = ''
-        self.assertEqual(self.transporteur.completeness, 40 + 15)
+        self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN + models.EARNED_POINT_VALUE)
 
-        # email x 2
+        # No email
+        self.transporteur.email = ''
+        self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN)
+
+        # Updated email
+        self.transporteur.email = 'foo@example.com'
         self.transporteur.updated_at = timezone.now()
-        self.assertEqual(self.transporteur.completeness, 40 + 30)
+        self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE)
 
-        # Fully defined
+        # Fully defined 100%
         self.transporteur.telephone = '02 40 41 42 43'
-        self.assertEqual(self.transporteur.completeness, 40 + 60)
+        self.assertEqual(self.transporteur.completeness, 100)

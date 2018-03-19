@@ -16,6 +16,14 @@ LICENSE_LTIV = 'LTIV'
 #     (LICENSE_LTIV, "Licence de transport intérieur de voyageurs : < 9 places."),
 # )
 
+COMPLETENESS_PERCENT_MAX = 100
+COMPLETENESS_PERCENT_MIN = 40
+
+# Tied to completeness() property
+EARNED_POINTS_MAX = 4
+EARNED_POINT_VALUE = (COMPLETENESS_PERCENT_MAX - COMPLETENESS_PERCENT_MIN) / EARNED_POINTS_MAX
+
+
 class Transporteur(models.Model):
     siret = models.CharField(max_length=transporteurs_validators.SIRET_LENGTH,
         validators=[transporteurs_validators.validate_siret],
@@ -69,10 +77,7 @@ class Transporteur(models.Model):
 
     @property
     def completeness(self):
-        PERCENT_MAX = 100
-        PERCENT_MIN = 40
-        EARNED_POINTS_MAX = 4
-
+        # Take care to adjust EARNED_POINTS_MAX on changes or unit tests will warn you!
         earned_points = 0
         original_fields_weight = 1 if self.updated_at is None else 2
         if self.telephone:
@@ -80,4 +85,4 @@ class Transporteur(models.Model):
         if self.email:
             earned_points += original_fields_weight
 
-        return PERCENT_MIN + ((PERCENT_MAX - PERCENT_MIN) / EARNED_POINTS_MAX) * earned_points
+        return COMPLETENESS_PERCENT_MIN + EARNED_POINT_VALUE * earned_points
