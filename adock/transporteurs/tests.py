@@ -1,5 +1,6 @@
 import json
 
+from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
@@ -107,17 +108,28 @@ class TransporteurDetailTestCase(TestCase):
     def test_patch(self):
         NEW_PHONE = '+33240424546'
         NEW_EMAIL = 'foo@example.com'
+
+        # Initial status
         self.assertNotEqual(self.transporteur.telephone, NEW_PHONE)
         self.assertNotEqual(self.transporteur.email, NEW_EMAIL)
-        response = self.client.patch(self.detail_url, json.dumps({
-            'telephone': NEW_PHONE,
-            'email': NEW_EMAIL,
-        }), 'application/json')
+        self.assertEqual(len(mail.outbox), 0)
+
+        # Apply changes
+        with self.settings(MANAGERS=(("Foo", 'foo@example.com'))):
+            response = self.client.patch(self.detail_url, json.dumps({
+                'telephone': NEW_PHONE,
+                'email': NEW_EMAIL,
+            }), 'application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
+
+        # Side effects
         self.assertEqual(data['telephone'], '02 40 42 45 46')
         self.assertEqual(data['email'], NEW_EMAIL)
         self.assertEqual(data['completeness'], 100)
+        self.assertEqual(len(mail.outbox), 1)
+        message = "[adock] Modification du transporteur %s" % self.transporteur.siret
+        self.assertEqual(mail.outbox[0].subject, message)
 
     def test_invalid_patch_request(self):
         response = self.client.patch(self.detail_url, {'foo': 'foo'})
@@ -151,10 +163,9 @@ class TransporteurDetailTestCase(TestCase):
 
         # Updated email
         self.transporteur.email = 'foo@example.com'
-        self.transporteur.save()
+        self.transporteur.updated_at = timezone.now()
         self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE)
 
         # Fully defined 100%
         self.transporteur.telephone = '02 40 41 42 43'
-        self.transporteur.save()
         self.assertEqual(self.transporteur.completeness, 100)

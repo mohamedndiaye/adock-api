@@ -1,9 +1,10 @@
 import json
 
 from django.conf import settings
+from django.core.mail import mail_managers
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.utils import datastructures
+from django.utils import datastructures, timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from . import models
@@ -90,8 +91,26 @@ def transporteur_detail(request, transporteur_siret):
         form = forms.SubscriptionForm(payload, instance=transporteur)
         if not form.is_valid():
             return JsonResponse(form.errors, status=400)
+
         # Valid
-        transporteur = form.save()
+        transporteur = form.save(commit=False)
+        transporteur.updated_at = timezone.now()
+        transporteur.save()
+
+        # Send a mail to managers to track changes
+        subject = "Modification du transporteur {0}".format(transporteur.siret)
+        message = """
+            Modification du transporteur : {raison_sociale}
+            SIRET : {siret}
+
+            Nouveaux champs :
+            - téléphone « {telephone} »
+            - adresse électronique « {email} »
+        """.format(raison_sociale=transporteur.raison_sociale,
+            siret=transporteur.siret,
+            telephone=transporteur.telephone,
+            email=transporteur.email)
+        mail_managers(subject, message, fail_silently=False)
 
     transporteur_as_json = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
     return JsonResponse(transporteur_as_json)
