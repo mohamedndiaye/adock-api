@@ -4,7 +4,6 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
-from django.utils import timezone
 
 from . import models
 from . import factories
@@ -163,9 +162,10 @@ class TransporteurDetailTestCase(TestCase):
 
         # Updated email
         self.transporteur.email = 'foo@example.com'
-        self.transporteur.updated_at = timezone.now()
+        self.transporteur.save()
         self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE)
 
         # Fully defined 100%
         self.transporteur.telephone = '02 40 41 42 43'
+        self.transporteur.save()
         self.assertEqual(self.transporteur.completeness, 100)
