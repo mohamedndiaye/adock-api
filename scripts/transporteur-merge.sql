@@ -18,7 +18,7 @@ begin;
 -- found in Sirène table.
 -- The second part adds the carrier to our table if it does exist already.
 with filtered_siret as (
-    select s.siren, s.nic, g.telephone, g.email, g.raison_sociale
+    select s.siren, s.nic, g.telephone, g.email, g.raison_sociale, g.localisation
     from greco as g
     join sirene as s
       on s.siren = g.siren and
@@ -27,7 +27,7 @@ with filtered_siret as (
       on t.siret = (s.siren || s.nic)
     where t.siret is null and
           g.localisation like '%' || s.numvoie || ' ' || s.typevoie || ' ' || s.libvoie || '%'
-    group by s.siren, s.nic, g.telephone, g.email, g.raison_sociale
+    group by s.siren, s.nic, g.telephone, g.email, g.raison_sociale, g.localisation
 )
 insert into transporteurs_transporteur
     (siret, raison_sociale, adresse, code_postal, ville,
@@ -36,7 +36,7 @@ insert into transporteurs_transporteur
      lower_than_3_5_licenses, greater_than_3_5_licenses, created_at)
     select fs.siren || fs.nic as siret,
            fs.raison_sociale,
-           s.numvoie || ' ' || s.typevoie || ' ' || s.libvoie as adresse,
+           fs.localisation as adresse,
            s.codpos, s.libcom,
            COALESCE(fs.telephone, '') as telephone,
            COALESCE(fs.email, '') as email,
