@@ -14,6 +14,8 @@ DATABASES = {
     }
 }
 
+STATIC_URL = '/api/static/'
+
 EMAIL_HOST = 'localhost'
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
