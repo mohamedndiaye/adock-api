@@ -5,11 +5,11 @@ USE_DJANGO_EXTENSIONS = False
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': PROJECT,
+        'NAME': PROJECT,  # noqa
         'USER': 'deploy',
         # For logs
         'OPTIONS': {
-            'application_name': PROJECT
+            'application_name': PROJECT  # noqa
         },
     }
 }
