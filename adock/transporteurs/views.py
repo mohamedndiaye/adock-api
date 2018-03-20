@@ -110,7 +110,7 @@ def transporteur_detail(request, transporteur_siret):
             siret=transporteur.siret,
             telephone=transporteur.telephone,
             email=transporteur.email)
-        mail_managers(subject, message, fail_silently=False)
+        mail_managers(subject, message, fail_silently=True)
 
     transporteur_as_json = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
     return JsonResponse(transporteur_as_json)
