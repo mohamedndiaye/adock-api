@@ -54,6 +54,8 @@ class Transporteur(models.Model):
     lower_than_3_5_licenses = models.IntegerField(default=0)
     # Licenses for >3.5 tons
     greater_than_3_5_licenses = models.IntegerField(default=0)
+    # To store computed vat_number
+    numero_tva = models.CharField(max_length=13)
     # working_area (FRANCE or DEPARTEMENT)
     # working_area_departments = array of zip code
     # type_marchandise = categories from FNTR
