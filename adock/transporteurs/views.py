@@ -94,7 +94,7 @@ def transporteur_detail(request, transporteur_siret):
 
         # Valid
         transporteur = form.save(commit=False)
-        transporteur.updated_at = timezone.now()
+        transporteur.validated_at = timezone.now()
         transporteur.save()
 
         # Send a mail to managers to track changes

@@ -59,8 +59,9 @@ class Transporteur(models.Model):
     # working_area_departments = array of zip code
     # type_marchandise = categories from FNTR
     created_at = models.DateTimeField(auto_now_add=True)
-    # Updated when the form is submitted
-    updated_at = models.DateTimeField(blank=True, null=True)
+    # The field is updated when the form is submitted by the user.
+    # It means a user has validated the information.
+    validated_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.siret
@@ -75,7 +76,7 @@ class Transporteur(models.Model):
     def completeness(self):
         # Take care to adjust EARNED_POINTS_MAX on changes or unit tests will warn you!
         earned_points = 0
-        original_fields_weight = 1 if self.updated_at is None else 2
+        original_fields_weight = 1 if self.validated_at is None else 2
         if self.telephone:
             earned_points += original_fields_weight
         if self.email:

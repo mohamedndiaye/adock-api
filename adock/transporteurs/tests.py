@@ -144,7 +144,7 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(data['telephone'][0], "Entrez un numéro de téléphone valide.")
 
     def test_completeness(self):
-        # The default factory sets telephone and email
+        # The default factory sets telephone and email but they aren't validated
         self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE)
 
         # No telephone
@@ -157,7 +157,7 @@ class TransporteurDetailTestCase(TestCase):
 
         # Updated email
         self.transporteur.email = 'foo@example.com'
-        self.transporteur.updated_at = timezone.now()
+        self.transporteur.validated_at = timezone.now()
         self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE)
 
         # Fully defined 100%
