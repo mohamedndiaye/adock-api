@@ -33,7 +33,9 @@ insert into transporteurs_transporteur
     (siret, raison_sociale, adresse, code_postal, ville,
      telephone, email,
      date_creation, debut_activite, code_ape, libelle_ape,
-     lower_than_3_5_licenses, greater_than_3_5_licenses, created_at)
+     lower_than_3_5_licenses, greater_than_3_5_licenses,
+     numero_tva, created_at
+    )
     select fs.siren || fs.nic as siret,
            fs.raison_sociale,
            fs.localisation as adresse,
@@ -44,7 +46,9 @@ insert into transporteurs_transporteur
            to_date(s.ddebact, 'YYYYMMDD'),
            s.apen700,
            s.libapen,
-           0, 0, now()
+           0, 0,
+           'FR' || to_char((12 + 3 * (cast(fs.siren::char(9) as bigint) % 97)) % 97, 'fm00') || fs.siren,
+           now()
     from filtered_siret as fs
     inner join sirene as s
       on s.siren = fs.siren and s.nic = fs.nic
