@@ -73,12 +73,6 @@ class Transporteur(models.Model):
         return self.siret[transporteurs_validators.SIREN_LENGTH:]
 
     @property
-    def vat_number(self):
-        siren = self.get_siren()
-        key = (12 + 3 * (int(siren) % 97)) % 97
-        return 'FR%d%s' % (key, siren)
-
-    @property
     def completeness(self):
         # Take care to adjust EARNED_POINTS_MAX on changes or unit tests will warn you!
         earned_points = 0
