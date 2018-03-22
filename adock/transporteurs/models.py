@@ -62,6 +62,8 @@ class Transporteur(models.Model):
     # The field is updated when the form is submitted by the user.
     # It means a user has validated the information.
     validated_at = models.DateTimeField(blank=True, null=True)
+    # Level of completeness of the carrier profile in percent
+    completeness = models.IntegerField(default=COMPLETENESS_PERCENT_MIN)
 
     def __str__(self):
         return self.siret
@@ -72,8 +74,7 @@ class Transporteur(models.Model):
     def get_nic(self):
         return self.siret[transporteurs_validators.SIREN_LENGTH:]
 
-    @property
-    def completeness(self):
+    def compute_completeness(self):
         # Take care to adjust EARNED_POINTS_MAX on changes or unit tests will warn you!
         earned_points = 0
         original_fields_weight = 1 if self.validated_at is None else 2
@@ -83,3 +84,7 @@ class Transporteur(models.Model):
             earned_points += original_fields_weight
 
         return COMPLETENESS_PERCENT_MIN + EARNED_POINT_VALUE * earned_points
+
+    def save(self, *args, **kwargs):
+        self.completeness = self.compute_completeness()
+        super().save(*args, **kwargs)
