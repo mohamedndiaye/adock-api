@@ -29,6 +29,7 @@ class TransporteurTestCase(TestCase):
 
     def test_get_siren_nic(self):
         transporteur = factories.TransporteurFactory(siret=VALID_SIRET)
+        self.assertEqual(str(transporteur), VALID_SIRET)
         self.assertEqual(transporteur.get_siren(), '123456789')
         self.assertEqual(transporteur.get_nic(), '12345')
 
