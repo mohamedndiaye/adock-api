@@ -66,6 +66,7 @@ def search(request):
             'message': "Le paramètre de recherche n'est pas valide."
         }, status=400)
 
+    transporteurs = transporteurs.order_by('-completeness')
     transporteurs_json = [
         get_transporteur_as_json(transporteur, TRANSPORTEUR_LIST_FIELDS) for transporteur in transporteurs
     ]

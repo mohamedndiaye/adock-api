@@ -80,6 +80,20 @@ class TransporteurSearchTestCase(TestCase):
         self.assertEqual(len(transporteurs), 1)
         self.assertEqual(transporteurs[0]['siret'], VALID_SIRET)
 
+    def test_ordering(self):
+        # Name is set according to the expected ordering
+        t3 = factories.TransporteurFactory(raison_sociale='t3', email='')
+        t4 = factories.TransporteurFactory(raison_sociale='t4', email='', telephone='')
+        t2 = factories.TransporteurFactory(raison_sociale='t2')
+        t1 = factories.TransporteurFactory(raison_sociale='t1', validated_at=timezone.now())
+        response = self.client.get(self.search_url, {'q': 't'})
+        data = json.loads(response.content)
+        self.assertEqual(response.status_code, 200)
+        transporteurs = data['results']
+        self.assertEqual(len(transporteurs), 4)
+        self.assertListEqual(
+            [t['siret'] for t in transporteurs],
+            [t.siret for t in [t1, t2, t3, t4]])
 
 class TransporteurDetailTestCase(TestCase):
     def setUp(self):
