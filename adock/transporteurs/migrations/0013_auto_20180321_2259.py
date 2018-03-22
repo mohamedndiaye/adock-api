@@ -6,7 +6,7 @@ def compute_completeness(apps, schema_editor):
     Transporteur = apps.get_model('transporteurs', 'Transporteur')
 
     # It's not possible to depend on application in a migration...
-    for transporteur in Transporteur.objects.all():
+    for transporteur in Transporteur.objects.all():  # pragma: no cover
         earned_points = 0
         if transporteur.telephone:
             earned_points += 1

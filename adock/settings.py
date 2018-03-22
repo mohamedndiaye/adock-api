@@ -146,7 +146,7 @@ USE_DJANGO_EXTENSIONS = DEBUG
 
 try:
     from .settings_local import *  # noqa
-except ImportError:
+except ImportError:  # pragma: no cover
     pass
 
 LOGGING = {

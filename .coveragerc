@@ -1,0 +1,5 @@
+[run]
+omit =
+    ./adock/wsgi.py
+    ./adock/settings_development.py
+    ./adock/settings_production.py
