@@ -41,41 +41,41 @@ class TransporteurSearchTestCase(TestCase):
     def test_empty_search(self):
         response = self.client.get(self.search_url)
         self.assertEqual(response.status_code, 400)
-        data = json.loads(response.content)
+        data = response.json()
         self.assertTrue('message' in data)
         self.assertEquals(data['message'], "La requête est vide.")
 
     def test_one_invalid_param(self):
         response = self.client.get(self.search_url, {'q': '123'})
         self.assertEqual(response.status_code, 400)
-        data = json.loads(response.content)
+        data = response.json()
         self.assertTrue('message' in data)
         self.assertEquals(data['message'], "Le paramètre de recherche n'est pas valide.")
 
     def test_invalid_siren(self):
         response = self.client.get(self.search_url, {'q': '123'})
         self.assertEqual(response.status_code, 400)
-        data = json.loads(response.content)
+        data = response.json()
         self.assertTrue('message' in data)
         self.assertEquals(data['message'], "Le paramètre de recherche n'est pas valide.")
 
     def test_empty_results_with_siren(self):
         response = self.client.get(self.search_url, {'q': '123456789'})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response.json()
         self.assertEqual(len(data['results']), 0)
 
     def test_empty_results_with_siret(self):
         response = self.client.get(self.search_url, {'q': VALID_SIRET})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response.json()
         self.assertEqual(len(data['results']), 0)
 
-    def test_one_result(self):
+    def test_one_result_with_siret(self):
         factories.TransporteurFactory(siret=VALID_SIRET)
         response = self.client.get(self.search_url, {'q': VALID_SIRET})
-        data = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
+        data = response.json()
         transporteurs = data['results']
         self.assertEqual(len(transporteurs), 1)
         self.assertEqual(transporteurs[0]['siret'], VALID_SIRET)
@@ -87,7 +87,7 @@ class TransporteurSearchTestCase(TestCase):
         t2 = factories.TransporteurFactory(raison_sociale='t2')
         t1 = factories.TransporteurFactory(raison_sociale='t1', validated_at=timezone.now())
         response = self.client.get(self.search_url, {'q': 't'})
-        data = json.loads(response.content)
+        data = response.json()
         self.assertEqual(response.status_code, 200)
         transporteurs = data['results']
         self.assertEqual(len(transporteurs), 4)
@@ -103,7 +103,7 @@ class TransporteurDetailTestCase(TestCase):
 
     def test_get(self):
         response = self.client.get(self.detail_url)
-        data = json.loads(response.content)
+        data = response.json()
         self.assertEqual(data['siret'], VALID_SIRET)
         self.assertEqual(data['raison_sociale'], self.transporteur.raison_sociale)
         self.assertEqual(data['completeness'], models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE)
@@ -112,7 +112,7 @@ class TransporteurDetailTestCase(TestCase):
         self.transporteur.telephone = ''
         self.transporteur.save()
         response = self.client.get(self.detail_url)
-        data = json.loads(response.content)
+        data = response.json()
         self.assertEqual(data['telephone'], '')
 
     def test_patch(self):
@@ -131,7 +131,7 @@ class TransporteurDetailTestCase(TestCase):
                 'email': NEW_EMAIL,
             }), 'application/json')
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response.json()
 
         # Side effects
         self.assertEqual(data['telephone'], '02 40 42 45 46')
@@ -144,7 +144,7 @@ class TransporteurDetailTestCase(TestCase):
     def test_invalid_patch_request(self):
         response = self.client.patch(self.detail_url, {'foo': 'foo'})
         self.assertEqual(response.status_code, 400)
-        data = json.loads(response.content)
+        data = response.json()
         self.assertEqual(data['message'], 'Seules les requêtes PATCH en JSON sont prises en charge.')
 
     def test_invalid_phone(self):
@@ -153,7 +153,7 @@ class TransporteurDetailTestCase(TestCase):
             'email': self.transporteur.email,
         }), 'application/json')
         self.assertEqual(response.status_code, 400)
-        data = json.loads(response.content)
+        data = response.json()
         # Wrong French translation will be fixed in django-phonenumber-field > 2.0 (my patch)
         self.assertEqual(data['telephone'][0], "Entrez un numéro de téléphone valide.")
 
