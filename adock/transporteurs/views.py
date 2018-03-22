@@ -12,8 +12,7 @@ from . import forms
 from . import validators
 
 TRANSPORTEUR_LIST_FIELDS = (
-    'siret', 'raison_sociale', 'adresse', 'code_postal', 'ville',
-    'completeness'
+    'siret', 'raison_sociale', 'adresse', 'code_postal', 'ville', 'completeness'
 )
 
 TRANSPORTEUR_DETAIL_FIELDS = (
@@ -29,7 +28,9 @@ def get_transporteur_as_json(transporteur, fields):
     for field in fields:
         if field == 'telephone' and not isinstance(transporteur.telephone, str):
             # Exception for PhoneNumberField
-            value = '0' + transporteur.telephone.format_as(settings.PHONENUMBER_DEFAULT_REGION)
+            value = '0' + transporteur.telephone.format_as(
+                settings.PHONENUMBER_DEFAULT_REGION
+            )
         else:
             value = getattr(transporteur, field)
         transporteur_json[field] = value
@@ -43,9 +44,7 @@ def search(request):
             message = "La requête est vide."
         else:
             message = "Le paramêtre requis « q » n'a pas été trouvé."
-        return JsonResponse({
-            'message': message
-        }, status=400)
+        return JsonResponse({'message': message}, status=400)
 
     # Allows SIREN instead of SIRET
     q_length = len(q)
@@ -68,7 +67,8 @@ def search(request):
 
     transporteurs = transporteurs.order_by('-completeness')
     transporteurs_json = [
-        get_transporteur_as_json(transporteur, TRANSPORTEUR_LIST_FIELDS) for transporteur in transporteurs
+        get_transporteur_as_json(transporteur, TRANSPORTEUR_LIST_FIELDS)
+        for transporteur in transporteurs
     ]
     return JsonResponse({'results': transporteurs_json})
 
@@ -78,16 +78,18 @@ def transporteur_detail(request, transporteur_siret):
     transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
     if request.method == 'PATCH':
         if not request.content_type == 'application/json':
-            return JsonResponse({
-                'message': 'Seules les requêtes PATCH en JSON sont prises en charge.'
-            }, status=400)
+            return JsonResponse(
+                {'message': 'Seules les requêtes PATCH en JSON sont prises en charge.'},
+                status=400
+            )
 
         try:
             payload = json.loads(request.body.decode('utf-8'))
         except json.decoder.JSONDecodeError:
-            return JsonResponse({
-                'message': "Les données ne sont pas valides.",
-            }, status=400)
+            return JsonResponse(
+                {'message': "Les données ne sont pas valides."},
+                status=400
+            )
 
         form = forms.SubscriptionForm(payload, instance=transporteur)
         if not form.is_valid():
@@ -107,10 +109,12 @@ def transporteur_detail(request, transporteur_siret):
             Nouveaux champs :
             - téléphone « {telephone} »
             - adresse électronique « {email} »
-        """.format(raison_sociale=transporteur.raison_sociale,
+        """.format(
+            raison_sociale=transporteur.raison_sociale,
             siret=transporteur.siret,
             telephone=transporteur.telephone,
-            email=transporteur.email)
+            email=transporteur.email
+        )
         mail_managers(subject, message, fail_silently=True)
 
     transporteur_as_json = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
