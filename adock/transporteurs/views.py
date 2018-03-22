@@ -37,6 +37,7 @@ def get_transporteur_as_json(transporteur, fields):
     return transporteur_json
 
 def search(request):
+    """The search allows partial SIRET or raison sociale"""
     try:
         q = request.GET['q']
     except datastructures.MultiValueDictKeyError:
@@ -46,24 +47,12 @@ def search(request):
             message = "Le paramêtre requis « q » n'a pas été trouvé."
         return JsonResponse({'message': message}, status=400)
 
-    # Allows SIREN instead of SIRET
-    q_length = len(q)
-    if q_length <= 0:
-        return JsonResponse({
-            'message': "Le paramètre de recherche est vide."
-        }, status=400)
-    elif validators.RE_NOT_DIGIT.search(q):
+    stripped_q = q.replace(' ', '')
+    if validators.RE_NOT_DIGIT.search(stripped_q):
         # The search criteria contains at least one not digit character so search on name
         transporteurs = models.Transporteur.objects.filter(raison_sociale__icontains=q)
-    elif q_length == validators.SIREN_LENGTH:
-        transporteurs = models.Transporteur.objects.filter(siret__startswith=q)
-    elif q_length == validators.SIRET_LENGTH:
-        transporteurs = models.Transporteur.objects.filter(siret=q)
     else:
-        # Only digits but not SIREN or SIRET
-        return JsonResponse({
-            'message': "Le paramètre de recherche n'est pas valide."
-        }, status=400)
+        transporteurs = models.Transporteur.objects.filter(siret__startswith=stripped_q)
 
     transporteurs = transporteurs.order_by('-completeness')
     transporteurs_json = [

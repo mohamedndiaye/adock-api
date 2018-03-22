@@ -46,18 +46,14 @@ class TransporteurSearchTestCase(TestCase):
         self.assertEquals(data['message'], "La requête est vide.")
 
     def test_one_invalid_param(self):
-        response = self.client.get(self.search_url, {'q': '123'})
+        response = self.client.get(self.search_url, {'wrong': VALID_SIRET})
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertTrue('message' in data)
-        self.assertEquals(data['message'], "Le paramètre de recherche n'est pas valide.")
-
-    def test_invalid_siren(self):
-        response = self.client.get(self.search_url, {'q': '123'})
-        self.assertEqual(response.status_code, 400)
-        data = response.json()
-        self.assertTrue('message' in data)
-        self.assertEquals(data['message'], "Le paramètre de recherche n'est pas valide.")
+        self.assertEquals(
+            data['message'],
+            "Le paramêtre requis « q » n'a pas été trouvé."
+        )
 
     def test_empty_results_with_siren(self):
         response = self.client.get(self.search_url, {'q': '123456789'})
@@ -71,16 +67,26 @@ class TransporteurSearchTestCase(TestCase):
         data = response.json()
         self.assertEqual(len(data['results']), 0)
 
-    def test_one_result_with_siret(self):
+    def test_search_with_siret(self):
         factories.TransporteurFactory(siret=VALID_SIRET)
         response = self.client.get(self.search_url, {'q': VALID_SIRET})
         self.assertEqual(response.status_code, 200)
-        data = response.json()
-        transporteurs = data['results']
+        transporteurs = response.json()['results']
         self.assertEqual(len(transporteurs), 1)
         self.assertEqual(transporteurs[0]['siret'], VALID_SIRET)
 
-    def test_ordering(self):
+    def test_search_with_spaced_siret(self):
+        # Search on SIRET with spaces
+        factories.TransporteurFactory(siret=VALID_SIRET)
+        response = self.client.get(
+            self.search_url,
+            {'q': ' ' + VALID_SIRET[0:4] + ' ' + VALID_SIRET[4:]}
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data['results']), 1)
+
+    def test_search_ordering(self):
         # Name is set according to the expected ordering
         t3 = factories.TransporteurFactory(raison_sociale='t3', email='')
         t4 = factories.TransporteurFactory(raison_sociale='t4', email='', telephone='')
