@@ -14,10 +14,10 @@ def validate_administrative_number(value, length, name):
             params={'value': value, 'name': name},
         )
 
-def validate_siren(value):
+def validate_siren(value):  # pragma: no cover - used in migration
     validate_administrative_number(value, SIREN_LENGTH, 'SIREN')
 
-def validate_nic(value):
+def validate_nic(value):  # pragma: no cover - used in migration
     validate_administrative_number(value, NIC_LENGTH, 'NIC')
 
 def validate_siret(value):
