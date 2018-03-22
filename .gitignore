@@ -1,8 +1,10 @@
 __pycache__/
 _build/
 *.pyc
+/.coverage
 /.pytest_cache/
 /.vscode/
+/htmlcov/
 /media/
 /static/
 *.csv
