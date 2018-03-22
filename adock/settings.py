@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'phonenumber_field',
     'adock.transporteurs.apps.TransporteursConfig',
-    'adock.sirene.apps.SireneConfig',
 ]
 
 MIDDLEWARE = [
