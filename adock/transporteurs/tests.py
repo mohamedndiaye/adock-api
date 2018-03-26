@@ -114,6 +114,8 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(data['siret'], VALID_SIRET)
         self.assertEqual(data['raison_sociale'], self.transporteur.raison_sociale)
         self.assertEqual(data['completeness'], models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE)
+        self.assertEqual(data['working_area'], 'DEPARTEMENT')
+        self.assertEqual(data['working_area_departements'], [35, 44])
 
     def test_get_empty_phone(self):
         self.transporteur.telephone = ''

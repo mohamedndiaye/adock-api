@@ -21,3 +21,5 @@ class TransporteurFactory(factory.django.DjangoModelFactory):
     debut_activite = factory.LazyAttribute(lambda o: o.date_creation)
     code_ape = '4941A'
     libelle_ape = 'Transports routiers de fret interurbains'
+    working_area = models.WORKING_AREA_DEPARTEMENT
+    working_area_departements = [35, 44]

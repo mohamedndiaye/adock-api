@@ -20,7 +20,8 @@ TRANSPORTEUR_DETAIL_FIELDS = (
     'telephone', 'email',
     'debut_activite', 'code_ape', 'libelle_ape',
     'numero_tva', 'completeness',
-    'lower_than_3_5_licenses', 'greater_than_3_5_licenses'
+    'lower_than_3_5_licenses', 'greater_than_3_5_licenses',
+    'working_area', 'working_area_departements'
 )
 
 def get_transporteur_as_json(transporteur, fields):
