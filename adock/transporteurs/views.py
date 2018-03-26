@@ -99,11 +99,13 @@ def transporteur_detail(request, transporteur_siret):
             Nouveaux champs :
             - téléphone « {telephone} »
             - adresse électronique « {email} »
+            - zone de travail « {working_area} »
         """.format(
             raison_sociale=transporteur.raison_sociale,
             siret=transporteur.siret,
             telephone=transporteur.telephone,
-            email=transporteur.email
+            email=transporteur.email,
+            working_area=transporteur.working_area,
         )
         mail_managers(subject, message, fail_silently=True)
 
