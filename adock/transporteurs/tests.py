@@ -147,7 +147,8 @@ class TransporteurDetailTestCase(TestCase):
             response = self.client.patch(self.detail_url, json.dumps({
                 'telephone': NEW_PHONE,
                 'email': NEW_EMAIL,
-                'working_area': models.WORKING_AREA_FRANCE,
+                'working_area': models.WORKING_AREA_DEPARTEMENT,
+                'working_area_departements': '23 45 ,,,67',
             }), 'application/json')
         self.assertEqual(response.status_code, 200)
         data = response.json()
@@ -155,7 +156,8 @@ class TransporteurDetailTestCase(TestCase):
         # Side effects
         self.assertEqual(data['telephone'], '02 40 42 45 46')
         self.assertEqual(data['email'], NEW_EMAIL)
-        self.assertEqual(data['working_area'], models.WORKING_AREA_FRANCE)
+        self.assertEqual(data['working_area'], models.WORKING_AREA_DEPARTEMENT)
+        self.assertListEqual(data['working_area_departements'], [23, 45, 67])
         self.assertEqual(data['completeness'], 100)
         self.assertEqual(len(mail.outbox), 2)
         message = "[adock] Modification du transporteur %s" % self.transporteur.siret

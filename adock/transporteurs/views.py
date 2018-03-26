@@ -1,4 +1,5 @@
 import json
+import re
 
 from django.conf import settings
 from django.core.mail import mail_managers
@@ -62,6 +63,9 @@ def search(request):
     ]
     return JsonResponse({'results': transporteurs_json})
 
+
+RE_MANY_COMMAS = re.compile(r',+')
+
 @csrf_exempt
 def transporteur_detail(request, transporteur_siret):
     # Get existing transporteur if any
@@ -81,6 +85,11 @@ def transporteur_detail(request, transporteur_siret):
                 status=400
             )
 
+        # Replace all non digits by ',' and avoid duplicates ','
+        cleaned_departements = payload.get('working_area_departements')
+        if cleaned_departements:
+            cleaned_departements = cleaned_departements.replace(' ', ',')
+            payload['working_area_departements'] = RE_MANY_COMMAS.sub(',', cleaned_departements)
         form = forms.SubscriptionForm(payload, instance=transporteur)
         if not form.is_valid():
             return JsonResponse(form.errors, status=400)
@@ -100,12 +109,14 @@ def transporteur_detail(request, transporteur_siret):
             - téléphone « {telephone} »
             - adresse électronique « {email} »
             - zone de travail « {working_area} »
+            - départements livrés « {working_area_departements} »
         """.format(
             raison_sociale=transporteur.raison_sociale,
             siret=transporteur.siret,
             telephone=transporteur.telephone,
             email=transporteur.email,
-            working_area=transporteur.working_area,
+            working_area=transporteur.get_working_area_display(),
+            working_area_departements=transporteur.working_area_departements
         )
         mail_managers(subject, message, fail_silently=True)
 
