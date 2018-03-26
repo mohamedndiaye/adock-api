@@ -133,7 +133,7 @@ class TransporteurDetailTestCase(TestCase):
         self.assertNotEqual(self.transporteur.email, NEW_EMAIL)
         self.assertEqual(len(mail.outbox), 0)
 
-        # Apply changes
+        # Apply changes w/o working area
         with self.settings(MANAGERS=(("Foo", 'foo@example.com'))):
             response = self.client.patch(self.detail_url, json.dumps({
                 'telephone': NEW_PHONE,
@@ -142,11 +142,22 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
+        # Apply changes with working area
+        with self.settings(MANAGERS=(("Foo", 'foo@example.com'))):
+            response = self.client.patch(self.detail_url, json.dumps({
+                'telephone': NEW_PHONE,
+                'email': NEW_EMAIL,
+                'working_area': models.WORKING_AREA_FRANCE,
+            }), 'application/json')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+
         # Side effects
         self.assertEqual(data['telephone'], '02 40 42 45 46')
         self.assertEqual(data['email'], NEW_EMAIL)
+        self.assertEqual(data['working_area'], models.WORKING_AREA_FRANCE)
         self.assertEqual(data['completeness'], 100)
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 2)
         message = "[adock] Modification du transporteur %s" % self.transporteur.siret
         self.assertEqual(mail.outbox[0].subject, message)
 
