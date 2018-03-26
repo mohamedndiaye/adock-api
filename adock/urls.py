@@ -15,6 +15,9 @@ Including another URLconf
 """
 from django.urls import include, path
 
+from adock.meta import views as meta_views
+
 urlpatterns = [
     path('transporteurs/', include('adock.transporteurs.urls')),
+    path('meta/', meta_views.meta_index, name='meta')
 ]
