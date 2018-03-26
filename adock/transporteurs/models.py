@@ -1,4 +1,6 @@
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
+
 from phonenumber_field.modelfields import PhoneNumberField
 
 from . import validators as transporteurs_validators
@@ -23,6 +25,14 @@ COMPLETENESS_PERCENT_MIN = 40
 EARNED_POINTS_MAX = 4
 EARNED_POINT_VALUE = (COMPLETENESS_PERCENT_MAX - COMPLETENESS_PERCENT_MIN) / EARNED_POINTS_MAX
 
+WORKING_AREA_UNDEFINED = ''
+WORKING_AREA_FRANCE = 'FRANCE'
+WORKING_AREA_DEPARTEMENT = 'DEPARTEMENT'
+WORKING_AREA_CHOICES = (
+    (WORKING_AREA_UNDEFINED, 'Non définie'),
+    (WORKING_AREA_FRANCE, 'France'),
+    (WORKING_AREA_DEPARTEMENT, 'Départementale')
+)
 
 class Transporteur(models.Model):
     siret = models.CharField(max_length=transporteurs_validators.SIRET_LENGTH,
@@ -55,8 +65,9 @@ class Transporteur(models.Model):
     greater_than_3_5_licenses = models.IntegerField(default=0)
     # To store computed vat_number
     numero_tva = models.CharField(max_length=13)
-    # working_area (FRANCE or DEPARTEMENT)
-    # working_area_departments = array of zip code
+    working_area = models.CharField(max_length=12, choices=WORKING_AREA_CHOICES, default=WORKING_AREA_UNDEFINED)
+    # This field is used when working_area is set to WORKING_AREA_DEPARTEMENT
+    working_area_departements = ArrayField(models.IntegerField(), blank=True, null=True)
     # type_marchandise = categories from FNTR
     created_at = models.DateTimeField(auto_now_add=True)
     # The field is updated when the form is submitted by the user.
