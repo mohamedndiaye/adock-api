@@ -51,7 +51,7 @@ class Transporteur(models.Model):
     libelle_ape = models.CharField(max_length=65)
     # Name of the transport manager
     gestionnaire = models.CharField(max_length=131)
-    # LTI Licence de transport intérieur => -  de 3,5 tonnes
+    # LTI Licence de transport intérieur => - de 3,5 tonnes
     # LTIM and LCM in GRECO
     # LTI 'YYYY RR NNNNNNNN', YYYY year, RR region, number starting to one of current year
     lti_numero = models.CharField(max_length=16, blank=True, default='')
