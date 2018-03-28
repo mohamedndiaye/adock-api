@@ -21,7 +21,8 @@ TRANSPORTEUR_DETAIL_FIELDS = (
     'telephone', 'email',
     'debut_activite', 'code_ape', 'libelle_ape',
     'numero_tva', 'completeness',
-    'lower_than_3_5_licenses', 'greater_than_3_5_licenses',
+    'lti_numero', 'lti_date_debut', 'lti_date_fin', 'lti_nombre',
+    'lc_numero', 'lc_date_debut', 'lc_date_fin', 'lc_nombre',
     'working_area', 'working_area_departements'
 )
 

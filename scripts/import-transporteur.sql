@@ -10,7 +10,6 @@ insert into transporteur
      lti_numero, lti_date_debut, lti_date_fin, lti_nombre,
      lc_numero, lc_date_debut, lc_date_fin, lc_nombre,
      working_area, completeness,
-     lower_than_3_5_licenses, greater_than_3_5_licenses,
      numero_tva, created_at
     )
     select m.siret,
@@ -37,7 +36,6 @@ insert into transporteur
            m.date_fin_validite_lc,
            m.nombre_de_copies_lc_valides,
            '', 40,
-           0, 0,
            'FR' || to_char((12 + 3 * (cast(s.siren::char(9) as bigint) % 97)) % 97, 'fm00') || s.siren,
            now()
     from marchandise as m

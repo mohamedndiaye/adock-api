@@ -63,10 +63,6 @@ class Transporteur(models.Model):
     lc_date_debut = models.DateField(blank=True, null=True)
     lc_date_fin = models.DateField(blank=True, null=True)
     lc_nombre = models.PositiveSmallIntegerField(default=0)
-    # Licenses for <3.5 tons
-    lower_than_3_5_licenses = models.PositiveSmallIntegerField(default=0)
-    # Licenses for >3.5 tons
-    greater_than_3_5_licenses = models.PositiveSmallIntegerField(default=0)
     # To store computed vat_number
     numero_tva = models.CharField(max_length=13)
     working_area = models.CharField(max_length=12, choices=WORKING_AREA_CHOICES, blank=True, default=WORKING_AREA_UNDEFINED)
