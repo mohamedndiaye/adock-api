@@ -1,13 +1,13 @@
 begin;
 
 -- Reset the values before the update
-update transporteurs_transporteur
+update transporteur
    set lower_than_3_5_licenses = 0,
        greater_than_3_5_licenses = 0;
 
 -- Update the current number of licenses for merchandise (travelers are excluded)
 -- Fast but a seq scan is used (create partial index?)
-update transporteurs_transporteur as t
+update transporteur as t
    set lower_than_3_5_licenses = case when g.licence = 'LCM'
                                       then g.copies_valides
                                       else lower_than_3_5_licenses

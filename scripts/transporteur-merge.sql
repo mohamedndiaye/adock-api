@@ -7,7 +7,7 @@ begin;
 --
 -- To find inconsistencies:
 --    select siret::char(9) as siren
---      from transporteurs_transporteur
+--      from transporteur
 --     group by siren
 --       having count(*) > 1;
 --
@@ -23,13 +23,13 @@ with filtered_siret as (
     join sirene as s
       on s.siren = g.siren and
          s.libcom = g.ville
-    left join transporteurs_transporteur as t
+    left join transporteur as t
       on t.siret = (s.siren || s.nic)
     where t.siret is null and
           g.localisation like '%' || s.numvoie || ' ' || s.typevoie || ' ' || s.libvoie || '%'
     group by s.siren, s.nic, g.telephone, g.email, g.raison_sociale, g.localisation
 )
-insert into transporteurs_transporteur
+insert into transporteur
     (siret, raison_sociale, adresse, code_postal, ville,
      telephone, email,
      date_creation, debut_activite, code_ape, libelle_ape,
@@ -52,7 +52,7 @@ insert into transporteurs_transporteur
     from filtered_siret as fs
     inner join sirene as s
       on s.siren = fs.siren and s.nic = fs.nic
-    left join transporteurs_transporteur as t
+    left join transporteur as t
       on t.siret = (fs.siren || fs.nic)
     where t.siret is null
 ;

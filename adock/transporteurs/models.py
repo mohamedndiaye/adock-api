@@ -76,6 +76,9 @@ class Transporteur(models.Model):
     # Level of completeness of the carrier profile in percent
     completeness = models.IntegerField(default=COMPLETENESS_PERCENT_MIN)
 
+    class Meta:
+        db_table = 'transporteur'
+
     def __str__(self):
         return self.siret
 

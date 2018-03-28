@@ -3,7 +3,7 @@
 from django.db import migrations
 
 query = """
-    UPDATE transporteurs_transporteur
+    UPDATE transporteur
        SET numero_tva = 'FR' || TO_CHAR((12 + 3 * (CAST(siret::CHAR(9) as bigint) % 97)) % 97, 'fm00') || siret::CHAR(9)
 """
 
