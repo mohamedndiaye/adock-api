@@ -1,6 +1,5 @@
 -- The CSV file should be UTF-8
 -- The header contains an invalid character to delete before import.
--- psql -d adock -f greco-import.sql
 
 begin;
 

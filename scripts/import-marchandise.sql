@@ -21,11 +21,11 @@ create table marchandise (
     numero_lti varchar(16),
     date_debut_validite_lti text,
     date_fin_validite_lti text,
-    nombre_de_copis_lti_valides text,
+    nombre_de_copies_lti_valides text,
     numero_lc varchar(16),
     date_debut_validite_lc text,
     date_fin_validite_lc text,
-    nombre_de_copis_lc_valides text
+    nombre_de_copies_lc_valides text
 );
 
 \copy marchandise from 'Marchandises.csv' with csv header delimiter as ',' null as '' quote '"';
