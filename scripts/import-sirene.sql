@@ -157,6 +157,10 @@ create table sirene (
 );
 
 \copy sirene FROM 'sirene.csv' with csv header delimiter ';' null '' encoding 'ISO-8859-1';
-commit;
 
-create unique index sirene_siret_idx on sirene(siren, nic);
+alter table sirene add siret char(14);
+alter table sirene alter siret set not null using siren || nic;
+
+create unique index sirene_siret_idx on sirene(siret);
+
+commit;
