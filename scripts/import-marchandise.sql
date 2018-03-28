@@ -41,19 +41,27 @@ alter table marchandise
 
     alter date_debut_validite_lti
      type date
-    using to_date(date_debut_validite_lti, 'DD/MM/YYYY')::date,
+    using case date_debut_validite_lti when '' then null else to_date(date_debut_validite_lti, 'DD/MM/YY')::date end,
 
     alter date_fin_validite_lti
      type date
-    using to_date(date_fin_validite_lti, 'DD/MM/YYYY')::date,
+    using case date_fin_validite_lti when '' then null else to_date(date_fin_validite_lti, 'DD/MM/YY')::date end,
 
     alter date_debut_validite_lc
      type date
-    using to_date(date_debut_validite_lc, 'DD/MM/YYYY')::date,
+    using case date_debut_validite_lc when '' then null else to_date(date_debut_validite_lc, 'DD/MM/YY')::date end,
 
     alter date_fin_validite_lc
      type date
-    using to_date(date_fin_validite_lc, 'DD/MM/YYYY')::date
+    using case date_fin_validite_lc when '' then null else to_date(date_fin_validite_lc, 'DD/MM/YY')::date end,
+
+    alter nombre_de_copies_lti_valides
+     type integer
+    using cast(nombre_de_copies_lti_valides as integer),
+
+    alter nombre_de_copies_lc_valides
+     type integer
+    using cast(nombre_de_copies_lc_valides as integer)
 ;
 
 create index marchandise_siret_idx on marchandise(siret);
