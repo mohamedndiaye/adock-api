@@ -5,19 +5,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from . import validators as transporteurs_validators
 
-LICENCE_LCM = 'LCM'
-LICENCE_LTIM = 'LTIM'
-LICENCE_LCV = 'LCV'
-LICENSE_LTIV = 'LTIV'
-
-# LICENSE_CHOICES = (
-#     (LICENCE_LCM, "Licence communautaire marchandise, camion > 3,5 tonnes"),
-#     (LICENCE_LTIM, "Licence de transport intérieur de marchandise : VUL < 3,5 tonnes"),
-#     # Not used
-#     (LICENCE_LCV, "Licence communautaire voyageurs, car > 9 places"),
-#     (LICENSE_LTIV, "Licence de transport intérieur de voyageurs : < 9 places."),
-# )
-
 COMPLETENESS_PERCENT_MAX = 100
 COMPLETENESS_PERCENT_MIN = 40
 
@@ -38,14 +25,17 @@ class Transporteur(models.Model):
     siret = models.CharField(max_length=transporteurs_validators.SIRET_LENGTH,
         validators=[transporteurs_validators.validate_siret],
         db_index=True, unique=True, editable=False)
-    # nomen_long from Sirene (raison_sociale in GRECO)
+    # nomen_long from Sirene (raison_sociale in Marchandise)
     raison_sociale = models.CharField(max_length=131)
+    # from Marchandise
+    categorie_juridique = models.TextField()
+    # This company is the siege social
+    is_siege = models.BooleanField(default=False)
     # numvoie, typevoie, libvoie from Sirene
-    # (localisation in GRECO)
     adresse = models.CharField(max_length=126)
-    # codpos from Sirene (code_postal in GRECO)
+    # codpos from Sirene (code_postal in Marchandise)
     code_postal = models.CharField(max_length=5)
-    # libcom from Sirene
+    # libcom from Sirene (commune in Marchandise)
     ville = models.CharField(max_length=32)
     # telephone from GRECO used as default (changed)
     telephone = PhoneNumberField()
@@ -59,10 +49,24 @@ class Transporteur(models.Model):
     code_ape = models.CharField(max_length=5)
     # libapen from Sirene
     libelle_ape = models.CharField(max_length=65)
+    # Name of the transport manager
+    gestionnaire = models.CharField(max_length=131)
+    # LTI Licence de transport intérieur => -  de 3,5 tonnes
+    # LTIM and LCM in GRECO
+    # LTI 'YYYY RR NNNNNNNN', YYYY year, RR region, number starting to one of current year
+    lti_numero = models.CharField(max_length=16, blank=True, default='')
+    lti_date_debut = models.DateField(blank=True, null=True)
+    lti_date_fin = models.DateField(blank=True, null=True)
+    lti_nombre = models.PositiveSmallIntegerField(default=0)
+    # LC Licence communautaire => + de 3,5 tonnes
+    lc_numero = models.CharField(max_length=16, blank=True, default='')
+    lc_date_debut = models.DateField(blank=True, null=True)
+    lc_date_fin = models.DateField(blank=True, null=True)
+    lc_nombre = models.PositiveSmallIntegerField(default=0)
     # Licenses for <3.5 tons
-    lower_than_3_5_licenses = models.IntegerField(default=0)
+    lower_than_3_5_licenses = models.PositiveSmallIntegerField(default=0)
     # Licenses for >3.5 tons
-    greater_than_3_5_licenses = models.IntegerField(default=0)
+    greater_than_3_5_licenses = models.PositiveSmallIntegerField(default=0)
     # To store computed vat_number
     numero_tva = models.CharField(max_length=13)
     working_area = models.CharField(max_length=12, choices=WORKING_AREA_CHOICES, blank=True, default=WORKING_AREA_UNDEFINED)
@@ -74,7 +78,7 @@ class Transporteur(models.Model):
     # It means a user has validated the information.
     validated_at = models.DateTimeField(blank=True, null=True)
     # Level of completeness of the carrier profile in percent
-    completeness = models.IntegerField(default=COMPLETENESS_PERCENT_MIN)
+    completeness = models.PositiveSmallIntegerField(default=COMPLETENESS_PERCENT_MIN)
 
     class Meta:
         db_table = 'transporteur'
