@@ -158,8 +158,16 @@ create table sirene (
 
 \copy sirene FROM 'sirene.csv' with csv header delimiter ';' null '' encoding 'ISO-8859-1';
 
-alter table sirene add siret char(14);
-alter table sirene alter siret set not null using siren || nic;
+alter table sirene
+    add siret char(14);
+
+alter table sirene
+    alter siret
+    type char(14)
+    using siren || nic,
+
+    alter siret
+    set not null;
 
 create unique index sirene_siret_idx on sirene(siret);
 
