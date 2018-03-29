@@ -2,7 +2,7 @@ import json
 
 from django.core import mail
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -94,13 +94,21 @@ class TransporteurSearchTestCase(TestCase):
         t2 = factories.TransporteurFactory(raison_sociale='t2')
         t1 = factories.TransporteurFactory(raison_sociale='t1', validated_at=timezone.now())
         response = self.client.get(self.search_url, {'q': 't'})
-        data = response.json()
         self.assertEqual(response.status_code, 200)
+        data = response.json()
         transporteurs = data['results']
         self.assertEqual(len(transporteurs), 4)
         self.assertListEqual(
             [t['siret'] for t in transporteurs],
             [t.siret for t in [t1, t2, t3, t4]])
+
+    @override_settings(TRANSPORTEURS_LIMIT=2)
+    def test_too_many_resultts(self):
+        factories.TransporteurFactory.create_batch(3, raison_sociale='Foo')
+        response = self.client.get(self.search_url, {'q': 'Foo'})
+        data = response.json()
+        self.assertEqual(data['limit'], 2)
+        self.assertEqual(len(data['results']), 2)
 
 class TransporteurDetailTestCase(TestCase):
     def setUp(self):

@@ -57,12 +57,17 @@ def search(request):
     else:
         transporteurs = models.Transporteur.objects.filter(siret__startswith=stripped_q)
 
-    transporteurs = transporteurs.order_by('-completeness')
+    transporteurs = transporteurs.order_by('-completeness')[:settings.TRANSPORTEURS_LIMIT]
     transporteurs_json = [
         get_transporteur_as_json(transporteur, TRANSPORTEUR_LIST_FIELDS)
         for transporteur in transporteurs
     ]
-    return JsonResponse({'results': transporteurs_json})
+    payload = {
+        'results': transporteurs_json
+    }
+    if len(transporteurs_json) == settings.TRANSPORTEURS_LIMIT:
+        payload['limit'] = settings.TRANSPORTEURS_LIMIT
+    return JsonResponse(payload)
 
 
 RE_MANY_COMMAS = re.compile(r',+')
