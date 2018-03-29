@@ -169,6 +169,7 @@ alter table sirene
     alter siret
     set not null;
 
+create index sirene_siren_idx on sirene(siren);
 create unique index sirene_siret_idx on sirene(siret);
 
 commit;
