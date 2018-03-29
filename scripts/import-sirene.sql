@@ -156,7 +156,7 @@ create table sirene (
     datemaj varchar(19)
 );
 
-\copy sirene FROM 'sirene.csv' with csv header delimiter ';' null '' encoding 'ISO-8859-1';
+\copy sirene FROM 'csv/sirene.csv' with csv header delimiter ';' null '' encoding 'ISO-8859-1';
 
 alter table sirene
     add siret char(14);

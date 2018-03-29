@@ -28,7 +28,7 @@ create table marchandise (
     nombre_de_copies_lc_valides text
 );
 
-\copy marchandise from 'Marchandises.csv' with csv header delimiter as ',' null as '' quote '"';
+\copy marchandise from 'csv/Marchandises.csv' with csv header delimiter as ',' null as '' quote '"';
 
 alter table marchandise
     drop _situation,

@@ -1,5 +1,6 @@
 #!/bin/sh
 
+output=csv/greco.csv
 files=(
     Auvergne_Rhone_Alpes.csv
     Bourgogne_franche_comte.csv
@@ -21,16 +22,16 @@ files=(
 #LC_ALL=C sed -e 's/|.$//' < idf.csv > idf-fixed.csv
 
 # Replace bad original header :(
-echo '"Registre"|"No siren ou provisoire"|"Raison sociale"|"Localisation"|"Code postal"|"Ville"|"Dept"|"Telephone"|"Mail"|"Inscription activite"|"Date dernier bilan"|"Capitaux propres"|"Import finance (oui/non)"|"Regime derogatoire"|"Motif derogation"|"Type licence"|"Date fin validite"|"Copies valides"|"Copies non valides"' > greco.csv
+echo '"Registre"|"No siren ou provisoire"|"Raison sociale"|"Localisation"|"Code postal"|"Ville"|"Dept"|"Telephone"|"Mail"|"Inscription activite"|"Date dernier bilan"|"Capitaux propres"|"Import finance (oui/non)"|"Regime derogatoire"|"Motif derogation"|"Type licence"|"Date fin validite"|"Copies valides"|"Copies non valides"' > $output
 
-rm greco.csv
+rm $output
 for f in ${files[@]}; do
     # Remove each header and concat
-    sed -e "1d" $f >> greco.csv
+    sed -e "1d" csv/$f >> $output
 done
 
-dos2unix greco.csv
-iconv --from-code=ISO-8859-1 --to-code=UTF-8 < greco.csv > tmp
-mv tmp greco.csv
+dos2unix $output
+iconv --from-code=ISO-8859-1 --to-code=UTF-8 < $output > tmp
+mv tmp $output
 
 exit 0
