@@ -7,7 +7,7 @@ import string
 from . import models
 from . import validators
 
-def get_license_number(o, n):
+def get_lti_number(o, n):
     keys = ['82', '84', '93']
     return "{} {} {:0>8}".format(
         o.lti_date_debut.year,
@@ -34,7 +34,7 @@ class TransporteurFactory(factory.django.DjangoModelFactory):
     gestionnaire = factory.Faker('name')
     working_area = models.WORKING_AREA_DEPARTEMENT
     working_area_departements = [35, 44]
-    lti_numero = factory.LazyAttributeSequence(get_license_number)
+    lti_numero = factory.LazyAttributeSequence(get_lti_number)
     lti_date_debut = fuzzy.FuzzyDate(datetime.date(2015, 1, 1))
     lti_date_fin = factory.LazyAttribute(
         lambda o: o.lti_date_debut + datetime.timedelta(days=6*364))
