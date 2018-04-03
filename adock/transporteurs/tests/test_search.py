@@ -19,6 +19,7 @@ class TransporteurSearchTestCase(TestCase):
 
 
 class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
+
     def test_empty_search(self):
         response = self.client.get(self.search_url)
         self.assertEqual(response.status_code, 400)
