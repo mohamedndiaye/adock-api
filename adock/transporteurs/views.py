@@ -40,7 +40,10 @@ def get_transporteur_as_json(transporteur, fields):
     return transporteur_json
 
 def search(request):
-    """The search allows partial SIRET or raison sociale"""
+    """The search allows to filter on:
+       - partial raison sociale or SIRET
+       - type of the license (LC heavy or LTI light)
+    """
     try:
         q = request.GET['q']
     except datastructures.MultiValueDictKeyError:
@@ -50,12 +53,21 @@ def search(request):
             message = "Le paramêtre requis « q » n'a pas été trouvé."
         return JsonResponse({'message': message}, status=400)
 
+    # Filtering on raison sociale or SIRET
     stripped_q = q.replace(' ', '')
     if validators.RE_NOT_DIGIT.search(stripped_q):
         # The search criteria contains at least one not digit character so search on name
         transporteurs = models.Transporteur.objects.filter(raison_sociale__icontains=q)
     else:
         transporteurs = models.Transporteur.objects.filter(siret__startswith=stripped_q)
+
+    # Filtering on type of license
+    license_types = request.GET.getlist('licencetypes[]')
+    for license_type in license_types:
+        if license_type == 'lc':
+            transporteurs = transporteurs.exclude(lc_numero='')
+        elif license_type == 'lti':
+            transporteurs = transporteurs.exclude(lti_numero='')
 
     transporteurs = transporteurs.order_by('-completeness')[:settings.TRANSPORTEURS_LIMIT]
     transporteurs_json = [

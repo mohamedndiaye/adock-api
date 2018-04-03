@@ -110,6 +110,39 @@ class TransporteurSearchTestCase(TestCase):
         self.assertEqual(data['limit'], 2)
         self.assertEqual(len(data['results']), 2)
 
+    def test_search_license_type(self):
+        # No licenses is impossible in pratice
+        factories.TransporteurFactory(lti_numero='', lc_numero='')
+        lti_only = factories.TransporteurFactory(lti_numero='2018 84 0000393', lc_numero='')
+        lc_only = factories.TransporteurFactory(lti_numero='', lc_numero='2017 84 0000285')
+        both = factories.TransporteurFactory(lti_numero='2018 84 0000393', lc_numero='2018 84 0000392')
+
+        # No filter
+        data = self.client.get(self.search_url, {'q': '', 'licencetypes': ''}).json()
+        self.assertEqual(len(data['results']), 4)
+
+        # Only LTI
+        data = self.client.get(self.search_url, {'q': '', 'licencetypes[]': ['lti']}).json()
+        transporteurs = data['results']
+        self.assertEqual(len(transporteurs), 2)
+        self.assertListEqual(
+            [lti_only.siret, both.siret],
+            [transporteur['siret'] for transporteur in transporteurs])
+
+        # Only LC
+        data = self.client.get(self.search_url, {'q': '', 'licencetypes[]': ['lc']}).json()
+        transporteurs = data['results']
+        self.assertEqual(len(transporteurs), 2)
+        self.assertListEqual(
+            [lc_only.siret, both.siret],
+            [transporteur['siret'] for transporteur in transporteurs])
+
+        # Both
+        data = self.client.get(self.search_url, {'q': '', 'licencetypes[]': ['lti', 'lc']}).json()
+        transporteurs = data['results']
+        self.assertEqual(len(transporteurs), 1)
+        self.assertEqual(transporteurs[0]['siret'], both.siret)
+
 class TransporteurDetailTestCase(TestCase):
     def setUp(self):
         self.transporteur = factories.TransporteurFactory(siret=VALID_SIRET)
