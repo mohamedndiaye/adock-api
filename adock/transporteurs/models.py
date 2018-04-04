@@ -85,6 +85,9 @@ class Transporteur(models.Model):
                 fields=['raison_sociale', '-completeness']
             )
         ]
+        # Take care to create the index, GinIndex is not able to handle it.
+        # One solution is to inherit and adapt the code for that.
+        # CREATE INDEX transporteur_search_trgm ON transporteur USING GIN (raison_sociale GIN_TRGM_OPS);
 
     def __str__(self):
         return self.siret
