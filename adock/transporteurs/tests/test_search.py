@@ -57,12 +57,20 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
         transporteurs = self.get_transporteurs({'q': ' ' + test.VALID_SIRET[0:4] + ' ' + test.VALID_SIRET[4:]})
         self.assertEqual(len(transporteurs), 1)
 
+    def test_search_with_raison_sociale(self):
+        factories.TransporteurFactory(raison_sociale='SUPER ROGER')
+        transporteurs = self.get_transporteurs({'q': 'rog'})
+        self.assertEqual(len(transporteurs), 1)
+
+        transporteurs = self.get_transporteurs({'q': 'rg'})
+        self.assertEqual(len(transporteurs), 0)
+
     def test_search_ordering(self):
         # Name is set according to the expected ordering
-        t3 = factories.TransporteurFactory(raison_sociale='t3', email='')
-        t4 = factories.TransporteurFactory(raison_sociale='t4', email='', telephone='')
-        t2 = factories.TransporteurFactory(raison_sociale='t2')
-        t1 = factories.TransporteurFactory(raison_sociale='t1', validated_at=timezone.now())
+        t3 = factories.TransporteurFactory(raison_sociale='T3', email='')
+        t4 = factories.TransporteurFactory(raison_sociale='T4', email='', telephone='')
+        t2 = factories.TransporteurFactory(raison_sociale='T2')
+        t1 = factories.TransporteurFactory(raison_sociale='T1', validated_at=timezone.now())
         transporteurs = self.get_transporteurs({'q': 't'})
         self.assertEqual(len(transporteurs), 4)
         self.assertListEqual(
@@ -71,7 +79,7 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
 
     @override_settings(TRANSPORTEURS_LIMIT=2)
     def test_too_many_results(self):
-        factories.TransporteurFactory.create_batch(3, raison_sociale='Foo')
+        factories.TransporteurFactory.create_batch(3, raison_sociale='FOO')
         response = self.client.get(self.search_url, {'q': 'Foo'})
         data = response.json()
         self.assertEqual(data['limit'], 2)

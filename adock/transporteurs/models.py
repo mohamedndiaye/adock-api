@@ -26,6 +26,7 @@ class Transporteur(models.Model):
         validators=[transporteurs_validators.validate_siret],
         db_index=True, unique=True, editable=False)
     # nomen_long from Sirene (raison_sociale in Marchandise)
+    # Always in uppercase
     raison_sociale = models.CharField(max_length=131)
     # from Marchandise
     categorie_juridique = models.TextField()

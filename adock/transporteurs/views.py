@@ -46,7 +46,7 @@ def search(request):
        - type of the license (LC heavy or LTI light)
     """
     try:
-        q = request.GET['q']
+        q = request.GET['q'].upper()
     except datastructures.MultiValueDictKeyError:
         if len(request.GET) == 0:
             message = "La requête est vide."
@@ -55,7 +55,7 @@ def search(request):
         return JsonResponse({'message': message}, status=400)
 
     # Filtering on raison sociale or SIRET
-    stripped_q = q.replace(' ', '').upper()
+    stripped_q = q.replace(' ', '')
     if validators.RE_NOT_DIGIT.search(stripped_q):
         # The search criteria contains at least one not digit character so search on name
         transporteurs = models.Transporteur.objects.filter(raison_sociale__contains=q)
