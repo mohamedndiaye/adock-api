@@ -82,6 +82,28 @@ def search(request):
         payload['limit'] = settings.TRANSPORTEURS_LIMIT
     return JsonResponse(payload)
 
+def mail_managers_on_changes(transporteur):
+    # Send a mail to managers to track changes
+    subject = "Modification du transporteur {0}".format(transporteur.siret)
+    message = """
+        Modification du transporteur : {raison_sociale}
+        SIRET : {siret}
+
+        Nouveaux champs :
+        - téléphone « {telephone} »
+        - adresse électronique « {email} »
+        - zone de travail « {working_area} »
+        - départements livrés « {working_area_departements} »
+    """.format(
+        raison_sociale=transporteur.raison_sociale,
+        siret=transporteur.siret,
+        telephone=transporteur.telephone,
+        email=transporteur.email,
+        working_area=transporteur.get_working_area_display(),
+        working_area_departements=transporteur.working_area_departements
+    )
+    mail_managers(subject, message, fail_silently=True)
+
 
 RE_MANY_COMMAS = re.compile(r',+')
 
@@ -118,26 +140,7 @@ def transporteur_detail(request, transporteur_siret):
         transporteur.validated_at = timezone.now()
         transporteur.save()
 
-        # Send a mail to managers to track changes
-        subject = "Modification du transporteur {0}".format(transporteur.siret)
-        message = """
-            Modification du transporteur : {raison_sociale}
-            SIRET : {siret}
-
-            Nouveaux champs :
-            - téléphone « {telephone} »
-            - adresse électronique « {email} »
-            - zone de travail « {working_area} »
-            - départements livrés « {working_area_departements} »
-        """.format(
-            raison_sociale=transporteur.raison_sociale,
-            siret=transporteur.siret,
-            telephone=transporteur.telephone,
-            email=transporteur.email,
-            working_area=transporteur.get_working_area_display(),
-            working_area_departements=transporteur.working_area_departements
-        )
-        mail_managers(subject, message, fail_silently=True)
+        mail_managers_on_changes(transporteur)
 
     transporteur_as_json = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
     return JsonResponse(transporteur_as_json)
