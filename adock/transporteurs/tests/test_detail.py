@@ -32,6 +32,13 @@ class TransporteurDetailTestCase(TestCase):
         data = response.json()
         self.assertEqual(data['telephone'], '')
 
+    def patch_transporteur(self, data, status_code):
+        response = self.client.patch(self.detail_url, json.dumps(data), 'application/json')
+        self.assertEqual(response.status_code, status_code)
+        return response.json()
+
+    def test_patch_log(self):
+
     def test_patch(self):
         NEW_PHONE = '+33240424546'
         NEW_EMAIL = 'foo@example.com'
@@ -42,26 +49,28 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
         # Apply changes w/o working area
-        with self.settings(MANAGERS=(("Foo", 'foo@example.com'))):
-            response = self.client.patch(self.detail_url, json.dumps({
-                'telephone': NEW_PHONE,
-                'email': NEW_EMAIL,
-            }), 'application/json')
-        self.assertEqual(response.status_code, 200)
-        data = response.json()
+        with self.settings(MANAGERS=(("Manager", 'manager@example.com'))):
+            data = self.patch_transporteur(
+                {
+                    'telephone': NEW_PHONE,
+                    'email': NEW_EMAIL
+                },
+                200
+            )
         self.assertEqual(data['telephone'], '02 40 42 45 46')
         self.assertEqual(data['email'], NEW_EMAIL)
 
         # Apply changes with working area
-        with self.settings(MANAGERS=(("Foo", 'foo@example.com'))):
-            response = self.client.patch(self.detail_url, json.dumps({
-                'telephone': NEW_PHONE,
-                'email': NEW_EMAIL,
-                'working_area': models.WORKING_AREA_DEPARTEMENT,
-                'working_area_departements': '23 45 ,,,67',
-            }), 'application/json')
-        self.assertEqual(response.status_code, 200)
-        data = response.json()
+        with self.settings(MANAGERS=(("Manage", 'manager@example.com'))):
+            data = self.patch_transporteur(
+                {
+                    'telephone': NEW_PHONE,
+                    'email': NEW_EMAIL,
+                    'working_area': models.WORKING_AREA_DEPARTEMENT,
+                    'working_area_departements': '23 45 ,,,67',
+                },
+                200
+            )
 
         # Side effects
         self.assertEqual(data['telephone'], '02 40 42 45 46')
@@ -86,12 +95,13 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(data['message'], 'Les données ne sont pas valides.')
 
     def test_invalid_phone(self):
-        response = self.client.patch(self.detail_url, json.dumps({
-            'telephone': '11223344556',
-            'email': self.transporteur.email,
-        }), 'application/json')
-        self.assertEqual(response.status_code, 400)
-        data = response.json()
+        data = self.patch_transporteur(
+            {
+                'telephone': '11223344556',
+                'email': self.transporteur.email,
+            },
+            400
+        )
         # Wrong French translation will be fixed in django-phonenumber-field > 2.0 (my patch)
         self.assertEqual(data['telephone'][0], "Entrez un numéro de téléphone valide.")
 
