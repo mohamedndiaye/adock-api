@@ -24,7 +24,7 @@ WORKING_AREA_CHOICES = (
 class Transporteur(models.Model):
     siret = models.CharField(max_length=transporteurs_validators.SIRET_LENGTH,
         validators=[transporteurs_validators.validate_siret],
-        db_index=True, unique=True, editable=False)
+        primary_key=True, db_index=True, editable=False)
     # nomen_long from Sirene (raison_sociale in Marchandise)
     # Always in uppercase
     raison_sociale = models.CharField(max_length=131)
