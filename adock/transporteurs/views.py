@@ -70,15 +70,15 @@ def search(request):
         elif license_type == 'lti':
             transporteurs = transporteurs.exclude(lti_numero='')
 
-    transporteurs = transporteurs.order_by('-completeness')[:settings.TRANSPORTEURS_LIMIT]
-    transporteurs_json = [
-        get_transporteur_as_json(transporteur, TRANSPORTEUR_LIST_FIELDS)
-        for transporteur in transporteurs
-    ]
+    transporteurs = (transporteurs
+        .order_by('-completeness')
+        .values(*TRANSPORTEUR_LIST_FIELDS)
+        [:settings.TRANSPORTEURS_LIMIT])
+
     payload = {
-        'results': transporteurs_json
+        'results': list(transporteurs)
     }
-    if len(transporteurs_json) == settings.TRANSPORTEURS_LIMIT:
+    if len(payload['results']) == settings.TRANSPORTEURS_LIMIT:
         payload['limit'] = settings.TRANSPORTEURS_LIMIT
     return JsonResponse(payload)
 
