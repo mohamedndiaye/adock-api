@@ -17,7 +17,8 @@ TRANSPORTEUR_LIST_FIELDS = (
 )
 
 TRANSPORTEUR_DETAIL_FIELDS = (
-    'siret', 'raison_sociale', 'adresse', 'code_postal', 'ville',
+    'siret', 'raison_sociale', 'gestionnaire',
+    'adresse', 'code_postal', 'ville',
     'telephone', 'email',
     'debut_activite', 'code_ape', 'libelle_ape',
     'numero_tva', 'completeness',
