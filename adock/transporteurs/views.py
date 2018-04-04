@@ -55,10 +55,10 @@ def search(request):
         return JsonResponse({'message': message}, status=400)
 
     # Filtering on raison sociale or SIRET
-    stripped_q = q.replace(' ', '')
+    stripped_q = q.replace(' ', '').upper()
     if validators.RE_NOT_DIGIT.search(stripped_q):
         # The search criteria contains at least one not digit character so search on name
-        transporteurs = models.Transporteur.objects.filter(raison_sociale__icontains=q)
+        transporteurs = models.Transporteur.objects.filter(raison_sociale__contains=q)
     else:
         transporteurs = models.Transporteur.objects.filter(siret__startswith=stripped_q)
 
