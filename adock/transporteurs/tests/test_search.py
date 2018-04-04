@@ -70,7 +70,7 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
             [t.siret for t in [t1, t2, t3, t4]])
 
     @override_settings(TRANSPORTEURS_LIMIT=2)
-    def test_too_many_resultts(self):
+    def test_too_many_results(self):
         factories.TransporteurFactory.create_batch(3, raison_sociale='Foo')
         response = self.client.get(self.search_url, {'q': 'Foo'})
         data = response.json()
