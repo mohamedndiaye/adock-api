@@ -49,6 +49,8 @@ class TransporteurDetailTestCase(TestCase):
             }), 'application/json')
         self.assertEqual(response.status_code, 200)
         data = response.json()
+        self.assertEqual(data['telephone'], '02 40 42 45 46')
+        self.assertEqual(data['email'], NEW_EMAIL)
 
         # Apply changes with working area
         with self.settings(MANAGERS=(("Foo", 'foo@example.com'))):
