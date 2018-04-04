@@ -71,7 +71,7 @@ def search(request):
             transporteurs = transporteurs.exclude(lti_numero='')
 
     transporteurs = (transporteurs
-        .order_by('-completeness')
+        .order_by('raison_sociale', '-completeness')
         .values(*TRANSPORTEUR_LIST_FIELDS)
         [:settings.TRANSPORTEURS_LIMIT])
 
