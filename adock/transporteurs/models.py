@@ -78,6 +78,12 @@ class Transporteur(models.Model):
 
     class Meta:
         db_table = 'transporteur'
+        indexes = [
+            models.Index(
+                name='transporteur_search_order_by',
+                fields=['raison_sociale', '-completeness']
+            )
+        ]
 
     def __str__(self):
         return self.siret
