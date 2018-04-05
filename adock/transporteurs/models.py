@@ -1,4 +1,4 @@
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField, HStoreField
 from django.db import models
 
 from phonenumber_field.modelfields import PhoneNumberField
@@ -112,3 +112,13 @@ class Transporteur(models.Model):
     def save(self, *args, **kwargs):
         self.completeness = self.compute_completeness()
         super().save(*args, **kwargs)
+
+
+class TransporteurLog(models.Model):
+    transporteur = models.ForeignKey(Transporteur, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    # Contains the previous data of the instance
+    data = HStoreField()
+
+    class Meta:
+        db_table = 'transporteur_log'

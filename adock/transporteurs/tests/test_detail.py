@@ -38,6 +38,53 @@ class TransporteurDetailTestCase(TestCase):
         return response.json()
 
     def test_patch_log(self):
+        transporteur = self.patch_transporteur(
+            {
+                'telephone': '+33102030405',
+            },
+            200
+        )
+        self.assertEqual(models.TransporteurLog.objects.count(), 1)
+        transporteur_log = models.TransporteurLog.objects.get()
+        # Only one field changed
+        self.assertEqual(len(transporteur_log.data), 1)
+        # Old value
+        self.assertEqual(transporteur_log.data['telephone'], str(self.transporteur.telephone))
+        # New value
+        self.assertEqual(transporteur['telephone'], '01 02 03 04 05')
+
+        self.transporteur.refresh_from_db()
+        transporteur = self.patch_transporteur(
+            {
+                'telephone': '+33102030405',
+                'working_area_departements': '24, 56',
+            },
+            200
+        )
+        self.assertEqual(models.TransporteurLog.objects.count(), 2)
+        # Only working area has changed
+        transporteur_log = models.TransporteurLog.objects.order_by('-pk').first()
+        self.assertEqual(len(transporteur_log.data), 1)
+        # Old value
+        self.assertEqual(
+            transporteur_log.data['working_area_departements'],
+            str(self.transporteur.working_area_departements)
+        )
+
+        self.transporteur.refresh_from_db()
+        # New phone and email fields
+        transporteur = self.patch_transporteur(
+            {
+                'telephone': '+33102030406',
+                'email': 'foo@example.com',
+                'working_area_departements': '24, 56',
+            },
+            200
+        )
+        self.assertEqual(models.TransporteurLog.objects.count(), 3)
+        # Only working area has changed
+        transporteur_log = models.TransporteurLog.objects.order_by('-pk').first()
+        self.assertEqual(len(transporteur_log.data), 2)
 
     def test_patch(self):
         NEW_PHONE = '+33240424546'

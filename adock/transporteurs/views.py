@@ -82,7 +82,19 @@ def search(request):
         payload['limit'] = settings.TRANSPORTEURS_LIMIT
     return JsonResponse(payload)
 
-def mail_managers_on_changes(transporteur):
+def log_transporteur_changes(transporteur, cleaned_payload):
+    old_data = {field: getattr(transporteur, field) for field in cleaned_payload}
+    old_data_changed = {}
+    for k, v in old_data.items():
+        if v != cleaned_payload[k]:
+            old_data_changed[k] = v
+
+    if old_data_changed:
+        models.TransporteurLog.objects.create(transporteur=transporteur, data=old_data_changed)
+
+    return old_data_changed
+
+def mail_managers_changes(transporteur, old_data_changed):
     # Send a mail to managers to track changes
     subject = "Modification du transporteur {0}".format(transporteur.siret)
     message = """
@@ -131,16 +143,24 @@ def transporteur_detail(request, transporteur_siret):
         if cleaned_departements:
             cleaned_departements = cleaned_departements.replace(' ', ',')
             payload['working_area_departements'] = RE_MANY_COMMAS.sub(',', cleaned_departements)
-        form = forms.SubscriptionForm(payload, instance=transporteur)
+
+        # Form is not bound to the transporteur instance
+        form = forms.SubscriptionForm(payload)
         if not form.is_valid():
             return JsonResponse(form.errors, status=400)
 
         # Valid
-        transporteur = form.save(commit=False)
-        transporteur.validated_at = timezone.now()
-        transporteur.save()
+        cleaned_payload = {k: form.cleaned_data[k] for k in payload.keys()}
+        old_data_changed = log_transporteur_changes(transporteur, cleaned_payload)
+        if old_data_changed:
+            # Data has been modified so saving is required
+            # Don't use form.save to edit only the submitted fields of the instance
+            for field in cleaned_payload:
+                setattr(transporteur, field, cleaned_payload[field])
+            transporteur.validated_at = timezone.now()
+            transporteur.save()
 
-        mail_managers_on_changes(transporteur)
+            mail_managers_changes(transporteur, old_data_changed)
 
     transporteur_as_json = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
     return JsonResponse(transporteur_as_json)
