@@ -97,24 +97,24 @@ class TransporteurSearchLicenseTypeTestCase(TransporteurSearchTestCase):
         self.both = factories.TransporteurFactory(lti_numero='2018 84 0000393', lc_numero='2018 84 0000392')
 
     def test_no_license(self):
-        transporteurs = self.get_transporteurs({'q': '', 'licencetypes[]': ''})
+        transporteurs = self.get_transporteurs({'q': '', 'licence-types[]': ''})
         self.assertEqual(len(transporteurs), 4)
 
     def test_lti_only(self):
-        transporteurs = self.get_transporteurs({'q': '', 'licencetypes[]': ['lti']})
+        transporteurs = self.get_transporteurs({'q': '', 'licence-types[]': ['lti']})
         self.assertEqual(len(transporteurs), 2)
         self.assertSetEqual(
             set([self.lti_only.siret, self.both.siret]),
             set([transporteur['siret'] for transporteur in transporteurs]))
 
     def test_lc_only(self):
-        transporteurs = self.get_transporteurs({'q': '', 'licencetypes[]': ['lc']})
+        transporteurs = self.get_transporteurs({'q': '', 'licence-types[]': ['lc']})
         self.assertEqual(len(transporteurs), 2)
         self.assertSetEqual(
             set([self.lc_only.siret, self.both.siret]),
             set([transporteur['siret'] for transporteur in transporteurs]))
 
     def test_both(self):
-        transporteurs = self.get_transporteurs({'q': '', 'licencetypes[]': ['lti', 'lc']})
+        transporteurs = self.get_transporteurs({'q': '', 'licence-types[]': ['lti', 'lc']})
         self.assertEqual(len(transporteurs), 1)
         self.assertEqual(transporteurs[0]['siret'], self.both.siret)

@@ -63,7 +63,7 @@ def search(request):
         transporteurs = models.Transporteur.objects.filter(siret__startswith=stripped_q)
 
     # Filtering on type of license
-    license_types = request.GET.getlist('licencetypes[]')
+    license_types = request.GET.getlist('licence-types[]')
     for license_type in license_types:
         if license_type == 'lc':
             transporteurs = transporteurs.exclude(lc_numero='')
