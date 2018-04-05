@@ -4,6 +4,7 @@ import re
 from django.conf import settings
 from django.core.mail import mail_managers
 from django.http import JsonResponse
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import datastructures, timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -69,6 +70,25 @@ def search(request):
             transporteurs = transporteurs.exclude(lc_numero='')
         elif license_type == 'lti':
             transporteurs = transporteurs.exclude(lti_numero='')
+
+    # Filtering on departements
+    departements = []
+    for field in ('departement-depart', 'departement-arrivee'):
+        departement = request.GET.get(field)
+        if departement:
+            try:
+                departement = int(departement)
+                if 0 < departement and departement < 1000:
+                    departements.append(departement)
+            except ValueError:
+                message = "Le numéro de département « %s » est non valide." % request.GET.get(field)
+                return JsonResponse({'message': message}, status=400)
+
+    if departements:
+        transporteurs = transporteurs.filter(
+            Q(working_area=models.WORKING_AREA_FRANCE) |
+            Q(working_area=models.WORKING_AREA_DEPARTEMENT, working_area_departements__contains=departements)
+        )
 
     transporteurs = (transporteurs
         .order_by('raison_sociale', '-completeness')
