@@ -1,5 +1,6 @@
 from django.contrib.postgres.fields import ArrayField, HStoreField
 from django.db import models
+from django.urls import reverse
 
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -97,6 +98,9 @@ class Transporteur(models.Model):
 
     def get_nic(self):
         return self.siret[transporteurs_validators.SIREN_LENGTH:]
+
+    def get_absolute_url(self):
+        return reverse('transporteurs_detail', args=[self.siret])
 
     def compute_completeness(self):
         # Take care to adjust EARNED_POINTS_MAX on changes or unit tests will warn you!

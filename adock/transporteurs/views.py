@@ -98,22 +98,24 @@ def mail_managers_changes(transporteur, old_data_changed):
     # Send a mail to managers to track changes
     subject = "Modification du transporteur {0}".format(transporteur.siret)
     message = """
-        Modification du transporteur : {raison_sociale}
-        SIRET : {siret}
+Modification du transporteur : {raison_sociale}
+SIRET : {siret}
+https://{website}{transporteur_url}
 
-        Nouveaux champs :
-        - téléphone « {telephone} »
-        - adresse électronique « {email} »
-        - zone de travail « {working_area} »
-        - départements livrés « {working_area_departements} »
+Valeurs modifiées :
     """.format(
         raison_sociale=transporteur.raison_sociale,
         siret=transporteur.siret,
-        telephone=transporteur.telephone,
-        email=transporteur.email,
-        working_area=transporteur.get_working_area_display(),
-        working_area_departements=transporteur.working_area_departements
+        website=settings.WEBSITE,
+        transporteur_url=transporteur.get_absolute_url()
     )
+
+    for field, old_value in old_data_changed.items():
+        message += "\n- {field} : {old_value} => {new_value}".format(
+            field=field,
+            old_value=old_value,
+            new_value=getattr(transporteur, field)
+        )
     mail_managers(subject, message, fail_silently=True)
 
 

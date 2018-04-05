@@ -129,10 +129,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+WEBSITE = 'adock.beta.gouv.fr'
+
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = False
 CORS_ORIGIN_WHITELIST = (
-    'adock.beta.gouv.fr',
+    WEBSITE,
 )
 
 PHONENUMBER_DB_FORMAT = 'NATIONAL'

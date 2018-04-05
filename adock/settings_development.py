@@ -1,5 +1,7 @@
+
+WEBSITE = 'localhost:8080'
 CORS_ORIGIN_WHITELIST = (
-    'localhost:8080',
+    WEBSITE,
 )
 
 EMAIL_PORT = 1025

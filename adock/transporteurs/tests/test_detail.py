@@ -106,6 +106,12 @@ class TransporteurDetailTestCase(TestCase):
             )
         self.assertEqual(data['telephone'], '02 40 42 45 46')
         self.assertEqual(data['email'], NEW_EMAIL)
+        self.assertEqual(len(mail.outbox), 1)
+        message = "[adock] Modification du transporteur %s" % self.transporteur.siret
+        self.assertEqual(mail.outbox[0].subject, message)
+        self.assertIn('telephone', mail.outbox[0].body)
+        self.assertIn('email', mail.outbox[0].body)
+        self.assertNotIn('working', mail.outbox[0].body)
 
         # Apply changes with working area
         with self.settings(MANAGERS=(("Manage", 'manager@example.com'))):
@@ -126,8 +132,6 @@ class TransporteurDetailTestCase(TestCase):
         self.assertListEqual(data['working_area_departements'], [23, 45, 67])
         self.assertEqual(data['completeness'], 100)
         self.assertEqual(len(mail.outbox), 2)
-        message = "[adock] Modification du transporteur %s" % self.transporteur.siret
-        self.assertEqual(mail.outbox[0].subject, message)
 
     def test_invalid_patch_request(self):
         response = self.client.patch(self.detail_url, {'foo': 'foo'})
