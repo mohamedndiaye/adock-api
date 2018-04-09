@@ -6,7 +6,7 @@ from django.core.mail import mail_managers
 from django.http import JsonResponse
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.utils import datastructures, timezone
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from . import models
@@ -46,22 +46,18 @@ def search(request):
        - partial raison sociale or SIRET
        - type of the license (LC heavy or LTI light)
     """
-    try:
-        q = request.GET['q'].upper()
-    except datastructures.MultiValueDictKeyError:
-        if len(request.GET) == 0:
-            message = "La requête est vide."
-        else:
-            message = "Le paramêtre requis « q » n'a pas été trouvé."
-        return JsonResponse({'message': message}, status=400)
+    transporteurs = models.Transporteur.objects.all()
 
-    # Filtering on raison sociale or SIRET
-    stripped_q = q.replace(' ', '')
-    if validators.RE_NOT_DIGIT.search(stripped_q):
-        # The search criteria contains at least one not digit character so search on name
-        transporteurs = models.Transporteur.objects.filter(raison_sociale__contains=q)
-    else:
-        transporteurs = models.Transporteur.objects.filter(siret__startswith=stripped_q)
+    q = request.GET.get('q')
+    if q:
+        # Filtering on raison sociale or SIRET
+        q = q.upper()
+        stripped_q = q.replace(' ', '')
+        if validators.RE_NOT_DIGIT.search(stripped_q):
+            # The search criteria contains at least one not digit character so search on name
+            transporteurs = transporteurs.filter(raison_sociale__contains=q)
+        else:
+            transporteurs = transporteurs.filter(siret__startswith=stripped_q)
 
     # Filtering on type of license
     license_types = request.GET.getlist('licence-types[]')

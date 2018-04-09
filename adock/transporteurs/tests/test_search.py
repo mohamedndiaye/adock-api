@@ -20,23 +20,10 @@ class TransporteurSearchTestCase(TestCase):
 
 
 class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
-
-    def test_empty_search(self):
-        response = self.client.get(self.search_url)
-        self.assertEqual(response.status_code, 400)
-        data = response.json()
-        self.assertTrue('message' in data)
-        self.assertEquals(data['message'], "La requête est vide.")
-
     def test_one_invalid_param(self):
         response = self.client.get(self.search_url, {'wrong': test.VALID_SIRET})
-        self.assertEqual(response.status_code, 400)
-        data = response.json()
-        self.assertTrue('message' in data)
-        self.assertEquals(
-            data['message'],
-            "Le paramêtre requis « q » n'a pas été trouvé."
-        )
+        # Useless parameter is ignored
+        self.assertEqual(response.status_code, 200)
 
     def test_empty_results_with_siren(self):
         transporteurs = self.get_transporteurs({'q': '123456789'})
@@ -98,25 +85,25 @@ class TransporteurSearchLicenseTypeTestCase(TransporteurSearchTestCase):
         self.both = factories.TransporteurFactory(lti_numero='2018 84 0000393', lc_numero='2018 84 0000392')
 
     def test_no_license(self):
-        transporteurs = self.get_transporteurs({'q': '', 'licence-types[]': ''})
+        transporteurs = self.get_transporteurs({'licence-types[]': ''})
         self.assertEqual(len(transporteurs), 4)
 
     def test_lti_only(self):
-        transporteurs = self.get_transporteurs({'q': '', 'licence-types[]': ['lti']})
+        transporteurs = self.get_transporteurs({'licence-types[]': ['lti']})
         self.assertEqual(len(transporteurs), 2)
         self.assertSetEqual(
             set([self.lti_only.siret, self.both.siret]),
             set([transporteur['siret'] for transporteur in transporteurs]))
 
     def test_lc_only(self):
-        transporteurs = self.get_transporteurs({'q': '', 'licence-types[]': ['lc']})
+        transporteurs = self.get_transporteurs({'licence-types[]': ['lc']})
         self.assertEqual(len(transporteurs), 2)
         self.assertSetEqual(
             set([self.lc_only.siret, self.both.siret]),
             set([transporteur['siret'] for transporteur in transporteurs]))
 
     def test_both(self):
-        transporteurs = self.get_transporteurs({'q': '', 'licence-types[]': ['lti', 'lc']})
+        transporteurs = self.get_transporteurs({'licence-types[]': ['lti', 'lc']})
         self.assertEqual(len(transporteurs), 1)
         self.assertEqual(transporteurs[0]['siret'], self.both.siret)
 
@@ -138,19 +125,19 @@ class TransporteurSearchDepartementTestCase(TransporteurSearchTestCase):
     def test_search_invalid(self):
         response = response = self.client.get(
             self.search_url,
-            {'q': '', 'departement-depart': 'A'}
+            {'departement-depart': 'A'}
         )
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertEqual(data['message'], "Le numéro de département « A » est non valide.")
 
     def test_search_france(self):
-        transporteurs = self.get_transporteurs({'q': '', 'departement-depart': 93})
+        transporteurs = self.get_transporteurs({'departement-depart': 93})
         self.assertEqual(len(transporteurs), 1)
         self.assertEqual(transporteurs[0]['raison_sociale'], 'FRANCE')
 
     def test_search_one_departement(self):
-        transporteurs = self.get_transporteurs({'q': '', 'departement-depart': 35})
+        transporteurs = self.get_transporteurs({'departement-depart': 35})
         self.assertEqual(len(transporteurs), 2)
 
     def test_search_two_departements(self):
