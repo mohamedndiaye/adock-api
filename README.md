@@ -60,7 +60,7 @@ un second temps (mise à jour SQL) depuis la base de données GRECO.
 
 - `update-transporteur.sql` met à jour la table transporteur avec les numéros de
   téléphone et les adresses électroniques issues de GRECO uniquement s'ils
-  n'ont pas été renseignés sur A Dock par l'utilisateur
+  n'ont pas été renseignés sur A Dock par l'utilisateur.
 
 ## Dépendances
 
@@ -69,5 +69,5 @@ un second temps (mise à jour SQL) depuis la base de données GRECO.
 - [PostgreSQL][postgresql] v9.6+
 
 [django]: https://www.djangoproject.com/
-[postgresql]: [https://www.postgresql.org/
 [python]: https://www.python.org/
+[postgresql]: https://www.postgresql.org/
