@@ -103,7 +103,8 @@ def log_transporteur_changes(transporteur, cleaned_payload):
     old_data_changed = {}
     for k, v in old_data.items():
         if v != cleaned_payload[k]:
-            old_data_changed[k] = v
+            # Serialize for JSON
+            old_data_changed[k] = str(v)
 
     if old_data_changed:
         models.TransporteurLog.objects.create(transporteur=transporteur, data=old_data_changed)

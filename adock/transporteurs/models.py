@@ -1,4 +1,4 @@
-from django.contrib.postgres.fields import ArrayField, HStoreField
+from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
 from django.urls import reverse
 
@@ -122,7 +122,7 @@ class TransporteurLog(models.Model):
     transporteur = models.ForeignKey(Transporteur, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     # Contains the previous data of the instance
-    data = HStoreField()
+    data = JSONField()
 
     class Meta:
         db_table = 'transporteur_log'
