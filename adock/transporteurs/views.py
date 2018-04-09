@@ -177,10 +177,14 @@ def transporteur_detail(request, transporteur_siret):
         if old_data_changed:
             # Data has been modified so saving is required
             # Don't use form.save to edit only the submitted fields of the instance
-            for field in cleaned_payload:
+            updated_fields = old_data_changed.keys()
+            for field in updated_fields:
                 setattr(transporteur, field, cleaned_payload[field])
             transporteur.validated_at = timezone.now()
-            transporteur.save()
+            transporteur.save(
+                force_update=True,
+                update_fields=updated_fields
+            )
 
             mail_managers_changes(transporteur, old_data_changed)
 
