@@ -1,8 +1,20 @@
-Scripts d'import SQL
-====================
+# A Dock
 
-Sources
--------
+> Simplifions les relations transporteurs/chargeurs
+
+## Description
+
+Ce dépôt contient le code source de l'application serveur du projet A Dock. Le
+serveur fournit une API REST sans authentification qui permet la consultation et
+la modification des informations de contact de la base de données des
+transporteurs.
+
+L'application est écrite en [Python][python] avec le framework [Django][django]
+et s'appuie sur une base de données [PostgreSQL][postgresql]. Cette application
+utilise des extensions spécifiques à PostgreSQL (`jsonb`, champs de type
+`array`, index de trigrammes, etc).
+
+## Sources des données
 
 L'import de la base de données s'effectue à partir des données de la [liste des
 entreprises](http://www2.transports.equipement.gouv.fr/registres/marchandises/SITR_Liste_des_entreprises_Marchandises_sortie_CSV.zip)
@@ -14,8 +26,7 @@ Dock par celles issues du projet [Sirène](https://www.data.gouv.fr/fr/datasets/
 Seules les informations de téléphone et adresse électronique sont extraites dans
 un second temps (mise à jour SQL) depuis la base de données GRECO.
 
-Rôle des scripts
-----------------
+## Description des scripts d'import
 
 - `import-all.sh` créé la base de données, l'ensemble des tables et effectue
   tous les imports en s'appuyant sur `import-all.sql`
@@ -51,4 +62,12 @@ Rôle des scripts
   téléphone et les adresses électroniques issues de GRECO uniquement s'ils
   n'ont pas été renseignés sur A Dock par l'utilisateur
 
+## Dépendances
 
+- [Django][django] v2
+- [Python 3][python] v3.5+
+- [PostgreSQL][postgresql] v9.6+
+
+[django]: https://www.djangoproject.com/
+[postgresql]: [https://www.postgresql.org/
+[python]: https://www.python.org/
