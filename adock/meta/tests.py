@@ -1,7 +1,8 @@
 import datetime
 
-from django.urls import reverse
+from django.conf import settings
 from django.test import TestCase
+from django.urls import reverse
 
 from . import models as meta_models
 
@@ -18,5 +19,6 @@ class MetaTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data['choices']['WORKING_AREA_CHOICES']['FRANCE'], 'France')
+        self.assertEqual(data['version'], settings.VERSION)
         self.assertEqual(data['transporteur']['count'], 42)
         self.assertEqual(data['transporteur']['date'], today_iso)

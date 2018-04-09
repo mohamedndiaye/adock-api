@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.cache import cache_page
 
@@ -11,7 +12,8 @@ def meta_index(request):
     data = {
         'choices': {
             'WORKING_AREA_CHOICES': dict(transporteurs_models.WORKING_AREA_CHOICES),
-        }
+        },
+        'version': settings.VERSION,
     }
     for meta in metas:
         data[meta.name] = meta.data
