@@ -141,10 +141,44 @@ class TransporteurSearchDepartementTestCase(TransporteurSearchTestCase):
         self.assertEqual(len(transporteurs), 2)
 
     def test_search_two_departements(self):
-        transporteurs = self.get_transporteurs({'q': 'DEP. 35', 'departement-depart': 35, 'departement-arrivee': 44})
+        transporteurs = self.get_transporteurs({
+            'q': 'DEP. 35',
+            'departement-depart': 35,
+            'departement-arrivee': 44
+        })
         self.assertEqual(len(transporteurs), 1)
         self.assertEqual(transporteurs[0]['raison_sociale'], 'DEP. 35, 44')
 
     def test_search_two_departements_no_match(self):
-        transporteurs = self.get_transporteurs({'q': 'DEP. 35', 'departement-depart': 35, 'departement-arrivee': 42})
+        transporteurs = self.get_transporteurs({
+            'q': 'DEP. 35',
+            'departement-depart': 35,
+            'departement-arrivee': 42
+        })
         self.assertEqual(len(transporteurs), 0)
+
+
+class TransporteurSearchSpecialitiesTestCase(TransporteurSearchTestCase):
+
+    def setUp(self):
+        super().setUp()
+        factories.TransporteurFactory(raison_sociale='NO SPECIALITIES', specialities=None)
+        factories.TransporteurFactory(raison_sociale='LOT', specialities=['LOT'])
+        factories.TransporteurFactory(raison_sociale='LOT, ANIMAL', specialities=['LOT', 'ANIMAL'])
+
+    def test_no_filter(self):
+        transporteurs = self.get_transporteurs({'specialities[]': []})
+        self.assertEqual(len(transporteurs), 3)
+
+    def test_one_speciality(self):
+        """The transporteur should provide one at least."""
+        transporteurs = self.get_transporteurs({'specialities[]': ['LOT']})
+        self.assertEqual(len(transporteurs), 2)
+
+        transporteurs = self.get_transporteurs({'specialities[]': ['ANIMAL']})
+        self.assertEqual(len(transporteurs), 1)
+
+    def test_two_specialities(self):
+        """The transport should provide the both."""
+        transporteurs = self.get_transporteurs({'specialities[]': ['LOT', 'ANIMAL']})
+        self.assertEqual(len(transporteurs), 1)

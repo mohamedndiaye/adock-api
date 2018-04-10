@@ -87,6 +87,11 @@ def search(request):
             Q(working_area=models.WORKING_AREA_DEPARTEMENT, working_area_departements__contains=departements)
         )
 
+    # Filtering on specialities
+    specialities = request.GET.getlist('specialities[]')
+    if specialities:
+        transporteurs = transporteurs.filter(specialities__contains=specialities)
+
     transporteurs = (transporteurs
         .order_by('raison_sociale', '-completeness')
         .values(*TRANSPORTEUR_LIST_FIELDS)
