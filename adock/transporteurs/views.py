@@ -3,8 +3,9 @@ import re
 
 from django.conf import settings
 from django.core.mail import mail_managers
-from django.http import JsonResponse
+from django.db import transaction
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -104,16 +105,13 @@ def search(request):
         payload['limit'] = settings.TRANSPORTEURS_LIMIT
     return JsonResponse(payload)
 
-def log_transporteur_changes(transporteur, cleaned_payload):
+def get_transporteur_changes(transporteur, cleaned_payload):
     old_data = {field: getattr(transporteur, field) for field in cleaned_payload}
     old_data_changed = {}
     for k, v in old_data.items():
         if v != cleaned_payload[k]:
             # Serialize for JSON
             old_data_changed[k] = str(v)
-
-    if old_data_changed:
-        models.TransporteurLog.objects.create(transporteur=transporteur, data=old_data_changed)
 
     return old_data_changed
 
@@ -176,7 +174,8 @@ def transporteur_detail(request, transporteur_siret):
 
         # Valid
         cleaned_payload = {k: form.cleaned_data[k] for k in payload.keys()}
-        old_data_changed = log_transporteur_changes(transporteur, cleaned_payload)
+
+        old_data_changed = get_transporteur_changes(transporteur, cleaned_payload)
         if old_data_changed:
             # Data has been modified so saving is required
             # Don't use form.save to edit only the submitted fields of the instance
@@ -184,10 +183,13 @@ def transporteur_detail(request, transporteur_siret):
             for field in updated_fields:
                 setattr(transporteur, field, cleaned_payload[field])
             transporteur.validated_at = timezone.now()
-            transporteur.save(
-                force_update=True,
-                update_fields=updated_fields
-            )
+
+            with transaction.atomic(savepoint=False):
+                transporteur.save(
+                    force_update=True,
+                    update_fields=updated_fields
+                )
+                models.TransporteurLog.objects.create(transporteur=transporteur, data=old_data_changed)
 
             mail_managers_changes(transporteur, old_data_changed)
 
