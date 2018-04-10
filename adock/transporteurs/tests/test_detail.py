@@ -21,7 +21,10 @@ class TransporteurDetailTestCase(TestCase):
         data = response.json()
         self.assertEqual(data['siret'], test.VALID_SIRET)
         self.assertEqual(data['raison_sociale'], self.transporteur.raison_sociale)
-        self.assertEqual(data['completeness'], models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE)
+        # Two original fields not validated and a working area => 4 points
+        self.assertEqual(
+            data['completeness'],
+            models.COMPLETENESS_PERCENT_MIN + 4 * models.EARNED_POINT_VALUE)
         self.assertEqual(data['working_area'], 'DEPARTEMENT')
         self.assertEqual(data['working_area_departements'], [35, 44])
 
@@ -158,26 +161,48 @@ class TransporteurDetailTestCase(TestCase):
 
     def test_completeness(self):
         # The default factory sets telephone and email but they aren't validated
-        self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE)
+        # and the working area.
+        self.assertEqual(
+            self.transporteur.completeness,
+            models.COMPLETENESS_PERCENT_MIN + 4 * models.EARNED_POINT_VALUE
+        )
 
-        # No telephone
+        # No telephone and working area
+        self.transporteur.working_area = models.WORKING_AREA_UNDEFINED
         self.transporteur.telephone = ''
         self.transporteur.save()
-        self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN + models.EARNED_POINT_VALUE)
+        self.assertEqual(
+            self.transporteur.completeness,
+            models.COMPLETENESS_PERCENT_MIN + models.EARNED_POINT_VALUE
+        )
 
         # No email
         self.transporteur.email = ''
         self.transporteur.save()
-        self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN)
+        self.assertEqual(
+            self.transporteur.completeness,
+            models.COMPLETENESS_PERCENT_MIN
+        )
 
         # Updated email
         self.transporteur.email = 'foo@example.com'
         self.transporteur.validated_at = timezone.now()
         self.transporteur.save()
-        self.assertEqual(self.transporteur.completeness, models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE)
+        self.assertEqual(
+            self.transporteur.completeness,
+            models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE
+        )
 
-        # Fully defined 100%
+        # Phone and email validated
         self.transporteur.telephone = '02 40 41 42 43'
         self.transporteur.validated_at = timezone.now()
+        self.transporteur.save()
+        self.assertEqual(
+            self.transporteur.completeness,
+            models.COMPLETENESS_PERCENT_MIN + 4 * models.EARNED_POINT_VALUE
+        )
+
+        # Fully validated 100%
+        self.transporteur.working_area = models.WORKING_AREA_DEPARTEMENT
         self.transporteur.save()
         self.assertEqual(self.transporteur.completeness, 100)
