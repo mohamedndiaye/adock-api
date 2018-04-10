@@ -1,5 +1,7 @@
 begin;
 
+delete from transporteur cascade;
+
 insert into transporteur
     (siret, raison_sociale,
      categorie_juridique, is_siege,
