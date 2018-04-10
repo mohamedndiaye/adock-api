@@ -28,7 +28,7 @@ SPECIALITY_CHOICES = (
     ('URBAIN', 'Urbain / Dernier kilomètre'),
     ('VRAC_SOLIDE', 'Vrac solide'),
     ('VRAC_LIQUIDE', 'Vrac liquide'),
-    ('TEMPERATURE', 'Temérature dirigée'),
+    ('TEMPERATURE', 'Température dirigée'),
     ('PLATEAU', 'Plateau bachés et spécifiques'),
     ('MULTIMODAL', 'Multimodal'),
     ('LOCATION', 'Location'),
