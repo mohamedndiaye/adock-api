@@ -1,7 +1,7 @@
 -- The CSV file should be UTF-8
 -- http://www2.transports.equipement.gouv.fr/registres/marchandises/SITR_Liste_des_entreprises_Marchandises_sortie_CSV.zip
 -- If trailing empty line:
--- sed -i '$ d' Marchandises.txt
+-- sed -i '$ d' Marchandises.csv
 
 begin;
 
