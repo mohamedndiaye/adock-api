@@ -1,3 +1,5 @@
+import collections
+
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.cache import cache_page
@@ -11,8 +13,8 @@ def meta_index(request):
     metas = meta_models.Meta.objects.all()
     data = {
         'choices': {
-            'WORKING_AREA_CHOICES': dict(transporteurs_models.WORKING_AREA_CHOICES),
-            'SPECIALITY_CHOICES': dict(transporteurs_models.SPECIALITY_CHOICES),
+            'WORKING_AREA_CHOICES': collections.OrderedDict(transporteurs_models.WORKING_AREA_CHOICES),
+            'SPECIALITY_CHOICES': collections.OrderedDict(transporteurs_models.SPECIALITY_CHOICES),
         },
         'version': settings.VERSION,
     }
