@@ -17,10 +17,14 @@ class TransporteurDetailTestCase(TestCase):
             kwargs={'transporteur_siret': test.VALID_SIRET})
 
     def test_get(self):
+        # To test JSON serialization with NULL value
+        self.transporteur.debut_activite = None
+        self.transporteur.save()
         response = self.client.get(self.detail_url)
         data = response.json()
         self.assertEqual(data['siret'], test.VALID_SIRET)
         self.assertEqual(data['raison_sociale'], self.transporteur.raison_sociale)
+        self.assertEqual(data['debut_activite'], None)
         # Two original fields not validated and a working area => 4 points
         self.assertEqual(
             data['completeness'],

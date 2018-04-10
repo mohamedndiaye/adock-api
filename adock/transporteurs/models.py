@@ -43,10 +43,11 @@ class Transporteur(models.Model):
     telephone = PhoneNumberField()
     # mail from GRECO used as default (changed)
     email = models.EmailField(blank=True, default='')
-    # dcret from Sirene (inscription_activite from GRECO)
-    date_creation = models.DateField()
+    # dcret from Sirene (inscription_activite from GRECO).
+    # Can be null (not present in Sirene)
+    date_creation = models.DateField(blank=True, null=True)
     # ddebact from Sirene
-    debut_activite = models.DateField()
+    debut_activite = models.DateField(blank=True, null=True)
     # apen700 from Sirene
     code_ape = models.CharField(max_length=5)
     # libapen from Sirene
