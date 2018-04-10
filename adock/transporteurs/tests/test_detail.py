@@ -152,6 +152,14 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(data['completeness'], 100)
         self.assertEqual(len(mail.outbox), 2)
 
+        # Be sure the response is identical to the DB
+        self.transporteur.refresh_from_db()
+        self.assertEqual(self.transporteur.telephone, NEW_PHONE)
+        self.assertEqual(self.transporteur.email, NEW_EMAIL)
+        self.assertEqual(self.transporteur.working_area, models.WORKING_AREA_DEPARTEMENT)
+        self.assertEqual(self.transporteur.working_area_departements, [23, 45, 67])
+        self.assertEqual(self.transporteur.completeness, 100)
+
     def test_invalid_patch_request(self):
         response = self.client.patch(self.detail_url, {'foo': 'foo'})
         self.assertEqual(response.status_code, 400)
