@@ -41,19 +41,19 @@ alter table marchandise
 
     alter date_debut_validite_lti
      type date
-    using case date_debut_validite_lti when '' then null else to_date(date_debut_validite_lti, 'DD/MM/YY')::date end,
+    using case date_debut_validite_lti when '' then null else to_date(date_debut_validite_lti, 'DD/MM/YY') end,
 
     alter date_fin_validite_lti
      type date
-    using case date_fin_validite_lti when '' then null else to_date(date_fin_validite_lti, 'DD/MM/YY')::date end,
+    using case date_fin_validite_lti when '' then null else to_date(date_fin_validite_lti, 'DD/MM/YY') end,
 
     alter date_debut_validite_lc
      type date
-    using case date_debut_validite_lc when '' then null else to_date(date_debut_validite_lc, 'DD/MM/YY')::date end,
+    using case date_debut_validite_lc when '' then null else to_date(date_debut_validite_lc, 'DD/MM/YY') end,
 
     alter date_fin_validite_lc
      type date
-    using case date_fin_validite_lc when '' then null else to_date(date_fin_validite_lc, 'DD/MM/YY')::date end,
+    using case date_fin_validite_lc when '' then null else to_date(date_fin_validite_lc, 'DD/MM/YY') end,
 
     alter nombre_de_copies_lti_valides
      type integer
