@@ -25,7 +25,8 @@ TRANSPORTEUR_DETAIL_FIELDS = (
     'numero_tva', 'completeness',
     'lti_numero', 'lti_date_debut', 'lti_date_fin', 'lti_nombre',
     'lc_numero', 'lc_date_debut', 'lc_date_fin', 'lc_nombre',
-    'working_area', 'working_area_departements'
+    'working_area', 'working_area_departements',
+    'specialities'
 )
 
 def get_transporteur_as_json(transporteur, fields):

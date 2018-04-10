@@ -13,24 +13,36 @@ from . import test
 class TransporteurDetailTestCase(TestCase):
     def setUp(self):
         self.transporteur = factories.TransporteurFactory(siret=test.VALID_SIRET)
-        self.detail_url = reverse('transporteurs_detail',
-            kwargs={'transporteur_siret': test.VALID_SIRET})
+        self.detail_url = reverse(
+            'transporteurs_detail',
+            kwargs={'transporteur_siret': test.VALID_SIRET}
+        )
 
     def test_get(self):
-        # To test JSON serialization with NULL value
-        self.transporteur.debut_activite = None
-        self.transporteur.save()
         response = self.client.get(self.detail_url)
         data = response.json()
         self.assertEqual(data['siret'], test.VALID_SIRET)
         self.assertEqual(data['raison_sociale'], self.transporteur.raison_sociale)
-        self.assertEqual(data['debut_activite'], None)
+        self.assertEqual(data['debut_activite'], str(self.transporteur.debut_activite))
         # Two original fields not validated and a working area => 4 points
         self.assertEqual(
             data['completeness'],
             models.COMPLETENESS_PERCENT_MIN + 4 * models.EARNED_POINT_VALUE)
         self.assertEqual(data['working_area'], 'DEPARTEMENT')
         self.assertEqual(data['working_area_departements'], [35, 44])
+        self.assertEqual(
+            sorted(data['specialities']),
+            ['TEMPERATURE', 'URBAIN']
+        )
+
+        # To test JSON serialization with NULL values
+        self.transporteur.debut_activite = None
+        self.transporteur.specialities = None
+        self.transporteur.save()
+        response = self.client.get(self.detail_url)
+        data = response.json()
+        self.assertEqual(data['debut_activite'], None)
+        self.assertEqual(data['specialities'], None)
 
     def test_get_empty_phone(self):
         self.transporteur.telephone = ''

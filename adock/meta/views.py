@@ -12,6 +12,7 @@ def meta_index(request):
     data = {
         'choices': {
             'WORKING_AREA_CHOICES': dict(transporteurs_models.WORKING_AREA_CHOICES),
+            'SPECIALITY_CHOICES': dict(transporteurs_models.SPECIALITY_CHOICES),
         },
         'version': settings.VERSION,
     }

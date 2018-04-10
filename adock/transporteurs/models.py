@@ -22,6 +22,20 @@ WORKING_AREA_CHOICES = (
     (WORKING_AREA_DEPARTEMENT, 'Départementale')
 )
 
+SPECIALITY_CHOICES = (
+    ('LOT', 'Transport de lots'),
+    ('PALETTE', 'Palettes / Messagerie palettisée'),
+    ('URBAIN', 'Urbain / Dernier kilomètre'),
+    ('VRAC_SOLIDE', 'Vrac solide'),
+    ('VRAC_LIQUIDE', 'Vrac liquide'),
+    ('TEMPERATURE', 'Temérature dirigée'),
+    ('PLATEAU', 'Plateau bachés et spécifiques'),
+    ('MULTIMODAL', 'Multimodal'),
+    ('LOCATION', 'Location'),
+    ('ANIMAL', 'Animaux vivants'),
+    ('VEHICULE', 'Transport de véhicules'),
+)
+
 class Transporteur(models.Model):
     siret = models.CharField(max_length=transporteurs_validators.SIRET_LENGTH,
         validators=[transporteurs_validators.validate_siret],
@@ -71,7 +85,10 @@ class Transporteur(models.Model):
     working_area = models.CharField(max_length=12, choices=WORKING_AREA_CHOICES, blank=True, default=WORKING_AREA_UNDEFINED)
     # This field is used when working_area is set to WORKING_AREA_DEPARTEMENT
     working_area_departements = ArrayField(models.IntegerField(), blank=True, null=True)
-    # type_marchandise = categories from FNTR
+    specialities = ArrayField(
+        models.CharField(max_length=63, choices=SPECIALITY_CHOICES),
+        blank=True, null=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     # The field is updated when the form is submitted by the user.
     # It means a user has validated the information.

@@ -24,8 +24,8 @@ class TransporteurFactory(factory.django.DjangoModelFactory):
         model = models.Transporteur
 
     siret = fuzzy.FuzzyText(length=validators.SIRET_LENGTH, chars=string.digits)
-    categorie_juridique = "Société par actions simplifiée (SAS)"
     raison_sociale = factory.LazyAttribute(lambda _: faker.company().upper())
+    categorie_juridique = "Société par actions simplifiée (SAS)"
     adresse = factory.LazyAttribute(lambda _: faker.street_address().upper())
     code_postal = factory.Faker('zipcode')
     ville = factory.LazyAttribute(lambda _: faker.city().upper())
@@ -36,10 +36,11 @@ class TransporteurFactory(factory.django.DjangoModelFactory):
     code_ape = '4941A'
     libelle_ape = 'Transports routiers de fret interurbains'
     gestionnaire = factory.LazyAttribute(lambda _: faker.name().upper())
-    working_area = models.WORKING_AREA_DEPARTEMENT
-    working_area_departements = [35, 44]
     lti_numero = factory.LazyAttributeSequence(get_lti_number)
     lti_date_debut = fuzzy.FuzzyDate(datetime.date(2015, 1, 1))
     lti_date_fin = factory.LazyAttribute(
         lambda o: o.lti_date_debut + datetime.timedelta(days=6*364))
     lti_nombre = fuzzy.FuzzyInteger(1, 20)
+    working_area = models.WORKING_AREA_DEPARTEMENT
+    working_area_departements = [35, 44]
+    specialities = ['TEMPERATURE', 'URBAIN']
