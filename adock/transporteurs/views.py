@@ -94,7 +94,7 @@ def search(request):
         transporteurs = transporteurs.filter(specialities__contains=specialities)
 
     transporteurs = (transporteurs
-        .order_by('raison_sociale', '-completeness')
+        .order_by('-completeness', 'raison_sociale')
         .values(*TRANSPORTEUR_LIST_FIELDS)
         [:settings.TRANSPORTEURS_LIMIT])
 
