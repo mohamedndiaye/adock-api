@@ -9,6 +9,10 @@ from .. import models
 from .. import factories
 from . import test
 
+PHONE = '+33240424546'
+PHONE_DISPLAY = '02 40 42 45 46'
+EMAIL = 'foo@example.com'
+
 
 class TransporteurDetailTestCase(TestCase):
     def setUp(self):
@@ -59,7 +63,7 @@ class TransporteurDetailTestCase(TestCase):
     def test_patch_log(self):
         transporteur = self.patch_transporteur(
             {
-                'telephone': '+33102030405',
+                'telephone': PHONE,
             },
             200
         )
@@ -70,12 +74,12 @@ class TransporteurDetailTestCase(TestCase):
         # Old value
         self.assertEqual(transporteur_log.data['telephone'], str(self.transporteur.telephone))
         # New value
-        self.assertEqual(transporteur['telephone'], '01 02 03 04 05')
+        self.assertEqual(transporteur['telephone'], PHONE_DISPLAY)
 
         self.transporteur.refresh_from_db()
         transporteur = self.patch_transporteur(
             {
-                'telephone': '+33102030405',
+                'telephone': PHONE,
                 'working_area_departements': '24, 56',
             },
             200
@@ -91,46 +95,63 @@ class TransporteurDetailTestCase(TestCase):
         )
 
         self.transporteur.refresh_from_db()
-        # New phone and email fields
         transporteur = self.patch_transporteur(
             {
-                'telephone': '+33102030406',
-                'email': 'foo@example.com',
-                'working_area_departements': '24, 56',
+                'telephone': PHONE,
+                'email': EMAIL,
+                'working_area_departements': '24, 57',
             },
             200
         )
         self.assertEqual(models.TransporteurLog.objects.count(), 3)
-        # Only working area has changed
+        # Only working area and email have changed
         transporteur_log = models.TransporteurLog.objects.order_by('-pk').first()
         self.assertEqual(len(transporteur_log.data), 2)
+        self.assertIn('email', transporteur_log.data)
+        self.assertIn('working_area_departements', transporteur_log.data)
 
     def test_patch_phone_email(self):
-        NEW_PHONE = '+33240424546'
-        NEW_EMAIL = 'foo@example.com'
-
         # Initial status
-        self.assertNotEqual(self.transporteur.telephone, NEW_PHONE)
-        self.assertNotEqual(self.transporteur.email, NEW_EMAIL)
+        self.assertNotEqual(self.transporteur.telephone, PHONE)
+        self.assertNotEqual(self.transporteur.email, EMAIL)
         self.assertEqual(len(mail.outbox), 0)
 
         # Apply changes w/o working area
         with self.settings(MANAGERS=(("Manager", 'manager@example.com'))):
             data = self.patch_transporteur(
                 {
-                    'telephone': NEW_PHONE,
-                    'email': NEW_EMAIL
+                    'telephone': PHONE,
+                    'email': EMAIL
                 },
                 200
             )
-        self.assertEqual(data['telephone'], '02 40 42 45 46')
-        self.assertEqual(data['email'], NEW_EMAIL)
+        self.assertEqual(data['telephone'], PHONE_DISPLAY)
+        self.assertEqual(data['email'], EMAIL)
         self.assertEqual(len(mail.outbox), 1)
         message = "[adock] Modification du transporteur %s" % self.transporteur.siret
         self.assertEqual(mail.outbox[0].subject, message)
         self.assertIn('telephone', mail.outbox[0].body)
         self.assertIn('email', mail.outbox[0].body)
         self.assertNotIn('working', mail.outbox[0].body)
+
+    def test_patch_partial_completeness(self):
+        # Remove other fields
+        self.transporteur.working_area = models.WORKING_AREA_UNDEFINED
+        self.transporteur.specialities = None
+        self.transporteur.save()
+        transporteur = self.patch_transporteur(
+            {
+                'telephone': PHONE,
+                'email': EMAIL
+            },
+            200
+        )
+        self.transporteur.refresh_from_db()
+        self.assertEqual(transporteur['completeness'], self.transporteur.completeness)
+        self.assertEqual(
+            self.transporteur.completeness,
+            models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE
+        )
 
     def test_patch_full_completeness(self):
         NEW_PHONE = '+33240424546'
