@@ -24,10 +24,10 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(data['siret'], test.VALID_SIRET)
         self.assertEqual(data['raison_sociale'], self.transporteur.raison_sociale)
         self.assertEqual(data['debut_activite'], str(self.transporteur.debut_activite))
-        # Two original fields not validated and a working area => 4 points
+        # Two original fields not validated, working area and specialities => 3 points
         self.assertEqual(
             data['completeness'],
-            models.COMPLETENESS_PERCENT_MIN + 4 * models.EARNED_POINT_VALUE)
+            models.COMPLETENESS_PERCENT_MIN + 3 * models.EARNED_POINT_VALUE)
         self.assertEqual(data['working_area'], 'DEPARTEMENT')
         self.assertEqual(data['working_area_departements'], [35, 44])
         self.assertEqual(
@@ -105,7 +105,7 @@ class TransporteurDetailTestCase(TestCase):
         transporteur_log = models.TransporteurLog.objects.order_by('-pk').first()
         self.assertEqual(len(transporteur_log.data), 2)
 
-    def test_patch(self):
+    def test_patch_phone_email(self):
         NEW_PHONE = '+33240424546'
         NEW_EMAIL = 'foo@example.com'
 
@@ -132,6 +132,10 @@ class TransporteurDetailTestCase(TestCase):
         self.assertIn('email', mail.outbox[0].body)
         self.assertNotIn('working', mail.outbox[0].body)
 
+    def test_patch_full_completeness(self):
+        NEW_PHONE = '+33240424546'
+        NEW_EMAIL = 'foo@example.com'
+
         # Apply changes with working area
         with self.settings(MANAGERS=(("Manage", 'manager@example.com'))):
             data = self.patch_transporteur(
@@ -140,6 +144,7 @@ class TransporteurDetailTestCase(TestCase):
                     'email': NEW_EMAIL,
                     'working_area': models.WORKING_AREA_DEPARTEMENT,
                     'working_area_departements': '23 45 ,,,67',
+                    'specialities': ['LOT'],
                 },
                 200
             )
@@ -149,8 +154,9 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(data['email'], NEW_EMAIL)
         self.assertEqual(data['working_area'], models.WORKING_AREA_DEPARTEMENT)
         self.assertListEqual(data['working_area_departements'], [23, 45, 67])
+        self.assertListEqual(data['specialities'], ['LOT'])
         self.assertEqual(data['completeness'], 100)
-        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(len(mail.outbox), 1)
 
         # Be sure the response is identical to the DB
         self.transporteur.refresh_from_db()
@@ -158,6 +164,7 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(self.transporteur.email, NEW_EMAIL)
         self.assertEqual(self.transporteur.working_area, models.WORKING_AREA_DEPARTEMENT)
         self.assertEqual(self.transporteur.working_area_departements, [23, 45, 67])
+        self.assertEqual(self.transporteur.specialities, ['LOT'])
         self.assertEqual(self.transporteur.completeness, 100)
 
     def test_invalid_patch_request(self):
@@ -185,23 +192,32 @@ class TransporteurDetailTestCase(TestCase):
 
     def test_completeness(self):
         # The default factory sets telephone and email but they aren't validated
-        # and the working area.
+        # a working area and specialities.
         self.assertEqual(
             self.transporteur.completeness,
-            models.COMPLETENESS_PERCENT_MIN + 4 * models.EARNED_POINT_VALUE
+            models.COMPLETENESS_PERCENT_MIN + 3 * models.EARNED_POINT_VALUE
         )
 
-        # No telephone and working area
+        # No telephone and no working area
+        # Still email not validated and specialities.
         self.transporteur.working_area = models.WORKING_AREA_UNDEFINED
         self.transporteur.telephone = ''
+        self.transporteur.save()
+        self.assertEqual(
+            self.transporteur.completeness,
+            models.COMPLETENESS_PERCENT_MIN + 1.5 * models.EARNED_POINT_VALUE
+        )
+
+        # No email
+        self.transporteur.email = ''
         self.transporteur.save()
         self.assertEqual(
             self.transporteur.completeness,
             models.COMPLETENESS_PERCENT_MIN + models.EARNED_POINT_VALUE
         )
 
-        # No email
-        self.transporteur.email = ''
+        # No specialities
+        self.transporteur.specialities = None
         self.transporteur.save()
         self.assertEqual(
             self.transporteur.completeness,
@@ -214,7 +230,7 @@ class TransporteurDetailTestCase(TestCase):
         self.transporteur.save()
         self.assertEqual(
             self.transporteur.completeness,
-            models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE
+            models.COMPLETENESS_PERCENT_MIN + models.EARNED_POINT_VALUE
         )
 
         # Phone and email validated
@@ -223,10 +239,12 @@ class TransporteurDetailTestCase(TestCase):
         self.transporteur.save()
         self.assertEqual(
             self.transporteur.completeness,
-            models.COMPLETENESS_PERCENT_MIN + 4 * models.EARNED_POINT_VALUE
+            models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE
         )
 
-        # Fully validated 100%
+        # Add working area and specialities
+        # Completeful 100%
         self.transporteur.working_area = models.WORKING_AREA_DEPARTEMENT
+        self.transporteur.specialities = ['LOT']
         self.transporteur.save()
         self.assertEqual(self.transporteur.completeness, 100)

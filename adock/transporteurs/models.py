@@ -10,7 +10,7 @@ COMPLETENESS_PERCENT_MAX = 100
 COMPLETENESS_PERCENT_MIN = 40
 
 # Tied to completeness() property
-EARNED_POINTS_MAX = 6
+EARNED_POINTS_MAX = 4
 EARNED_POINT_VALUE = (COMPLETENESS_PERCENT_MAX - COMPLETENESS_PERCENT_MIN) / EARNED_POINTS_MAX
 
 WORKING_AREA_UNDEFINED = ''
@@ -125,21 +125,22 @@ class Transporteur(models.Model):
         Take care to adjust EARNED_POINTS_MAX on changes or unit tests will warn you!
         Rules:
         - nothing: 0
-        - +1 for a phone or an email not validated
-        - +2 for a phone or an email validated
-        - +2 for a working area
-        Maximum: 6 (2 points for each field)
+        - +0.5 for a phone or an email not validated
+        - +1 for all others (phone, email, working_area and specialities)
+        Maximum: 4
         """
         earned_points = 0
-        original_fields_weight = 1 if self.validated_at is None else 2
+        original_fields_weight = 0.5 if self.validated_at is None else 1
         if self.telephone:
             earned_points += original_fields_weight
         if self.email:
             earned_points += original_fields_weight
         if self.working_area != WORKING_AREA_UNDEFINED:
-            earned_points += 2
+            earned_points += 1
+        if self.specialities:
+            earned_points += 1
 
-        return COMPLETENESS_PERCENT_MIN + EARNED_POINT_VALUE * earned_points
+        return COMPLETENESS_PERCENT_MIN + earned_points * EARNED_POINT_VALUE
 
     def save(self, *args, **kwargs):
         self.completeness = self.compute_completeness()
