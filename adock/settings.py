@@ -148,6 +148,7 @@ TRANSPORTEURS_LIMIT = 200
 
 USE_DEBUG_CONSOLE = False
 USE_DJANGO_EXTENSIONS = False
+USE_RAVEN = True
 
 try:
     from .settings_local import *  # noqa
@@ -186,3 +187,7 @@ if USE_DEBUG_CONSOLE:
 
 if USE_DJANGO_EXTENSIONS:
     INSTALLED_APPS += ('django_extensions',)
+
+if USE_RAVEN:
+    INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
+    # RAVEN_CONFIG should be provided by production settings

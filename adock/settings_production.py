@@ -1,3 +1,6 @@
+import os
+import raven
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -27,3 +30,8 @@ CORS_ORIGIN_WHITELIST = (
 )
 ALLOWED_HOSTS = [SERVER_NAME]
 SECRET_KEY = ''
+
+RAVEN_CONFIG = {
+    'dsn': 'https://URL-TO-PASTE-FROM-SENTRY-IO',
+    'release': raven.fetch_git_sha(os.path.dirname(os.pardir)),
+}
