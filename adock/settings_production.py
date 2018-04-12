@@ -1,7 +1,3 @@
-DEBUG = False
-USE_DEBUG_CONSOLE = False
-USE_DJANGO_EXTENSIONS = False
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

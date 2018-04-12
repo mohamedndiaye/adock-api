@@ -25,8 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'ikc26ecc!xo8kck_8+_il6)m-^px@weoi6tq_1t+(50ar896h3'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Application definition
 
@@ -147,8 +146,8 @@ EMAIL_HOST_PASSWORD = ''
 
 TRANSPORTEURS_LIMIT = 200
 
-USE_DEBUG_CONSOLE = DEBUG
-USE_DJANGO_EXTENSIONS = DEBUG
+USE_DEBUG_CONSOLE = False
+USE_DJANGO_EXTENSIONS = False
 
 try:
     from .settings_local import *  # noqa
