@@ -18,12 +18,20 @@ def get_lti_number(o, n):
         n
     )
 
+def compute_vat_number(siret):
+    siren = siret[:validators.SIREN_LENGTH]
+    try:
+        key = (12 + 3 * (int(siren) % 97)) % 97
+        return 'FR%d%s' % (key, siren)
+    except ValueError:
+        return ''
 
 class TransporteurFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Transporteur
 
     siret = fuzzy.FuzzyText(length=validators.SIRET_LENGTH, chars=string.digits)
+    numero_tva = factory.LazyAttribute(lambda o: compute_vat_number(o.siret))
     raison_sociale = factory.LazyAttribute(lambda _: faker.company().upper())
     categorie_juridique = "Société par actions simplifiée (SAS)"
     adresse = factory.LazyAttribute(lambda _: faker.street_address().upper())
