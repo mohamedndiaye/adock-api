@@ -34,6 +34,7 @@ SPECIALITY_CHOICES = (
     ('LOCATION', 'Location'),
     ('ANIMAL', 'Animaux vivants'),
     ('VEHICULE', 'Transport de véhicules'),
+    ('AUTRE', 'Autre')
 )
 
 class Transporteur(models.Model):
