@@ -12,4 +12,5 @@ class SubscriptionForm(forms.ModelForm):
             'working_area',
             'working_area_departements',
             'specialities',
+            'website',
         ]

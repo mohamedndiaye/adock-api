@@ -188,13 +188,26 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(self.transporteur.specialities, ['LOT'])
         self.assertEqual(self.transporteur.completeness, 100)
 
-    def test_invalid_patch_request(self):
+    def test_patch_website(self):
+        WEBSITE = 'http://www.example.com'
+        data = self.patch_transporteur(
+            {
+                'telephone': PHONE,
+                'website': 'www.example.com',
+            },
+            200
+        )
+        self.assertEqual(data['website'], WEBSITE)
+        self.transporteur.refresh_from_db()
+        self.assertEqual(self.transporteur.website, WEBSITE)
+
+    def test_patch_invalid_request(self):
         response = self.client.patch(self.detail_url, {'foo': 'foo'})
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertEqual(data['message'], 'Seules les requêtes PATCH en JSON sont prises en charge.')
 
-    def test_invalid_patch_payload(self):
+    def test_patch_invalid_payload(self):
         response = self.client.patch(self.detail_url, {'foo': 'foo'}, 'application/json')
         self.assertEqual(response.status_code, 400)
         data = response.json()

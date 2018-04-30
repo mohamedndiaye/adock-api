@@ -90,6 +90,7 @@ class Transporteur(models.Model):
         models.CharField(max_length=63, choices=SPECIALITY_CHOICES),
         blank=True, null=True
     )
+    website = models.URLField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     # The field is updated when the form is submitted by the user.
     # It means a user has validated the information.
