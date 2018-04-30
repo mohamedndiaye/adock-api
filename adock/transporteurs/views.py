@@ -172,9 +172,11 @@ def transporteur_detail(request, transporteur_siret):
         if not form.is_valid():
             return JsonResponse(form.errors, status=400)
 
-        # Valid
-        cleaned_payload = {k: form.cleaned_data[k] for k in payload.keys()}
+        # Limit cleaned_data to the keys of the payload but only accept keys of cleaned_data (intersection)
+        # to only update the submitted values
+        cleaned_payload = {k: form.cleaned_data[k] for k in payload.keys() if k in form.cleaned_data}
 
+        # Only apply the submitted values if they are different in DB
         old_data_changed = get_transporteur_changes(transporteur, cleaned_payload)
         if old_data_changed:
             # Data has been modified so saving is required

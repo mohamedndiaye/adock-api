@@ -200,6 +200,16 @@ class TransporteurDetailTestCase(TestCase):
         data = response.json()
         self.assertEqual(data['message'], 'Les données ne sont pas valides.')
 
+    def test_patch_unknow_payload(self):
+        data = self.patch_transporteur(
+            {
+                'telephone': PHONE,
+                'foo': '42',
+            },
+            200
+        )
+        self.assertNotIn('foo', data)
+
     def test_invalid_phone(self):
         data = self.patch_transporteur(
             {
