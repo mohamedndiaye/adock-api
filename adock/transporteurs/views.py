@@ -117,18 +117,18 @@ def get_transporteur_changes(transporteur, cleaned_payload):
 
 def mail_managers_changes(transporteur, old_data_changed):
     # Send a mail to managers to track changes
+    # The URL is detail view of the front application
     subject = "Modification du transporteur {0}".format(transporteur.siret)
     message = """
 Modification du transporteur : {raison_sociale}
 SIRET : {siret}
-https://{website}{transporteur_url}
+https://{website}/transporteur/{siret}
 
 Valeurs modifiées :
     """.format(
         raison_sociale=transporteur.raison_sociale,
         siret=transporteur.siret,
         website=settings.WEBSITE,
-        transporteur_url=transporteur.get_absolute_url()
     )
 
     for field, old_value in old_data_changed.items():

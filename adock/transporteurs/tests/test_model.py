@@ -25,3 +25,4 @@ class TransporteurModelTestCase(TestCase):
         self.assertEqual(str(transporteur), test.VALID_SIRET)
         self.assertEqual(transporteur.get_siren(), '123456789')
         self.assertEqual(transporteur.get_nic(), '12345')
+        self.assertIn(test.VALID_SIRET, transporteur.get_absolute_url())
