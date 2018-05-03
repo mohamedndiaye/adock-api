@@ -14,10 +14,12 @@ EARNED_POINTS_MAX = 4
 EARNED_POINT_VALUE = (COMPLETENESS_PERCENT_MAX - COMPLETENESS_PERCENT_MIN) / EARNED_POINTS_MAX
 
 WORKING_AREA_UNDEFINED = ''
+WORKING_AREA_INTERNATIONAL = 'INTERNATIONAL'
 WORKING_AREA_FRANCE = 'FRANCE'
 WORKING_AREA_DEPARTEMENT = 'DEPARTEMENT'
 WORKING_AREA_CHOICES = (
     (WORKING_AREA_UNDEFINED, 'Non définie'),
+    (WORKING_AREA_INTERNATIONAL, 'Internationale'),
     (WORKING_AREA_FRANCE, 'France'),
     (WORKING_AREA_DEPARTEMENT, 'Départementale')
 )
@@ -83,7 +85,7 @@ class Transporteur(models.Model):
     lc_nombre = models.PositiveSmallIntegerField(default=0)
     # To store computed vat_number
     numero_tva = models.CharField(max_length=13)
-    working_area = models.CharField(max_length=12, choices=WORKING_AREA_CHOICES, blank=True, default=WORKING_AREA_UNDEFINED)
+    working_area = models.CharField(max_length=15, choices=WORKING_AREA_CHOICES, blank=True, default=WORKING_AREA_UNDEFINED)
     # This field is used when working_area is set to WORKING_AREA_DEPARTEMENT
     working_area_departements = ArrayField(models.IntegerField(), blank=True, null=True)
     specialities = ArrayField(

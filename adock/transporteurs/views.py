@@ -84,6 +84,7 @@ def search(request):
 
     if departements:
         transporteurs = transporteurs.filter(
+            Q(working_area=models.WORKING_AREA_INTERNATIONAL) |
             Q(working_area=models.WORKING_AREA_FRANCE) |
             Q(working_area=models.WORKING_AREA_DEPARTEMENT, working_area_departements__contains=departements)
         )

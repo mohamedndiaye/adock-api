@@ -117,6 +117,8 @@ class TransporteurSearchDepartementTestCase(TransporteurSearchTestCase):
             # Be sure filtering on working are is applied
             working_area_departements=[35, 44])
         factories.TransporteurFactory(
+            raison_sociale='INTERNATIONAL', working_area=models.WORKING_AREA_INTERNATIONAL)
+        factories.TransporteurFactory(
             raison_sociale='FRANCE', working_area=models.WORKING_AREA_FRANCE)
         factories.TransporteurFactory(
             raison_sociale='DEP. 35, 44', working_area=models.WORKING_AREA_DEPARTEMENT,
@@ -131,14 +133,18 @@ class TransporteurSearchDepartementTestCase(TransporteurSearchTestCase):
         data = response.json()
         self.assertEqual(data['message'], "Le numéro de département « A » est non valide.")
 
-    def test_search_france(self):
+    def test_search_international_france(self):
         transporteurs = self.get_transporteurs({'departement-depart': 93})
-        self.assertEqual(len(transporteurs), 1)
-        self.assertEqual(transporteurs[0]['raison_sociale'], 'FRANCE')
+        self.assertEqual(len(transporteurs), 2)
+        raison_sociales = sorted([transporteur['raison_sociale'] for transporteur in transporteurs])
+        self.assertListEqual(raison_sociales, ['FRANCE', 'INTERNATIONAL'])
 
     def test_search_one_departement(self):
-        transporteurs = self.get_transporteurs({'departement-depart': 35})
-        self.assertEqual(len(transporteurs), 2)
+        transporteurs = self.get_transporteurs({
+            'q': 'DEP. 35',
+            'departement-depart': 35
+        })
+        self.assertEqual(len(transporteurs), 1)
 
     def test_search_two_departements(self):
         transporteurs = self.get_transporteurs({
