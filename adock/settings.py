@@ -128,6 +128,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+DATAFILES_ROOT = os.path.join(BASE_DIR, 'datafiles')
+
 WEBSITE = 'adock.beta.gouv.fr'
 
 CORS_ORIGIN_ALLOW_ALL = False

@@ -162,3 +162,12 @@ class TransporteurLog(models.Model):
 
     class Meta:
         db_table = 'transporteur_log'
+
+
+class TransporteurScraper(models.Model):
+    source = models.CharField(max_length=32)
+    title = models.CharField(max_length=126)
+    url = models.URLField()
+
+    class Meta:
+        db_table = 'transporteur_scraper'
