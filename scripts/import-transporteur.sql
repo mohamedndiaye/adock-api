@@ -44,6 +44,5 @@ insert into transporteur
     inner join sirene as s
        on s.siret = m.siret;
 -- TODO Update of addresses. Rewrite as UPSERT?
--- TODO Dashboard to display inconsistencies (if any)
 
 commit;
