@@ -32,7 +32,7 @@ create table sirene (
     numvoie varchar(4),
     -- B (bis), T (ter), Q (quarter), etc
     indrep varchar(1),
-    typevoie varchar(4),
+    typvoie varchar(4),
     libvoie varchar(32),
     codpos varchar(5),
     cedex varchar(5),

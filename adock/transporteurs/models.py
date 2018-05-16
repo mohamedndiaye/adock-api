@@ -50,7 +50,7 @@ class Transporteur(models.Model):
     categorie_juridique = models.TextField()
     # This company is the siege social
     is_siege = models.BooleanField(default=False)
-    # numvoie, typevoie, libvoie from Sirene
+    # numvoie, typvoie, libvoie from Sirene
     adresse = models.CharField(max_length=126)
     # codpos from Sirene (code_postal in Marchandise)
     code_postal = models.CharField(max_length=5)

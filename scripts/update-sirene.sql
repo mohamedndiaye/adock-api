@@ -4,7 +4,7 @@ drop table if exists sirene_update;
 create table sirene_update(like sirene);
 
 alter table sirene_update add eve varchar(4);
-alter table sirene_update add dateeve varchar(8);
+alter table sirene_update add dateve varchar(8);
 alter table sirene_update add typcreh varchar(1);
 alter table sirene_update add dreactet varchar(8);
 alter table sirene_update add dreacten varchar(8);

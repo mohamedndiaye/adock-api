@@ -17,9 +17,9 @@ insert into transporteur
            m.raison_sociale,
            m.categorie_juridique,
            m.is_siege,
-           coalesce(s.numvoie || ' ' || s.typevoie || ' ' || s.libvoie, '') as adresse,
-           m.code_postal,
-           m.commune,
+           s.numvoie || ' ' || s.typvoie || ' ' || s.libvoie as adresse,
+           s.codpos,
+           s.libcom,
            '', '',
            case s.dcret when '' then null else to_date(s.dcret, 'YYYYMMDD') end,
            case s.ddebact when '' then null else to_date(s.ddebact, 'YYYYMMDD') end,
@@ -48,7 +48,7 @@ with filtered_greco as (
     from greco as g
     join sirene as s
       on g.siren = s.siren
-    where g.localisation like '%' || s.numvoie || ' ' || s.typevoie || ' ' || s.libvoie || '%'
+    where g.localisation like '%' || s.numvoie || ' ' || s.typvoie || ' ' || s.libvoie || '%'
       and g.ville = s.libcom
 )
 --- Only applied if no validated data in transporteur.
