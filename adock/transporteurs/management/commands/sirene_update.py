@@ -1,3 +1,4 @@
+from glob import glob
 import os
 import subprocess
 import tempfile
@@ -20,15 +21,14 @@ class Command(BaseCommand):
                 with zipfile.ZipFile(zip_filename, 'r') as zf:
                     zf.extractall(tmp_dirname)
 
-                # List CSV file
-                for root, dirs, files in os.walk(tmp_dirname):
-                    fullname = os.path.join(root, files[0])
-                    print(fullname)
+                # List CSV files
+                for filename in glob(tmp_dirname + '/*.csv'):
+                    print(filename)
                     # Call SQL script on it...
                     sed_ps = subprocess.Popen(
                         [
                             'sed',
-                            's:FILENAMEPLACEHOLDER:' + fullname + ':g',
+                            's:FILENAMEPLACEHOLDER:' + filename + ':g',
                             os.path.join(settings.BASE_DIR, 'scripts', 'update-sirene.sql')
                         ],
                         stdout=subprocess.PIPE
