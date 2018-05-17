@@ -39,10 +39,13 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
         self.assertEqual(len(transporteurs), 1)
         self.assertEqual(transporteurs[0]['siret'], test.VALID_SIRET)
 
-    def test_search_with_spaced_siret(self):
+    def test_search_with_siret_code_postal(self):
         # Search on SIRET with spaces
-        factories.TransporteurFactory(siret=test.VALID_SIRET)
-        transporteurs = self.get_transporteurs({'q': ' ' + test.VALID_SIRET[0:4] + ' ' + test.VALID_SIRET[4:]})
+        factories.TransporteurFactory(
+            siret=test.VALID_SIRET,
+            code_postal='35000'
+        )
+        transporteurs = self.get_transporteurs({'q': ' ' + test.VALID_SIRET[0:6] + ', 35'})
         self.assertEqual(len(transporteurs), 1)
 
     def test_search_with_raison_sociale(self):
@@ -51,6 +54,17 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
         self.assertEqual(len(transporteurs), 1)
 
         transporteurs = self.get_transporteurs({'q': 'rg'})
+        self.assertEqual(len(transporteurs), 0)
+
+    def test_search_with_code_postal(self):
+        factories.TransporteurFactory(
+            raison_sociale='XPO BOIS DISTRIBUTION',
+            code_postal='49000'
+        )
+        transporteurs = self.get_transporteurs({'q': 'xpo, DIS, 49'})
+        self.assertEqual(len(transporteurs), 1)
+
+        transporteurs = self.get_transporteurs({'q': 'xpo DIS, 49'})
         self.assertEqual(len(transporteurs), 0)
 
     def test_search_ordering(self):

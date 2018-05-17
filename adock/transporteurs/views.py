@@ -48,18 +48,29 @@ def search(request):
        - partial raison sociale or SIRET
        - type of the license (LC heavy or LTI light)
     """
-    transporteurs = models.Transporteur.objects.all()
 
+    transporteurs = models.Transporteur.objects.all()
     q = request.GET.get('q')
     if q:
         # Filtering on raison sociale or SIRET
         q = q.upper()
-        stripped_q = q.replace(' ', '')
-        if validators.RE_NOT_DIGIT.search(stripped_q):
-            # The search criteria contains at least one not digit character so search on name
-            transporteurs = transporteurs.filter(raison_sociale__contains=q)
-        else:
-            transporteurs = transporteurs.filter(siret__startswith=stripped_q)
+        criteria_list = q.split(',')
+        for criteria in criteria_list:
+            criteria = criteria.strip()
+            if validators.RE_NOT_DIGIT.search(criteria):
+                # The search criteria contains at least one not digit character so search on name
+                transporteurs = transporteurs.filter(raison_sociale__contains=criteria)
+            else:
+                if len(criteria) > 5:
+                    # SIREN is longer than 5
+                    transporteurs = transporteurs.filter(siret__startswith=criteria)
+                else:
+                    # Zip code are shorter than 5 digits, could be a digit in the
+                    # company name too
+                    transporteurs = transporteurs.filter(
+                        Q(code_postal__startswith=criteria) |
+                        Q(raison_sociale__contains=criteria)
+                    )
 
     # Filtering on type of license
     license_types = request.GET.getlist('licence-types[]')
