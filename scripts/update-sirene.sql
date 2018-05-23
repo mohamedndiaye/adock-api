@@ -28,4 +28,69 @@ alter table sirene_update add tel varchar(14);
 
 --- cat update-sirene.sql | sed s:FILENAMEPLACEHOLDER:foo.csv:g | psql adock
 \copy sirene_update from 'FILENAMEPLACEHOLDER' with csv header delimiter ';' null '' encoding 'ISO-8859-1';
+
+insert into sirene (
+        siret,
+        siren,
+        nic,
+        numvoie,
+        indrep,
+        typvoie,
+        libvoie,
+        codpos,
+        libcom,
+        dcret,
+        ddebact,
+        apen700,
+        libapen,
+        is_hidden
+    )
+    select siren || nic as siret,
+        siren,
+        nic,
+        numvoie,
+        indrep,
+        typvoie,
+        libvoie,
+        codpos,
+        libcom,
+        dcret,
+        ddebact,
+        apen700,
+        libapen,
+        false
+    from sirene_update su
+    where vmaj in ('C', 'D')
+      and not exists (
+        select 1
+        from sirene s
+        where s.siren = su.siren
+          and s.nic = su.nic
+      );
+
+-- 'I' Initial is ignored
+-- Sort by datemaj
+update sirene s
+    set numvoie = su.numvoie,
+        indrep = su.indrep,
+        typvoie = su.typvoie,
+        libvoie = su.libvoie,
+        codpos = su.codpos,
+        libcom = su.libcom,
+        dcret = su.dcret,
+        ddebact = su.ddebact,
+        apen700 = su.apen700,
+        libapen = su.libapen,
+        is_hidden = case su.vmaj when 'O' then true else false end,
+        is_deleted = case su.vmaj when 'E' then true else false end
+    from (
+        select *
+        from sirene_update
+        where vmaj in ('D', 'O', 'F', 'E')
+        order by datemaj
+        for update
+    ) as su
+    where su.siren = s.siren
+      and su.nic = s.nic;
+
 commit;
