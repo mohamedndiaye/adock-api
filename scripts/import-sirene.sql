@@ -7,8 +7,11 @@ begin;
 
 drop table if exists sirene;
 
+-- Fields copied into transporteur table are marked with the letter 'U' for 'Used'
 create table sirene (
+    -- U
     siren char(9),
+    -- U
     nic char(5),
     --- Adresse normalisée
     l1_normalisee varchar(38),
@@ -28,12 +31,15 @@ create table sirene (
     l6_declaree varchar(38),
     l7_declaree varchar(38),
 
-    --- Adresse géographique
+    -- U - Adresse géographique
     numvoie varchar(4),
     -- B (bis), T (ter), Q (quarter), etc
     indrep varchar(1),
+    -- U
     typvoie varchar(4),
+    -- U
     libvoie varchar(32),
+    -- U
     codpos varchar(5),
     cedex varchar(5),
 
@@ -44,6 +50,7 @@ create table sirene (
     arronet varchar(2),
     ctonet varchar(3),
     comet varchar(3),
+    -- U - Commune de l'établissement
     libcom varchar(32),
     du varchar(2),
     -- Taille de l'unité urbaine
@@ -80,8 +87,9 @@ create table sirene (
     -- Année de validité de l'effectif salarié de l'établissement
     defet varchar(4),
     origine varchar(2),
-    -- Date de création de l'établissement AAAAMMJJ
+    -- U - Date de création de l'établissement AAAAMMJJ
     dcret varchar(8),
+    -- U - Date de début d'activité
     ddebact varchar(8),
     activnat varchar(2),
     lieuact varchar(2),
@@ -117,7 +125,9 @@ create table sirene (
     -- Nature juridique de l'entreprise
     nj varchar(4),
     libnj varchar(100),
+    -- U - Code activité
     apen700 varchar(5),
+    -- U - Libelle activité
     libapen varchar(65),
     -- AAAA
     dapen varchar(4),
