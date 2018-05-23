@@ -168,8 +168,12 @@ create table sirene (
 
 \copy sirene from 'csv/sirene.csv' with csv header delimiter ';' null '' encoding 'ISO-8859-1';
 
-alter table sirene
-    add siret char(14);
+-- Slow but I'm not able to speed up the process by defining them in 'create table'
+-- because I have issues to specify the columns to copy from the CSV file
+
+alter table sirene add siret char(14);
+alter table sirene add is_hidden boolean default false;
+alter table sirene add is_deleted boolean default false;
 
 alter table sirene
     alter siret

@@ -4,6 +4,9 @@ drop table if exists sirene_update;
 create table sirene_update(like sirene);
 
 alter table sirene_update drop siret;
+alter table sirene_update drop is_deleted;
+alter table sirene_update drop is_hidden;
+
 alter table sirene_update add eve varchar(4);
 alter table sirene_update add dateve varchar(8);
 alter table sirene_update add typcreh varchar(1);

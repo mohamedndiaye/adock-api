@@ -51,6 +51,8 @@ class Command(BaseCommand):
                             self.style.ERROR("Timeout on running of '%s'" % filename))
 
                     if rc == 0:
+                        scraper.is_applied = True
+                        scraper.save()
                         self.stdout.write(
                             self.style.SUCCESS("Filename '%s' imported with success." % filename))
                     else:
