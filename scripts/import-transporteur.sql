@@ -17,7 +17,15 @@ insert into transporteur
            m.raison_sociale,
            m.categorie_juridique,
            m.is_siege,
-           s.numvoie || ' ' || s.typvoie || ' ' || s.libvoie as adresse,
+           s.numvoie ||
+           case s.indrep
+            when 'B' then ' bis'
+            when 'T' then ' ter'
+            when 'Q' then ' quater'
+            when 'C' then ' quinquies'
+            else ''
+          end
+           || ' ' || s.typvoie || ' ' || s.libvoie as adresse,
            s.codpos,
            s.libcom,
            '', '',
