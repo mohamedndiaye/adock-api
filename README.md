@@ -26,6 +26,20 @@ Dock par celles issues du projet [Sirène](https://www.data.gouv.fr/fr/datasets/
 Seules les informations de téléphone et adresse électronique sont extraites dans
 un second temps (mise à jour SQL) depuis la base de données GRECO.
 
+Les informations sont ensuite modifiées (champs téléphone et adresse
+électronique) et étendues (aire de travail, départements, spécialités et site
+Web) via l'application.
+
+## Actualisation des données
+
+Afin de mettre à jour les informations des entreprises des mises à jour sont
+effectués chaque jour par un traitement automatisé. Ces traitements consistent à
+collecter le flux quotidien de la base de données Sirène et à relire la base de
+jour actuelle du registre des transports.
+
+Seules les données non modifiables de la base de données A Dock sont mises à
+jour.
+
 ## Description des scripts d'import
 
 - `import-all.sh` créé la base de données, l'ensemble des tables et effectue
