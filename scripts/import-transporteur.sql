@@ -17,14 +17,14 @@ insert into transporteur
            m.raison_sociale,
            m.categorie_juridique,
            m.is_siege,
-           s.numvoie || ' ' || s.typevoie || ' ' || s.libvoie as adresse,
-           s.codpos,
-           s.libcom,
+           coalesce(s.numvoie || ' ' || s.typevoie || ' ' || s.libvoie, '') as adresse,
+           m.code_postal,
+           m.commune,
            '', '',
            case s.dcret when '' then null else to_date(s.dcret, 'YYYYMMDD') end,
            case s.ddebact when '' then null else to_date(s.ddebact, 'YYYYMMDD') end,
-           s.apen700,
-           s.libapen,
+           coalesce(s.apen700, ''),
+           coalesce(s.libapen, ''),
            m.gestionnaire_de_transport,
            m.numero_lti,
            m.date_debut_validite_lti,
@@ -35,10 +35,10 @@ insert into transporteur
            m.date_fin_validite_lc,
            m.nombre_de_copies_lc_valides,
            '', '', 40,
-           'FR' || to_char((12 + 3 * (cast(s.siren::char(9) as bigint) % 97)) % 97, 'fm00') || s.siren,
+           'FR' || to_char((12 + 3 * (cast(m.siret::char(9) as bigint) % 97)) % 97, 'fm00') || m.siret::char(9),
            now()
     from marchandise as m
-    inner join sirene as s
+    left join sirene as s
        on s.siret = m.siret;
 commit;
 begin;
