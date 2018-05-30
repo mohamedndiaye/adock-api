@@ -85,7 +85,9 @@ class Transporteur(models.Model):
     lc_nombre = models.PositiveSmallIntegerField(default=0)
     # To store computed vat_number
     numero_tva = models.CharField(max_length=13)
-    working_area = models.CharField(max_length=15, choices=WORKING_AREA_CHOICES, blank=True, default=WORKING_AREA_UNDEFINED)
+    working_area = models.CharField(
+        max_length=15, choices=WORKING_AREA_CHOICES, blank=True, default=WORKING_AREA_UNDEFINED
+    )
     # This field is used when working_area is set to WORKING_AREA_DEPARTEMENT
     working_area_departements = ArrayField(models.IntegerField(), blank=True, null=True)
     specialities = ArrayField(
@@ -99,6 +101,10 @@ class Transporteur(models.Model):
     validated_at = models.DateTimeField(blank=True, null=True)
     # Level of completeness of the carrier profile in percent
     completeness = models.PositiveSmallIntegerField(default=COMPLETENESS_PERCENT_MIN)
+    in_sirene = models.BooleanField(
+        default=False,
+        help_text="Drapeau indiquant la présence de l'entreprise dans la base de données Sirène."
+    )
 
     class Meta:
         db_table = 'transporteur'
