@@ -17,17 +17,18 @@ insert into transporteur
            m.raison_sociale,
            m.categorie_juridique,
            m.is_siege,
-           s.numvoie ||
-           case s.indrep
-            when 'B' then ' bis'
-            when 'T' then ' ter'
-            when 'Q' then ' quater'
-            when 'C' then ' quinquies'
-            else ''
-          end
-           || ' ' || s.typvoie || ' ' || s.libvoie as adresse,
-           s.codpos,
-           s.libcom,
+           coalesce(
+            s.numvoie ||
+            case s.indrep
+              when 'B' then ' bis'
+              when 'T' then ' ter'
+              when 'Q' then ' quater'
+              when 'C' then ' quinquies'
+              else ''
+            end || ' ' || s.typvoie || ' ' || s.libvoie,
+            '') as adresse,
+           m.code_postal,
+           m.commune,
            '', '',
            case s.dcret when '' then null else to_date(s.dcret, 'YYYYMMDD') end,
            case s.ddebact when '' then null else to_date(s.ddebact, 'YYYYMMDD') end,
