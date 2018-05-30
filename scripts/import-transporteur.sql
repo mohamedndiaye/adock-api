@@ -12,7 +12,7 @@ insert into transporteur
      lti_numero, lti_date_debut, lti_date_fin, lti_nombre,
      lc_numero, lc_date_debut, lc_date_fin, lc_nombre,
      working_area, website, completeness,
-     numero_tva, created_at)
+     numero_tva, created_at, in_sirene)
     select m.siret,
            m.raison_sociale,
            m.categorie_juridique,
@@ -45,7 +45,9 @@ insert into transporteur
            m.nombre_de_copies_lc_valides,
            '', '', 40,
            'FR' || to_char((12 + 3 * (cast(m.siret::char(9) as bigint) % 97)) % 97, 'fm00') || m.siret::char(9),
-           now()
+           now(),
+           -- In Sirene DB or not
+           s.apen700 is not null
     from marchandise as m
     left join sirene as s
        on s.siret = m.siret;
