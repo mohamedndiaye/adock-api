@@ -1,5 +1,4 @@
 from django.contrib.postgres.fields import ArrayField, JSONField
-from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.urls import reverse
 from django.conf import settings
