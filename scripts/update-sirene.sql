@@ -81,8 +81,8 @@ update sirene s
         ddebact = su.ddebact,
         apen700 = su.apen700,
         libapen = su.libapen,
-        is_hidden = case su.vmaj when 'O' then true else false end,
-        is_deleted = case su.vmaj when 'E' then true else false end
+        is_hidden = (su.vmaj = 'O'),
+        is_deleted = (su.vmaj = 'E')
     from (
         select *
         from sirene_update
