@@ -35,12 +35,14 @@ class Command(BaseCommand):
 
         # rsync them all
         for link in links:
+            url = link['url']
             try:
-                transporteurs_models.TransporteurFeed.objects.get(source='sirene', url=link['url'])
+                transporteurs_models.TransporteurFeed.objects.get(source='sirene', url=url)
             except ObjectDoesNotExist:
-                subprocess.run(['wget', '-c', link['url'], '-P', settings.DATAFILES_ROOT], check=True)
+                subprocess.run(['wget', '-c', url, '-P', settings.DATAFILES_ROOT], check=True)
                 transporteurs_models.TransporteurFeed.objects.create(
                     source='sirene',
                     title=link['title'],
-                    url=link['url'],
+                    url=url,
+                    filename=url.split('/')[-1]
                 )

@@ -1,6 +1,8 @@
 from django.contrib.postgres.fields import ArrayField, JSONField
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.urls import reverse
+from django.conf import settings
 
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -175,6 +177,7 @@ class TransporteurFeed(models.Model):
     source = models.CharField(max_length=32)
     title = models.CharField(max_length=126)
     url = models.URLField()
+    filename = models.FilePathField(path=settings.DATAFILES_ROOT)
     downloaded_at = models.DateTimeField(auto_now_add=True)
     applied_at = models.DateTimeField(blank=True, null=True)
 
