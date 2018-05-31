@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('transporteurs', '0016_transporteurscraper_is_applied'),
+        ('transporteurs', '0016_transporteurfeed_is_applied'),
     ]
 
     operations = [

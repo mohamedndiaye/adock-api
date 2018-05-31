@@ -170,12 +170,12 @@ class TransporteurLog(models.Model):
         db_table = 'transporteur_log'
 
 
-# FIXME Not happy with the model name, DataFiles?
-class TransporteurScraper(models.Model):
+class TransporteurFeed(models.Model):
+    """The table Transporteur is fed by various sources (Sirène, Registre ou GRECO)"""
     source = models.CharField(max_length=32)
     title = models.CharField(max_length=126)
     url = models.URLField()
     is_applied = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'transporteur_scraper'
+        db_table = 'transporteur_feed'

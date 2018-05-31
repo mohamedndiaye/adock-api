@@ -14,10 +14,10 @@ class Command(BaseCommand):
     help = "Update the Sirene DB with the downloaded data files."
 
     def handle(self, *args, **options):
-        scrapers = transporteurs_models.TransporteurScraper.objects.filter(is_applied=False)
-        for scraper in scrapers:
+        feeds = transporteurs_models.TransporteurFeed.objects.filter(is_applied=False)
+        for feed in feeds:
             with tempfile.TemporaryDirectory() as tmp_dirname:
-                zip_filename = os.path.join(settings.DATAFILES_ROOT, scraper.url.split('/')[-1])
+                zip_filename = os.path.join(settings.DATAFILES_ROOT, feed.url.split('/')[-1])
                 with zipfile.ZipFile(zip_filename, 'r') as zf:
                     zf.extractall(tmp_dirname)
 
@@ -51,8 +51,8 @@ class Command(BaseCommand):
                             self.style.ERROR("Timeout on running of '%s'" % filename))
 
                     if rc == 0:
-                        scraper.is_applied = True
-                        scraper.save()
+                        feed.is_applied = True
+                        feed.save()
                         self.stdout.write(
                             self.style.SUCCESS("Filename '%s' imported with success." % filename))
                     else:

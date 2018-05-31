@@ -6,12 +6,12 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('transporteurs', '0015_transporteurscraper'),
+        ('transporteurs', '0015_transporteurfeed'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='transporteurscraper',
+            model_name='transporteurfeed',
             name='is_applied',
             field=models.BooleanField(default=False),
         ),

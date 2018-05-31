@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='TransporteurScraper',
+            name='TransporteurFeed',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('source', models.CharField(max_length=32)),
@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('url', models.URLField()),
             ],
             options={
-                'db_table': 'transporteur_scraper',
+                'db_table': 'transporteur_feed',
             },
         ),
     ]

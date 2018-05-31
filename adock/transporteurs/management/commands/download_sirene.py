@@ -36,10 +36,10 @@ class Command(BaseCommand):
         # rsync them all
         for link in links:
             try:
-                transporteurs_models.TransporteurScraper.objects.get(source='sirene', url=link['url'])
+                transporteurs_models.TransporteurFeed.objects.get(source='sirene', url=link['url'])
             except ObjectDoesNotExist:
                 subprocess.run(['wget', '-c', link['url'], '-P', settings.DATAFILES_ROOT], check=True)
-                transporteurs_models.TransporteurScraper.objects.create(
+                transporteurs_models.TransporteurFeed.objects.create(
                     source='sirene',
                     title=link['title'],
                     url=link['url'],
