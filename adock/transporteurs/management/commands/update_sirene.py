@@ -15,10 +15,11 @@ class Command(BaseCommand):
     help = "Update the Sirene DB with the downloaded data files."
 
     def handle(self, *args, **options):
-        feeds = transporteurs_models.TransporteurFeed.objects.filter(applied_at=None).order_by('downloaded_at')
+        feeds = transporteurs_models.TransporteurFeed.objects.filter(
+            source='sirene', applied_at=None).order_by('downloaded_at')
         for feed in feeds:
             with tempfile.TemporaryDirectory() as tmp_dirname:
-                zip_filename = os.path.join(settings.DATAFILES_ROOT, feed.url.split('/')[-1])
+                zip_filename = os.path.join(settings.DATAFILES_ROOT, feed.filename)
                 with zipfile.ZipFile(zip_filename, 'r') as zf:
                     zf.extractall(tmp_dirname)
 
