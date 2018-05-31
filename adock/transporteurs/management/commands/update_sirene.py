@@ -1,6 +1,7 @@
 from glob import glob
 import os
 import subprocess
+import sys
 import tempfile
 import zipfile
 
@@ -51,6 +52,7 @@ class Command(BaseCommand):
                     except subprocess.TimeoutExpired:
                         self.stderr.write(
                             self.style.ERROR("Timeout on running of '%s'" % filename))
+                        sys.exit(1)
 
                     if rc == 0:
                         feed.applied_at = timezone.now()
@@ -59,4 +61,4 @@ class Command(BaseCommand):
                             self.style.SUCCESS("Filename '%s' imported with success." % filename))
                     else:
                         self.stderr.write(
-                            self.style.ERROR("Failed to run the SQL script 'update-sirene.sql' with the CSV file '%s'." % filename))
+                            self.style.ERROR("Failed to run 'update-sirene.sql' with the CSV file '%s'." % filename))
