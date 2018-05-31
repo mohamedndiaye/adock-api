@@ -1,6 +1,5 @@
 begin;
 
-drop table if exists sirene_update;
 create table sirene_update(like sirene);
 
 alter table sirene_update drop siret;
@@ -92,5 +91,7 @@ update sirene s
     ) as su
     where su.siren = s.siren
       and su.nic = s.nic;
+
+drop table sirene_update;
 
 commit;
