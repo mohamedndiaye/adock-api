@@ -17,7 +17,7 @@ RE_DAILY_FILE = re.compile(r'sirene_\d{7}_E_Q\.zip')
 
 
 class Command(BaseCommand):
-    help = "Scrap the data.gouv.fr to get the list of available files."
+    help = "Scrap the data.gouv.fr to get the list of available files and download them."
 
     def handle(self, *args, **options):
         r = requests.get(SCRAPPER_URL)
