@@ -42,7 +42,6 @@ SPECIALITY_CHOICES = (
 
 class Transporteur(models.Model):
     siret = models.CharField(max_length=transporteurs_validators.SIRET_LENGTH,
-        validators=[transporteurs_validators.validate_siret],
         primary_key=True, db_index=True, editable=False)
     # nomen_long from Sirene (raison_sociale in Marchandise)
     # Always in uppercase
