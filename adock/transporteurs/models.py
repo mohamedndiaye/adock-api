@@ -105,6 +105,7 @@ class Transporteur(models.Model):
         default=False,
         help_text="Drapeau indiquant la présence de l'entreprise dans la base de données Sirène."
     )
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         db_table = 'transporteur'

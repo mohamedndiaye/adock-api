@@ -75,9 +75,11 @@ update set
   lc_date_fin = excluded.lc_date_fin,
   lc_nombre = excluded.lc_nombre,
   in_sirene = excluded.in_sirene;
-commit;
 
--- FIXME Delete transporteurs not marchandise
+--- Delete
+update transporteur set deleted_at = now() where siret not in (select siret from marchandise);
+
+commit;
 
 begin;
 --- First query, try to find a corresonding SIRET in Sirène for each GRECO record.
