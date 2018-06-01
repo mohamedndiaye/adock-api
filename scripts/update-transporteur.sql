@@ -42,7 +42,11 @@ insert into transporteur
            m.date_fin_validite_lc,
            m.nombre_de_copies_lc_valides,
            '', '', 40,
-           'FR' || to_char((12 + 3 * (cast(m.siret::char(9) as bigint) % 97)) % 97, 'fm00') || m.siret::char(9),
+           case m.siret::char(1)
+           when 'P'
+            then ''
+            else 'FR' || to_char((12 + 3 * (cast(m.siret::char(9) as bigint) % 97)) % 97, 'fm00') || m.siret::char(9)
+           end,
            now(),
            -- In Sirene DB or not
            s.apen700 is not null
