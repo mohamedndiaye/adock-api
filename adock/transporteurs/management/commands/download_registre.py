@@ -14,7 +14,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         filename = 'registre.zip'
-        subprocess.run(['wget', '-c', REGISTRE_URL, '-O', os.path.join(settings.DATAFILES_ROOT, filename)], check=True)
+        full_filename = os.path.join(settings.DATAFILES_ROOT, filename)
+
+        if os.path.isfile(full_filename):
+            os.remove(full_filename)
+
+        subprocess.run(['wget', '-c', REGISTRE_URL, '-O', full_filename], check=True)
         transporteurs_models.TransporteurFeed.objects.create(
             source='registre',
             title='SITR_Liste_des_entreprises_Marchandises_sortie_CSV',
