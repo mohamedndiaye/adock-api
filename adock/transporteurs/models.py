@@ -83,8 +83,8 @@ class Transporteur(models.Model):
     lc_date_debut = models.DateField(blank=True, null=True)
     lc_date_fin = models.DateField(blank=True, null=True)
     lc_nombre = models.PositiveSmallIntegerField(default=0)
-    # To store computed vat_number
-    numero_tva = models.CharField(max_length=13)
+    # To store computed vat_number (computed by PostgreSQL on import)
+    numero_tva = models.CharField(max_length=13, blank=True, null=True)
     working_area = models.CharField(
         max_length=15, choices=WORKING_AREA_CHOICES, blank=True, default=WORKING_AREA_UNDEFINED
     )
