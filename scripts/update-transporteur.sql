@@ -11,10 +11,10 @@ insert into transporteur
      lc_numero, lc_date_debut, lc_date_fin, lc_nombre,
      working_area, website, completeness,
      numero_tva, created_at, in_sirene)
-    select m.siret,
-           m.raison_sociale,
-           m.categorie_juridique,
-           m.is_siege,
+    select r.siret,
+           r.raison_sociale,
+           r.categorie_juridique,
+           r.is_siege,
            coalesce(
             s.numvoie ||
             case s.indrep
@@ -25,34 +25,34 @@ insert into transporteur
               else ''
             end || ' ' || s.typvoie || ' ' || s.libvoie,
             '') as adresse,
-           m.code_postal,
-           m.commune,
+           r.code_postal,
+           r.commune,
            '', '',
            case s.dcret when '' then null else to_date(s.dcret, 'YYYYMMDD') end,
            case s.ddebact when '' then null else to_date(s.ddebact, 'YYYYMMDD') end,
            coalesce(s.apen700, ''),
            coalesce(s.libapen, ''),
-           m.gestionnaire_de_transport,
-           m.numero_lti,
-           m.date_debut_validite_lti,
-           m.date_fin_validite_lti,
-           m.nombre_de_copies_lti_valides,
-           m.numero_lc,
-           m.date_debut_validite_lc,
-           m.date_fin_validite_lc,
-           m.nombre_de_copies_lc_valides,
+           r.gestionnaire_de_transport,
+           r.numero_lti,
+           r.date_debut_validite_lti,
+           r.date_fin_validite_lti,
+           r.nombre_de_copies_lti_valides,
+           r.numero_lc,
+           r.date_debut_validite_lc,
+           r.date_fin_validite_lc,
+           r.nombre_de_copies_lc_valides,
            '', '', 40,
-           case m.siret::char(1)
+           case r.siret::char(1)
            when 'P'
             then ''
-            else 'FR' || to_char((12 + 3 * (cast(m.siret::char(9) as bigint) % 97)) % 97, 'fm00') || m.siret::char(9)
+            else 'FR' || to_char((12 + 3 * (cast(r.siret::char(9) as bigint) % 97)) % 97, 'fm00') || r.siret::char(9)
            end,
            now(),
            -- In Sirene DB or not
            s.apen700 is not null
-    from marchandise as m
+    from registre as r
     left join sirene as s
-       on s.siret = m.siret
+       on s.siret = r.siret
 on conflict (siret) do
 update set
   raison_sociale = excluded.raison_sociale,
@@ -77,7 +77,7 @@ update set
   in_sirene = excluded.in_sirene;
 
 --- Delete
-update transporteur set deleted_at = now() where siret not in (select siret from marchandise);
+update transporteur set deleted_at = now() where siret not in (select siret from registre);
 
 commit;
 

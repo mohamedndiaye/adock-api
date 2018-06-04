@@ -63,7 +63,7 @@ class Command(BaseCommand):
                 [
                     'sed',
                     's:FILENAMEPLACEHOLDER:' + filename + ':g',
-                    os.path.join(settings.BASE_DIR, 'scripts', 'import-marchandise.sql')
+                    os.path.join(settings.BASE_DIR, 'scripts', 'import-registre.sql')
                 ],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
@@ -107,7 +107,7 @@ class Command(BaseCommand):
 
             if stderr_data:
                 self.stderr.write(
-                    self.style.ERROR("Unable to 'psql' the file '%s' with 'import-marchandise.sql'." % filename)
+                    self.style.ERROR("Unable to 'psql' the file '%s' with 'import-registre.sql'." % filename)
                 )
                 self.stderr.write(self.style.ERROR(stderr_data))
                 sys.exit(1)

@@ -5,9 +5,9 @@
 
 begin;
 
-drop table if exists marchandise cascade;
+drop table if exists registre cascade;
 
-create table marchandise (
+create table registre (
     _situation text,
     _code_departement text,
     _nom_departement text,
@@ -28,10 +28,10 @@ create table marchandise (
     nombre_de_copies_lc_valides text
 );
 
---- cat import-marchandise.sql | sed s:FILENAMEPLACEHOLDER:registre.csv:g | psql adock
-\copy marchandise from 'FILENAMEPLACEHOLDER' with csv header delimiter as ',' null as '' quote '"';
+--- cat import-registre.sql | sed s:FILENAMEPLACEHOLDER:registre.csv:g | psql adock
+\copy registre from 'FILENAMEPLACEHOLDER' with csv header delimiter as ',' null as '' quote '"';
 
-alter table marchandise
+alter table registre
     drop _situation,
     drop _code_departement,
     drop _nom_departement,
@@ -65,6 +65,6 @@ alter table marchandise
     using cast(nombre_de_copies_lc_valides as integer)
 ;
 
-create index marchandise_siret_idx on marchandise(siret);
+create index registre_siret_idx on registre(siret);
 
 commit;

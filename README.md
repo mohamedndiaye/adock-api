@@ -55,7 +55,7 @@ jour.
   compléter les informations sur les transporteurs au moment de l'import. Les informations
   de raison sociale, code APE, adresse, etc sont issues de cette base.
 
-- `import-marchandise.sql` importe les entreprises inscrites au registre du commerce
+- `import-registre.sql` importe les entreprises inscrites au registre du commerce
   dans une table spécifique. Les informations sur les licences (LC, LTI), numéro,
   dates de validité, nombre ainsi que le gestionnaire sont issues de cette table.
 
@@ -68,7 +68,7 @@ jour.
   `transporteur` et `transporteur_log`)
 
 - `import-transporteur.sql` crée la table socle de l'application A Dock, elle
-  est l'agrégation des tables `marchandise` et `sirene` et permet aux
+  est l'agrégation des tables `registre` et `sirene` et permet aux
   utilisateurs d'y ajouter des informations complémentaires (téléphone, adresse
   électronique, aire de travail, départements couverts, etc)
 
