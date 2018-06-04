@@ -52,3 +52,4 @@ class TransporteurFactory(factory.django.DjangoModelFactory):
     working_area = models.WORKING_AREA_DEPARTEMENT
     working_area_departements = [35, 44]
     specialities = ['TEMPERATURE', 'URBAIN']
+    in_sirene = True
