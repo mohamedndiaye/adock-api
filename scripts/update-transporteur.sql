@@ -79,24 +79,6 @@ update set
 --- Delete
 update transporteur set deleted_at = now() where siret not in (select siret from registre);
 
---- First query, try to find a corresonding SIRET in Sirène for each GRECO record.
-with filtered_greco as (
-    select s.siret, g.telephone, g.email
-    from greco as g
-    join sirene as s
-      on g.siren = s.siren
-    where g.localisation like '%' || s.numvoie || ' ' || s.typvoie || ' ' || s.libvoie || '%'
-      and g.ville = s.libcom
-)
---- Only applied if no validated data in transporteur.
---- It's possible to have several entries with the same SIRET so last one wins.
-update transporteur t
-   set email = coalesce(fg.email, ''),
-       telephone = coalesce(fg.telephone, '')
-  from filtered_greco fg
- where t.siret = fg.siret
-   and t.validated_at is null;
-
 -- Update meta stats
 with json_data as (
   select json_build_object('count', count(*), 'date', current_date) from transporteur

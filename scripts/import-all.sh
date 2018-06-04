@@ -6,4 +6,5 @@ psql -d adock -f import-sirene.sql &&
 psql -d adock -f import-greco.sql &&
 ../manage.py download_registre &&
 ../manage.py import_registre &&
-psql -d adock -f update-transporteur.sql
+psql -d adock -f update-transporteur.sql &&
+psql  -d adock -f update-transporteur-from-greco.sql
