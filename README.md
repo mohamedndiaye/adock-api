@@ -40,10 +40,14 @@ jour actuelle du registre des transports.
 Seules les données non modifiables de la base de données A Dock sont mises à
 jour.
 
-## Description des scripts d'import
+## Description des scripts SQL et des commandes Django
 
-- `import-all.sh` créé la base de données, l'ensemble des tables et effectue
-  tous les imports en s'appuyant sur `import-all.sql`
+Les scripts SQL portent l'extension `.sql` dans leur description à la différence
+des commandes Django :
+
+- `import-all.sh` créé la base de données initiale, l'ensemble des tables et
+  effectue tous les imports et les mises à jour. Ce script est uniquement utile
+  pour créer une base vierge pour le développement.
 
 - `import-greco.sql` importe le fichier `greco.csv` contenant tous les exports
   CSV de la base de données GRECO dans une table spécifique pour l'extraction des
@@ -52,29 +56,39 @@ jour.
 
 - `import-sirene.sql` importe les 11 millions d'enregistrements de la base
   Sirène (toutes les entreprises françaises), la table est uniquement utile pour
-  compléter les informations sur les transporteurs au moment de l'import. Les informations
-  de raison sociale, code APE, adresse, etc sont issues de cette base.
+  compléter les informations sur les transporteurs au moment de l'import. Les
+  informations de raison sociale, code APE, adresse, etc sont issues de cette
+  base. Il faut au préalable télécharger la base de données complète au format
+  CSV (cf notes dans le script).
 
-- `import-registre.sql` importe les entreprises inscrites au registre du commerce
-  dans une table spécifique. Les informations sur les licences (LC, LTI), numéro,
-  dates de validité, nombre ainsi que le gestionnaire sont issues de cette table.
+- `download_sirene` analyse le site Sirène et télécharge les mises à jour
+  quotidiennes qui ne l'ont pas encore été.
 
-- `import-transporteur.sh` est un script qui supprime toutes les tables de
-  l'application Django (`reset-transporteur.sql`) et qui peuple la table
-  `transporteur` à partir des autres tables (utilise `import-transporteur.sql`)
+- `update_sirene` met à jour la base de données Sirène en appliquant les
+  mises à jour quotidiennes qui n'ont pas encore été appliquées.
 
-- `reset-transporteur.sql` permet de supprimer les tables Django de
-  l'application ainsi que les tables métiers de l'application (par ex.
-  `transporteur` et `transporteur_log`)
+- `import-greco.sql` importe la table à partir de la concaténation de l'ensemble
+  des fichiers CSV de chaque région et un nettoyage préalable.
 
-- `import-transporteur.sql` crée la table socle de l'application A Dock, elle
-  est l'agrégation des tables `registre` et `sirene` et permet aux
-  utilisateurs d'y ajouter des informations complémentaires (téléphone, adresse
-  électronique, aire de travail, départements couverts, etc)
+- `download_registre` télécharge la dernière version du registre des transports
+  de marchandise et créé une entrée en base de données.
 
-- `update-transporteur.sql` met à jour la table transporteur avec les numéros de
-  téléphone et les adresses électroniques issues de GRECO uniquement s'ils
-  n'ont pas été renseignés sur A Dock par l'utilisateur.
+- `import_registre` importe les entreprises inscrites au registre du commerce
+  dans une table spécifique. Les informations sur les licences (LC, LTI),
+  numéro, dates de validité, nombre ainsi que le gestionnaire sont issues de
+  cette table. En cas de succès, le téléchargement est marqué comme appliqué
+  dans la base de données.
+
+- `update-transporteur.sql` met à jour la table transporteur en insérant tous
+  les enregistrements de la table registre étendus si possible avec les
+  informations de la base Sirène. Les transporteurs non présents dans la
+  registre sont marqués comme supprimés. La table transporteur est la table
+  socle de l'application A Dock. Elle est l'agrégation des tables `registre` et
+  `sirene` et permet aux utilisateurs d'y ajouter des informations
+  complémentaires (téléphone, adresse électronique, aire de travail,
+  départements couverts, etc) avec les numéros de téléphone et les adresses
+  électroniques issues de GRECO uniquement s'ils n'ont pas été renseignés sur A
+  Dock par l'utilisateur.
 
 ## Dépendances
 
