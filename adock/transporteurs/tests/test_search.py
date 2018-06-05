@@ -143,6 +143,9 @@ class TransporteurSearchDepartementTestCase(TransporteurSearchTestCase):
         factories.TransporteurFactory(
             raison_sociale='DEP. 35, 44', working_area=models.WORKING_AREA_DEPARTEMENT,
             working_area_departements=[35, 44])
+        factories.TransporteurFactory(
+            raison_sociale='DEP. 72', working_area=models.WORKING_AREA_DEPARTEMENT,
+            working_area_departements=[72])
 
     def test_search_invalid(self):
         response = response = self.client.get(
@@ -156,8 +159,9 @@ class TransporteurSearchDepartementTestCase(TransporteurSearchTestCase):
     def test_search_international_france(self):
         transporteurs = self.get_transporteurs({'departement-depart': 93})
         self.assertEqual(len(transporteurs), 2)
-        raison_sociales = sorted([transporteur['raison_sociale'] for transporteur in transporteurs])
-        self.assertListEqual(raison_sociales, ['FRANCE', 'INTERNATIONAL'])
+        # Ordering is consistent
+        self.assertEqual(transporteurs[0]['raison_sociale'], 'FRANCE')
+        self.assertEqual(transporteurs[1]['raison_sociale'], 'INTERNATIONAL')
 
     def test_search_one_departement(self):
         transporteurs = self.get_transporteurs({
@@ -182,6 +186,12 @@ class TransporteurSearchDepartementTestCase(TransporteurSearchTestCase):
             'departement-arrivee': 42
         })
         self.assertEqual(len(transporteurs), 0)
+
+    def test_search_ordering(self):
+        # Fewer number of departements first
+        transporteurs = self.get_transporteurs({})
+        for i, raison_sociale in enumerate(('DEP. 72', 'DEP. 35, 44', 'FRANCE', 'INTERNATIONAL', 'UNDEFINED')):
+            self.assertEqual(transporteurs[i]['raison_sociale'], raison_sociale)
 
 
 class TransporteurSearchSpecialitiesTestCase(TransporteurSearchTestCase):

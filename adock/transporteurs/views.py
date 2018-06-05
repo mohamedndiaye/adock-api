@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.mail import mail_managers
 from django.db import transaction
 from django.db.models import Q
+from django.db.models.expressions import OrderBy, RawSQL
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -105,8 +106,23 @@ def search(request):
     if specialities:
         transporteurs = transporteurs.filter(specialities__contains=specialities)
 
+    # Raw SQL is more simple here than Case, When, etc
+    departement_counter_raw = """
+        CASE working_area
+        WHEN 'DEPARTEMENT'
+          THEN array_length(working_area_departements, 1)
+        WHEN 'FRANCE'
+          THEN 101
+        WHEN 'INTERNATIONAL'
+          THEN 102
+        END
+    """
     transporteurs = (transporteurs
-        .order_by('-completeness', 'raison_sociale')
+        .order_by(
+            OrderBy(RawSQL(departement_counter_raw, ()), nulls_last=True),
+            '-completeness',
+            'raison_sociale'
+        )
         .values(*TRANSPORTEUR_LIST_FIELDS)
         [:settings.TRANSPORTEURS_LIMIT])
 
