@@ -8,12 +8,12 @@ from . import test
 
 
 class TransporteurSearchTestCase(TestCase):
-
     def setUp(self):
         super().setUp()
         self.search_url = reverse('transporteurs_recherche')
 
-    def get_transporteurs(self, params):
+    def get_transporteurs(self, params=None):
+        """Helper"""
         response = self.client.get(self.search_url, params)
         self.assertEqual(response.status_code, 200)
         return response.json()['results']
@@ -87,6 +87,12 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
         self.assertEqual(data['limit'], 2)
         self.assertEqual(len(data['results']), 2)
 
+    def test_deleted(self):
+        factories.TransporteurFactory(raison_sociale='ACTIVE')
+        factories.TransporteurFactory(raison_sociale='DELETED', deleted_at=timezone.now())
+        transporteurs = self.get_transporteurs()
+        self.assertEqual(len(transporteurs), 1)
+        self.assertEqual(transporteurs[0]['raison_sociale'], 'ACTIVE')
 
 class TransporteurSearchLicenseTypeTestCase(TransporteurSearchTestCase):
 

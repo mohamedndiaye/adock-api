@@ -27,7 +27,7 @@ TRANSPORTEUR_DETAIL_FIELDS = (
     'lti_numero', 'lti_date_debut', 'lti_date_fin', 'lti_nombre',
     'lc_numero', 'lc_date_debut', 'lc_date_fin', 'lc_nombre',
     'working_area', 'working_area_departements',
-    'specialities', 'website', 'in_sirene'
+    'specialities', 'website', 'in_sirene', 'deleted_at'
 )
 
 def get_transporteur_as_json(transporteur, fields):
@@ -48,8 +48,7 @@ def search(request):
        - partial raison sociale or SIRET
        - type of the license (LC heavy or LTI light)
     """
-
-    transporteurs = models.Transporteur.objects.all()
+    transporteurs = models.Transporteur.objects.filter(deleted_at=None)
     q = request.GET.get('q')
     if q:
         # Filtering on raison sociale or SIRET
