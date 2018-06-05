@@ -81,7 +81,7 @@ update transporteur set deleted_at = now() where siret not in (select siret from
 
 -- Update meta stats
 with json_data as (
-  select json_build_object('count', count(*), 'date', current_date) from transporteur
+  select json_build_object('count', count(*), 'date', current_date) from transporteur where deleted_at is null
 )
 insert into meta (name, data)
     values (
