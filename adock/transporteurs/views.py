@@ -15,7 +15,8 @@ from . import forms
 from . import validators
 
 TRANSPORTEUR_LIST_FIELDS = (
-    'siret', 'raison_sociale', 'adresse', 'code_postal', 'ville', 'completeness'
+    'siret', 'raison_sociale', 'adresse', 'code_postal', 'ville',
+    'completeness', 'lti_nombre', 'lc_nombre', 'working_area'
 )
 
 TRANSPORTEUR_DETAIL_FIELDS = (
@@ -155,6 +156,7 @@ RE_MANY_COMMAS = re.compile(r',+')
 
 @csrf_exempt
 def transporteur_detail(request, transporteur_siret):
+    # Access to deleted transporteurs is allowed.
     # Get existing transporteur if any
     transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
     if request.method == 'PATCH':
