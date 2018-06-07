@@ -85,14 +85,11 @@ def search(request):
     departements = []
     for field in ('departement-depart', 'departement-arrivee'):
         departement = request.GET.get(field)
+        # Max departement string length is 3 characters (976 for Mayotte)
         if departement:
-            try:
-                departement = int(departement)
-                if 0 < departement and departement < 1000:
-                    departements.append(departement)
-                else:
-                    raise ValueError
-            except ValueError:
+            if len(departement) <= 3:
+                departements.append(departement)
+            else:
                 message = "Le numéro de département « %s » est non valide." % request.GET.get(field)
                 return JsonResponse({'message': message}, status=400)
 

@@ -135,29 +135,29 @@ class TransporteurSearchDepartementTestCase(TransporteurSearchTestCase):
         factories.TransporteurFactory(
             raison_sociale='UNDEFINED', working_area=models.WORKING_AREA_UNDEFINED,
             # Be sure filtering on working are is applied
-            working_area_departements=[35, 44])
+            working_area_departements=['35', '44'])
         factories.TransporteurFactory(
             raison_sociale='INTERNATIONAL', working_area=models.WORKING_AREA_INTERNATIONAL)
         factories.TransporteurFactory(
             raison_sociale='FRANCE', working_area=models.WORKING_AREA_FRANCE)
         factories.TransporteurFactory(
             raison_sociale='DEP. 35, 44', working_area=models.WORKING_AREA_DEPARTEMENT,
-            working_area_departements=[35, 44])
+            working_area_departements=['35', '44'])
         factories.TransporteurFactory(
             raison_sociale='DEP. 72', working_area=models.WORKING_AREA_DEPARTEMENT,
-            working_area_departements=[72])
+            working_area_departements=['72'])
 
     def test_search_invalid(self):
         response = response = self.client.get(
             self.search_url,
-            {'departement-depart': 'A'}
+            {'departement-depart': '1000'}
         )
         self.assertEqual(response.status_code, 400)
         data = response.json()
-        self.assertEqual(data['message'], "Le numéro de département « A » est non valide.")
+        self.assertEqual(data['message'], "Le numéro de département « 1000 » est non valide.")
 
     def test_search_international_france(self):
-        transporteurs = self.get_transporteurs({'departement-depart': 93})
+        transporteurs = self.get_transporteurs({'departement-depart': '93'})
         self.assertEqual(len(transporteurs), 2)
         # Ordering is consistent
         self.assertEqual(transporteurs[0]['raison_sociale'], 'FRANCE')
@@ -166,15 +166,15 @@ class TransporteurSearchDepartementTestCase(TransporteurSearchTestCase):
     def test_search_one_departement(self):
         transporteurs = self.get_transporteurs({
             'q': 'DEP. 35',
-            'departement-depart': 35
+            'departement-depart': '35'
         })
         self.assertEqual(len(transporteurs), 1)
 
     def test_search_two_departements(self):
         transporteurs = self.get_transporteurs({
             'q': 'DEP. 35',
-            'departement-depart': 35,
-            'departement-arrivee': 44
+            'departement-depart': '35',
+            'departement-arrivee': '44'
         })
         self.assertEqual(len(transporteurs), 1)
         self.assertEqual(transporteurs[0]['raison_sociale'], 'DEP. 35, 44')
@@ -182,8 +182,8 @@ class TransporteurSearchDepartementTestCase(TransporteurSearchTestCase):
     def test_search_two_departements_no_match(self):
         transporteurs = self.get_transporteurs({
             'q': 'DEP. 35',
-            'departement-depart': 35,
-            'departement-arrivee': 42
+            'departement-depart': '35',
+            'departement-arrivee': '42'
         })
         self.assertEqual(len(transporteurs), 0)
 

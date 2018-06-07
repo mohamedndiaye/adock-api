@@ -33,7 +33,7 @@ class TransporteurDetailTestCase(TestCase):
             data['completeness'],
             models.COMPLETENESS_PERCENT_MIN + 3 * models.EARNED_POINT_VALUE)
         self.assertEqual(data['working_area'], 'DEPARTEMENT')
-        self.assertEqual(data['working_area_departements'], [35, 44])
+        self.assertEqual(data['working_area_departements'], ['35', '44'])
         self.assertEqual(
             sorted(data['specialities']),
             ['TEMPERATURE', 'URBAIN']
@@ -80,7 +80,7 @@ class TransporteurDetailTestCase(TestCase):
         transporteur = self.patch_transporteur(
             {
                 'telephone': PHONE,
-                'working_area_departements': '24, 56',
+                'working_area_departements': '2A, 56',
             },
             200
         )
@@ -99,7 +99,7 @@ class TransporteurDetailTestCase(TestCase):
             {
                 'telephone': PHONE,
                 'email': EMAIL,
-                'working_area_departements': '24, 57',
+                'working_area_departements': '2A, 57',
             },
             200
         )
@@ -158,13 +158,13 @@ class TransporteurDetailTestCase(TestCase):
         NEW_EMAIL = 'foo@example.com'
 
         # Apply changes with working area
-        with self.settings(MANAGERS=(("Manage", 'manager@example.com'))):
+        with self.settings(MANAGERS=(("Manager", 'manager@example.com'))):
             data = self.patch_transporteur(
                 {
                     'telephone': NEW_PHONE,
                     'email': NEW_EMAIL,
                     'working_area': models.WORKING_AREA_DEPARTEMENT,
-                    'working_area_departements': '23 45 ,,,67',
+                    'working_area_departements': '23 45 ,,,967',
                     'specialities': ['LOT'],
                 },
                 200
@@ -174,7 +174,7 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(data['telephone'], '02 40 42 45 46')
         self.assertEqual(data['email'], NEW_EMAIL)
         self.assertEqual(data['working_area'], models.WORKING_AREA_DEPARTEMENT)
-        self.assertListEqual(data['working_area_departements'], [23, 45, 67])
+        self.assertListEqual(data['working_area_departements'], ['23', '45', '967'])
         self.assertListEqual(data['specialities'], ['LOT'])
         self.assertEqual(data['completeness'], 100)
         self.assertEqual(len(mail.outbox), 1)
@@ -184,7 +184,7 @@ class TransporteurDetailTestCase(TestCase):
         self.assertEqual(self.transporteur.telephone, NEW_PHONE)
         self.assertEqual(self.transporteur.email, NEW_EMAIL)
         self.assertEqual(self.transporteur.working_area, models.WORKING_AREA_DEPARTEMENT)
-        self.assertEqual(self.transporteur.working_area_departements, [23, 45, 67])
+        self.assertEqual(self.transporteur.working_area_departements, ['23', '45', '967'])
         self.assertEqual(self.transporteur.specialities, ['LOT'])
         self.assertEqual(self.transporteur.completeness, 100)
 

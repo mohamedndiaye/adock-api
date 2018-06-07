@@ -50,6 +50,6 @@ class TransporteurFactory(factory.django.DjangoModelFactory):
         lambda o: o.lti_date_debut + datetime.timedelta(days=6*364))
     lti_nombre = fuzzy.FuzzyInteger(1, 20)
     working_area = models.WORKING_AREA_DEPARTEMENT
-    working_area_departements = [35, 44]
+    working_area_departements = ['35', '44']
     specialities = ['TEMPERATURE', 'URBAIN']
     in_sirene = True
