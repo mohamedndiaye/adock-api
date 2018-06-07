@@ -90,6 +90,8 @@ def search(request):
                 departement = int(departement)
                 if 0 < departement and departement < 1000:
                     departements.append(departement)
+                else:
+                    raise ValueError
             except ValueError:
                 message = "Le numéro de département « %s » est non valide." % request.GET.get(field)
                 return JsonResponse({'message': message}, status=400)
