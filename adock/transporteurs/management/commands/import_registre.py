@@ -40,7 +40,7 @@ class Command(BaseCommand):
 
             # Get the uncompressed file
             filename = filenames[0]
-            print(filename)
+            self.stdout.write(filename)
 
             # Exception for inferior OS (aka MacOS)
             system = platform.system()
