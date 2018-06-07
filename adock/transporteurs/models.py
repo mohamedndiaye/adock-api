@@ -89,6 +89,7 @@ class Transporteur(models.Model):
         max_length=15, choices=WORKING_AREA_CHOICES, blank=True, default=WORKING_AREA_UNDEFINED
     )
     # This field is used when working_area is set to WORKING_AREA_DEPARTEMENT
+    # The default value is the departement of the company
     working_area_departements = ArrayField(models.IntegerField(), blank=True, null=True)
     specialities = ArrayField(
         models.CharField(max_length=63, choices=SPECIALITY_CHOICES),

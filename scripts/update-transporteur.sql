@@ -9,7 +9,8 @@ insert into transporteur
      gestionnaire,
      lti_numero, lti_date_debut, lti_date_fin, lti_nombre,
      lc_numero, lc_date_debut, lc_date_fin, lc_nombre,
-     working_area, website, completeness,
+     working_area, working_area_departements,
+     website, completeness,
      numero_tva, created_at, in_sirene)
     select r.siret,
            r.raison_sociale,
@@ -41,7 +42,8 @@ insert into transporteur
            r.date_debut_validite_lc,
            r.date_fin_validite_lc,
            r.nombre_de_copies_lc_valides,
-           '', '', 40,
+           '', array[cast(s.depet as int)],
+           '', 40,
            case r.siret::char(1)
            when 'P'
             then ''
