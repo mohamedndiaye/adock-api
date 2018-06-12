@@ -87,7 +87,7 @@ def search(request):
         departement = request.GET.get(field)
         # Max departement string length is 3 characters (976 for Mayotte)
         if departement:
-            if len(departement) <= 3:
+            if validators.is_french_departement(departement):
                 departements.append(departement)
             else:
                 message = "Le numéro de département « %s » est non valide." % request.GET.get(field)
