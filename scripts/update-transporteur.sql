@@ -42,7 +42,7 @@ insert into transporteur
            r.date_debut_validite_lc,
            r.date_fin_validite_lc,
            r.nombre_de_copies_lc_valides,
-           '', array[cast(s.depet as int)],
+           '', array[s.depet],
            '', 40,
            case r.siret::char(1)
            when 'P'
