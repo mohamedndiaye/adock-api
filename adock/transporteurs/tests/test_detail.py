@@ -234,6 +234,29 @@ class TransporteurDetailTestCase(TestCase):
         # Wrong French translation will be fixed in django-phonenumber-field > 2.0 (my patch)
         self.assertEqual(data['telephone'][0], "Entrez un numéro de téléphone valide.")
 
+    def test_not_exists_working_area_departements(self):
+        data = self.patch_transporteur(
+            {
+                'telephone': PHONE,
+                'working_area_departements': '20',
+            },
+            400
+        )
+        self.assertEqual(
+            data['working_area_departements'][0],
+            "« 20 » n'est pas un département français valide."
+        )
+
+    def test_invalid_working_area_departements(self):
+        data = self.patch_transporteur(
+            {
+                'telephone': PHONE,
+                'working_area_departements': '2034;454',
+            },
+            400
+        )
+        self.assertTrue(data['working_area_departements'][0])
+
     def test_completeness(self):
         # The default factory sets telephone and email but they aren't validated
         # a working area and specialities.
