@@ -11,7 +11,8 @@ insert into transporteur
      lc_numero, lc_date_debut, lc_date_fin, lc_nombre,
      working_area, working_area_departements,
      website, completeness,
-     numero_tva, created_at, in_sirene)
+     numero_tva, created_at,
+     in_sirene, deleted_at)
     select r.siret,
            r.raison_sociale,
            r.categorie_juridique,
@@ -51,12 +52,14 @@ insert into transporteur
            end,
            now(),
            -- In Sirene DB or not
-           s.apen700 is not null
+           s.apen700 is not null,
+           -- Deleted
+           null
     from registre as r
     left join sirene as s
        on s.siret = r.siret
-on conflict (siret) do
-update set
+on conflict (siret) do update
+set
   raison_sociale = excluded.raison_sociale,
   categorie_juridique = excluded.categorie_juridique,
   is_siege = excluded.is_siege,
