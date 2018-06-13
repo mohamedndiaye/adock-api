@@ -36,6 +36,8 @@ alter table registre
     drop _code_departement,
     drop _nom_departement,
 
+    add id serial primary key,
+
     alter is_siege
      type boolean
     using case is_siege when 'Y' then true else false end,
@@ -65,6 +67,14 @@ alter table registre
     using cast(nombre_de_copies_lc_valides as integer)
 ;
 
-create index registre_siret_idx on registre(siret);
+-- It's possible to have duplicated SIRET in the registre (bug)!
+-- We choose the delete the one with the older license date (lc or lti)
+delete from registre
+      where id = (
+          select id
+            from registre
+           where siret = (select siret from registre group by siret having count(siret) > 1)
+           order by coalesce(date_debut_validite_lc, date_debut_validite_lti) desc
+           offset 1);
 
 commit;
