@@ -78,8 +78,11 @@ update set
   lc_nombre = excluded.lc_nombre,
   in_sirene = excluded.in_sirene;
 
---- Delete
-update transporteur set deleted_at = now() where siret not in (select siret from registre);
+--- Delete by setting the deleted_at attribute with current date (if not alreay deleted).
+update transporteur
+   set deleted_at = now()
+ where not exists (select 1 from registre r where r.siret = transporteur.siret)
+   and deleted_at is null;
 
 -- Update meta stats
 with json_data as (
