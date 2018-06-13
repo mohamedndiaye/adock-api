@@ -91,7 +91,8 @@ class Command(BaseCommand):
                     settings.DATABASES['default']['NAME']
                 ],
                 stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
             )
             # Allow sed_ps to receive a SIGPIPE if p2 exits.
             sed_ps.stdout.close()
