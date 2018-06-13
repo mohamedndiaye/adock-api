@@ -85,12 +85,11 @@ def search(request):
     departements = []
     for field in ('departement-depart', 'departement-arrivee'):
         departement = request.GET.get(field)
-        # Max departement string length is 3 characters (976 for Mayotte)
         if departement:
             if validators.is_french_departement(departement):
                 departements.append(departement)
             else:
-                message = "Le numéro de département « %s » est non valide." % request.GET.get(field)
+                message = "Le numéro de département français « %s » n'est pas valide." % request.GET.get(field)
                 return JsonResponse({'message': message}, status=400)
 
     if departements:
@@ -190,10 +189,10 @@ def transporteur_detail(request, transporteur_siret):
             )
 
         # Replace all non digits by ',' and avoid duplicates ','
-        cleaned_departements = payload.get('working_area_departements')
-        if cleaned_departements:
-            cleaned_departements = cleaned_departements.replace(' ', ',')
-            payload['working_area_departements'] = RE_MANY_COMMAS.sub(',', cleaned_departements)
+        raw_departements = payload.get('working_area_departements')
+        if raw_departements:
+            raw_departements = raw_departements.replace(' ', ',')
+            payload['working_area_departements'] = RE_MANY_COMMAS.sub(',', raw_departements)
 
         # Form is not bound to the transporteur instance
         form = forms.SubscriptionForm(payload)

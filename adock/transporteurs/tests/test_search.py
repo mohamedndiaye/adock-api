@@ -154,7 +154,7 @@ class TransporteurSearchDepartementTestCase(TransporteurSearchTestCase):
         )
         self.assertEqual(response.status_code, 400)
         data = response.json()
-        self.assertEqual(data['message'], "Le numéro de département « 1000 » est non valide.")
+        self.assertEqual(data['message'], "Le numéro de département français « 1000 » n'est pas valide.")
 
     def test_search_international_france(self):
         transporteurs = self.get_transporteurs({'departement-depart': '93'})
