@@ -76,7 +76,8 @@ update set
   lc_date_debut = excluded.lc_date_debut,
   lc_date_fin = excluded.lc_date_fin,
   lc_nombre = excluded.lc_nombre,
-  in_sirene = excluded.in_sirene;
+  in_sirene = excluded.in_sirene,
+  deleted_at = null;
 
 --- Delete by setting the deleted_at attribute with current date (if not alreay deleted).
 update transporteur
