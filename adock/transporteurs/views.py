@@ -104,25 +104,45 @@ def search(request):
     if specialities:
         transporteurs = transporteurs.filter(specialities__contains=specialities)
 
+    # Ordering
+
     # Raw SQL is more simple here than Case, When, etc
-    departement_counter_raw = """
-        CASE working_area
-        WHEN 'DEPARTEMENT'
-          THEN array_length(working_area_departements, 1)
-        WHEN 'FRANCE'
-          THEN 101
-        WHEN 'INTERNATIONAL'
-          THEN 102
-        END
-    """
-    transporteurs = (transporteurs
-        .order_by(
-            OrderBy(RawSQL(departement_counter_raw, ()), nulls_last=True),
-            '-completeness',
-            'raison_sociale'
+    order_departement_counter = OrderBy(
+        RawSQL("""
+            CASE working_area
+            WHEN 'DEPARTEMENT'
+            THEN array_length(working_area_departements, 1)
+            WHEN 'FRANCE'
+            THEN 101
+            WHEN 'INTERNATIONAL'
+            THEN 102
+            END
+        """, ()),
+        nulls_last=True
+    )
+
+    order_by_list = [
+        order_departement_counter,
+    ]
+
+    # By departement of the company if relevant
+    if departements:
+        order_departement_company = RawSQL(
+            "CASE WHEN departement IN (%s) THEN 1 ELSE 2 END",
+            (','.join(departements),)
         )
+        order_by_list.append(order_departement_company)
+
+    # By completeness and raison sociale
+    order_by_list.extend((
+        '-completeness',
+        'raison_sociale'
+    ))
+    transporteurs = (transporteurs
+        .order_by(*order_by_list)
         .values(*TRANSPORTEUR_LIST_FIELDS)
-        [:settings.TRANSPORTEURS_LIMIT])
+        [:settings.TRANSPORTEURS_LIMIT]
+    )
 
     payload = {
         'results': list(transporteurs)
