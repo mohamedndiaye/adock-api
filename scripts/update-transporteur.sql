@@ -4,6 +4,7 @@ insert into transporteur
     (siret, raison_sociale,
      categorie_juridique, is_siege,
      adresse, code_postal, ville,
+     departement,
      telephone, email,
      date_creation, debut_activite, code_ape, libelle_ape,
      gestionnaire,
@@ -29,6 +30,8 @@ insert into transporteur
             '') as adresse,
            r.code_postal,
            r.commune,
+           -- Departement is used for ranking
+           case when s.depet is null then '' else s.depet end,
            '', '',
            case s.dcret when '' then null else to_date(s.dcret, 'YYYYMMDD') end,
            case s.ddebact when '' then null else to_date(s.ddebact, 'YYYYMMDD') end,
@@ -45,10 +48,7 @@ insert into transporteur
            r.nombre_de_copies_lc_valides,
            '',
            -- Default departement for working area departements in company departement
-           case when s.depet is null
-            then null
-            else array[s.depet]
-           end,
+           case when s.depet is null then null else array[s.depet] end,
            '', 40,
            case r.siret::char(1)
            when 'P'
@@ -71,6 +71,7 @@ set
   adresse = excluded.adresse,
   code_postal = excluded.code_postal,
   ville = excluded.ville,
+  departement = excluded.departement,
   date_creation = excluded.date_creation,
   debut_activite = excluded.debut_activite,
   code_ape = excluded.code_ape,
