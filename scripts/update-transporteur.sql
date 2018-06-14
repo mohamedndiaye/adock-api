@@ -43,7 +43,12 @@ insert into transporteur
            r.date_debut_validite_lc,
            r.date_fin_validite_lc,
            r.nombre_de_copies_lc_valides,
-           '', array[s.depet],
+           '',
+           -- Default departement for working area departements in company departement
+           case when s.depet is null
+            then null
+            else array[s.depet]
+           end,
            '', 40,
            case r.siret::char(1)
            when 'P'
