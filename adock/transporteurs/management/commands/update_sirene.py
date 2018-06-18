@@ -16,8 +16,9 @@ class Command(BaseCommand):
     help = "Update the Sirene DB with the downloaded data files."
 
     def handle(self, *args, **options):
+        # Filename are composed of the year and day of year so they are sortable
         feeds = transporteurs_models.TransporteurFeed.objects.filter(
-            source='sirene', applied_at=None).order_by('downloaded_at')
+            source='sirene', applied_at=None).order_by('filename')
         for feed in feeds:
             with tempfile.TemporaryDirectory() as tmp_dirname:
                 zip_filename = os.path.join(settings.DATAFILES_ROOT, feed.filename)
@@ -25,8 +26,8 @@ class Command(BaseCommand):
                     zf.extractall(tmp_dirname)
 
                 # List CSV files
+                self.stdout.write("%s - %s" % (feed.title, feed.filename))
                 for filename in glob(tmp_dirname + '/*.csv'):
-                    print(filename)
                     # Call SQL script on it...
                     sed_ps = subprocess.Popen(
                         [
