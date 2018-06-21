@@ -127,7 +127,7 @@ class Transporteur(models.Model):
         ]
         # Take care to create the index, GinIndex is not able to handle it.
         # One solution is to inherit and adapt the code for that but it's not trivial
-        # so the index is created in a raw SQL migration.
+        # so the index is created in a raw SQL migration (0004 and updated in 0025).
         # CREATE INDEX transporteur_search_trgm_enseigne ON transporteur USING GIN (enseigne GIN_TRGM_OPS);
 
     def __str__(self):
