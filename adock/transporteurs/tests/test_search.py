@@ -49,7 +49,7 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
         self.assertEqual(len(transporteurs), 1)
 
     def test_search_with_raison_sociale(self):
-        factories.TransporteurFactory(raison_sociale='SUPER ROGER')
+        factories.TransporteurFactory(enseigne='SUPER ROGER')
         transporteurs = self.get_transporteurs({'q': 'rog'})
         self.assertEqual(len(transporteurs), 1)
 
@@ -58,7 +58,7 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
 
     def test_search_with_code_postal(self):
         factories.TransporteurFactory(
-            raison_sociale='XPO BOIS DISTRIBUTION',
+            enseigne='XPO BOIS DISTRIBUTION',
             code_postal='49000'
         )
         transporteurs = self.get_transporteurs({'q': 'xpo, DIS, 49'})
@@ -69,10 +69,10 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
 
     def test_search_ordering(self):
         # Name is set according to the expected ordering
-        t3 = factories.TransporteurFactory(raison_sociale='T3', email='')
-        t4 = factories.TransporteurFactory(raison_sociale='T4', email='', telephone='')
-        t2 = factories.TransporteurFactory(raison_sociale='T2')
-        t1 = factories.TransporteurFactory(raison_sociale='T1', validated_at=timezone.now())
+        t3 = factories.TransporteurFactory(enseigne='T3', email='')
+        t4 = factories.TransporteurFactory(enseigne='T4', email='', telephone='')
+        t2 = factories.TransporteurFactory(enseigne='T2')
+        t1 = factories.TransporteurFactory(enseigne='T1', validated_at=timezone.now())
         transporteurs = self.get_transporteurs({'q': 't'})
         self.assertEqual(len(transporteurs), 4)
         self.assertListEqual(
@@ -81,7 +81,7 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
 
     @override_settings(TRANSPORTEURS_LIMIT=2)
     def test_too_many_results(self):
-        factories.TransporteurFactory.create_batch(3, raison_sociale='FOO')
+        factories.TransporteurFactory.create_batch(3, enseigne='FOO')
         response = self.client.get(self.search_url, {'q': 'Foo'})
         data = response.json()
         self.assertEqual(data['limit'], 2)
@@ -215,6 +215,7 @@ class TransporteurSearchDepartementTestCase(TransporteurSearchTestCase):
         transporteurs = self.get_transporteurs({'departement-arrivee': '72'})
         for i, raison_sociale in enumerate(expected_ordering):
             self.assertEqual(transporteurs[i]['raison_sociale'], raison_sociale)
+
 
 class TransporteurSearchSpecialitiesTestCase(TransporteurSearchTestCase):
 

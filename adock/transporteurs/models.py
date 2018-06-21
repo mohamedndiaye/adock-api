@@ -46,6 +46,8 @@ class Transporteur(models.Model):
     # nomen_long from Sirene (raison_sociale in Marchandise)
     # Always in uppercase
     raison_sociale = models.CharField(max_length=131)
+    # Business name (filled with raison_sociale when undefined)
+    enseigne = models.CharField(max_length=131)
     # from Marchandise
     categorie_juridique = models.TextField()
     # This company is the siege social
@@ -120,12 +122,13 @@ class Transporteur(models.Model):
         indexes = [
             models.Index(
                 name='transporteur_search_order_by',
-                fields=['raison_sociale', '-completeness']
+                fields=['enseigne', '-completeness']
             )
         ]
         # Take care to create the index, GinIndex is not able to handle it.
-        # One solution is to inherit and adapt the code for that.
-        # CREATE INDEX transporteur_search_trgm ON transporteur USING GIN (raison_sociale GIN_TRGM_OPS);
+        # One solution is to inherit and adapt the code for that but it's not trivial
+        # so the index is created in a raw SQL migration.
+        # CREATE INDEX transporteur_search_trgm_enseigne ON transporteur USING GIN (enseigne GIN_TRGM_OPS);
 
     def __str__(self):
         return self.siret

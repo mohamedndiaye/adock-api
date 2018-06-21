@@ -1,7 +1,8 @@
 begin;
 
 insert into transporteur
-    (siret, raison_sociale,
+    (siret,
+     raison_sociale, enseigne,
      categorie_juridique, is_siege,
      adresse, code_postal, ville,
      departement,
@@ -15,7 +16,7 @@ insert into transporteur
      numero_tva, created_at,
      in_sirene, deleted_at)
     select r.siret,
-           r.raison_sociale,
+           r.raison_sociale, coalesce(s.enseigne, r.raison_sociale),
            r.categorie_juridique,
            r.is_siege,
            coalesce(
@@ -66,6 +67,7 @@ insert into transporteur
 on conflict (siret) do update
 set
   raison_sociale = excluded.raison_sociale,
+  enseigne = excluded.enseigne,
   categorie_juridique = excluded.categorie_juridique,
   is_siege = excluded.is_siege,
   adresse = excluded.adresse,

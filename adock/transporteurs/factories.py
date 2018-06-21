@@ -33,6 +33,7 @@ class TransporteurFactory(factory.django.DjangoModelFactory):
     siret = fuzzy.FuzzyText(length=validators.SIRET_LENGTH, chars=string.digits)
     numero_tva = factory.LazyAttribute(lambda o: compute_vat_number(o.siret))
     raison_sociale = factory.LazyAttribute(lambda _: faker.company().upper())
+    enseigne = factory.LazyAttribute(lambda o: o.raison_sociale)
     categorie_juridique = "Société par actions simplifiée (SAS)"
     adresse = factory.LazyAttribute(lambda _: faker.street_address().upper())
     code_postal = factory.Faker('zipcode')

@@ -16,12 +16,12 @@ from . import forms
 from . import validators
 
 TRANSPORTEUR_LIST_FIELDS = (
-    'siret', 'raison_sociale', 'adresse', 'code_postal', 'ville',
+    'siret', 'raison_sociale', 'enseigne', 'adresse', 'code_postal', 'ville',
     'completeness', 'lti_nombre', 'lc_nombre', 'working_area'
 )
 
 TRANSPORTEUR_DETAIL_FIELDS = (
-    'siret', 'raison_sociale', 'gestionnaire',
+    'siret', 'raison_sociale', 'enseigne', 'gestionnaire',
     'adresse', 'code_postal', 'ville',
     'telephone', 'email',
     'debut_activite', 'code_ape', 'libelle_ape',
@@ -47,20 +47,20 @@ def get_transporteur_as_json(transporteur, fields):
 
 def search(request):
     """The search allows to filter on:
-       - partial raison sociale or SIRET
+       - partial enseigne or SIRET
        - type of the license (LC heavy or LTI light)
     """
     transporteurs = models.Transporteur.objects.filter(deleted_at=None)
     q = request.GET.get('q')
     if q:
-        # Filtering on raison sociale or SIRET
+        # Filtering on enseigne or SIRET
         q = q.upper()
         criteria_list = q.split(',')
         for criteria in criteria_list:
             criteria = criteria.strip()
             if validators.RE_NOT_DIGIT.search(criteria):
                 # The search criteria contains at least one not digit character so search on name
-                transporteurs = transporteurs.filter(raison_sociale__contains=criteria)
+                transporteurs = transporteurs.filter(enseigne__contains=criteria)
             else:
                 if len(criteria) > 5:
                     # SIREN is longer than 5
@@ -70,7 +70,7 @@ def search(request):
                     # company name too
                     transporteurs = transporteurs.filter(
                         Q(code_postal__startswith=criteria) |
-                        Q(raison_sociale__contains=criteria)
+                        Q(enseigne__contains=criteria)
                     )
 
     # Filtering on type of license
@@ -133,10 +133,10 @@ def search(request):
         )
         order_by_list.append(order_departement_company)
 
-    # By completeness and raison sociale
+    # By completeness and enseigne
     order_by_list.extend((
         '-completeness',
-        'raison_sociale'
+        'enseigne'
     ))
     transporteurs = (transporteurs
         .order_by(*order_by_list)
@@ -166,13 +166,13 @@ def mail_managers_changes(transporteur, old_data_changed):
     # The URL is detail view of the front application
     subject = "Modification du transporteur {0}".format(transporteur.siret)
     message = """
-Modification du transporteur : {raison_sociale}
+Modification du transporteur : {enseigne}
 SIRET : {siret}
 https://{website}/transporteur/{siret}
 
 Valeurs modifiées :
     """.format(
-        raison_sociale=transporteur.raison_sociale,
+        enseigne=transporteur.enseigne,
         siret=transporteur.siret,
         website=settings.WEBSITE,
     )
