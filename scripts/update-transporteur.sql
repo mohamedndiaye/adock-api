@@ -16,7 +16,8 @@ insert into transporteur
      numero_tva, created_at,
      in_sirene, deleted_at)
     select r.siret,
-           r.raison_sociale, coalesce(s.enseigne, r.raison_sociale),
+           r.raison_sociale,
+           coalesce(nullif(s.enseigne, ''), r.raison_sociale),
            r.categorie_juridique,
            r.is_siege,
            coalesce(
