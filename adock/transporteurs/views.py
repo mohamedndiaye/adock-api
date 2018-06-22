@@ -110,12 +110,9 @@ def search(request):
     order_departement_counter = OrderBy(
         RawSQL("""
             CASE working_area
-            WHEN 'DEPARTEMENT'
-            THEN array_length(working_area_departements, 1)
-            WHEN 'FRANCE'
-            THEN 101
-            WHEN 'INTERNATIONAL'
-            THEN 102
+            WHEN 'DEPARTEMENT' THEN array_length(working_area_departements, 1)
+            WHEN 'FRANCE' THEN 101
+            WHEN 'INTERNATIONAL' THEN 102
             END
         """, ()),
         nulls_last=True
@@ -233,8 +230,8 @@ def transporteur_detail(request, transporteur_siret):
                 setattr(transporteur, field, cleaned_payload[field])
 
             with transaction.atomic(savepoint=False):
-                updated_fields.append('validated_at')
                 transporteur.validated_at = timezone.now()
+                updated_fields.append('validated_at')
                 transporteur.save(
                     force_update=True,
                     update_fields=updated_fields
