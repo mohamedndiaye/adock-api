@@ -275,6 +275,21 @@ class TransporteurDetailTestCase(TestCase):
             "Des départements doivent être renseignés quand l'aire de travail est départementale."
         )
 
+    def test_format_working_area_departements(self):
+        self.patch_transporteur(
+            {
+                'telephone': PHONE,
+                'working_area': models.WORKING_AREA_DEPARTEMENT,
+                'working_area_departements': '1, 5, 10, 2A, 976',
+            },
+            200
+        )
+        self.transporteur.refresh_from_db()
+        self.assertListEqual(
+            self.transporteur.working_area_departements,
+            ['01', '05', '10', '2A', '976']
+        )
+
     def test_completeness(self):
         # The default factory sets telephone and email but they aren't validated
         # a working area and specialities.

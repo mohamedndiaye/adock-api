@@ -15,6 +15,14 @@ class SubscriptionForm(forms.ModelForm):
             'website',
         ]
 
+    def clean_working_area_departements(self):
+        """Pads departement numbers lesser than 10 with a zero"""
+        formated_departements = []
+        departements = self.cleaned_data['working_area_departements']
+        for departement in departements:
+            formated_departements.append('{:0>2}'.format(departement))
+        return formated_departements
+
     def clean(self):
         cleaned_data = super().clean()
         if (cleaned_data.get('working_area') == WORKING_AREA_DEPARTEMENT and
