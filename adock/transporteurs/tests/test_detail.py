@@ -255,7 +255,25 @@ class TransporteurDetailTestCase(TestCase):
             },
             400
         )
-        self.assertTrue(data['working_area_departements'][0])
+        self.assertEqual(
+            data['working_area_departements'][0],
+            "L'élément n°0 du tableau n'est pas valide :"
+            "Assurez-vous que cette valeur comporte au plus 3 caractères (actuellement 8)."
+        )
+
+    def test_no_working_area_departements(self):
+        data = self.patch_transporteur(
+            {
+                'telephone': PHONE,
+                'working_area': models.WORKING_AREA_DEPARTEMENT,
+                'working_area_departements': '',
+            },
+            400
+        )
+        self.assertEqual(
+            data['working_area_departements'][0],
+            "Des départements doivent être renseignés quand l'aire de travail est départementale."
+        )
 
     def test_completeness(self):
         # The default factory sets telephone and email but they aren't validated
