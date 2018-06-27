@@ -77,4 +77,6 @@ delete from registre
            order by coalesce(date_debut_validite_lc, date_debut_validite_lti) desc
            offset 1);
 
+create unique index registre_siret_idx on registre(siret);
+
 commit;
