@@ -105,6 +105,8 @@ class Transporteur(models.Model):
         blank=True, null=True
     )
     website = models.URLField(blank=True)
+    # Filled by the user to describe his activity
+    description = models.TextField(blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     # The field is updated when the form is submitted by the user.
     # It means a user has validated the information.
