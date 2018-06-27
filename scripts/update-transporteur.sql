@@ -30,8 +30,8 @@ insert into transporteur
               else ''
             end || ' ' || s.typvoie || ' ' || s.libvoie,
             '') as adresse,
-           r.code_postal,
-           r.commune,
+           coalesce(s.codpos, r.code_postal),
+           coalesce(s.libcom, r.commune),
            -- Departement is used for ranking
            case when s.depet is null then '' else s.depet end,
            '', '',

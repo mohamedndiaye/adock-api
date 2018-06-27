@@ -43,20 +43,20 @@ SPECIALITY_CHOICES = (
 class Transporteur(models.Model):
     siret = models.CharField(max_length=transporteurs_validators.SIRET_LENGTH,
         primary_key=True, db_index=True, editable=False)
-    # nomen_long from Sirene (raison_sociale in Marchandise)
+    # nomen_long from Sirene (raison_sociale in Registre)
     # Always in uppercase
     raison_sociale = models.CharField(max_length=131)
     # Business name (filled with raison_sociale when undefined)
     enseigne = models.CharField(max_length=131)
-    # from Marchandise
+    # from Registre
     categorie_juridique = models.TextField()
     # This company is the siege social
     is_siege = models.BooleanField(default=False)
     # numvoie, typvoie, libvoie from Sirene
     adresse = models.CharField(max_length=126)
-    # codpos from Sirene (code_postal in Marchandise)
+    # codpos from Sirene (code_postal in Registre)
     code_postal = models.CharField(max_length=5)
-    # libcom from Sirene (commune in Marchandise)
+    # libcom from Sirene (commune in Registre)
     ville = models.CharField(max_length=32)
     # depet from Sirene - Departement of the siege social
     departement = models.CharField(max_length=3, blank=True, null=False, default='')
