@@ -2,7 +2,7 @@ import json
 import re
 
 from django.conf import settings
-from django.core.mail import mail_managers
+from django.core.mail import mail_managers, send_mail
 from django.db import transaction
 from django.db.models import Q
 from django.db.models.expressions import OrderBy, RawSQL
@@ -10,10 +10,12 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.views import View
 
 from . import models
 from . import forms
 from . import validators
+from . import tokens
 
 TRANSPORTEUR_LIST_FIELDS = (
     'siret', 'raison_sociale', 'enseigne', 'adresse', 'code_postal', 'ville',
@@ -159,6 +161,33 @@ def get_transporteur_changes(transporteur, cleaned_payload):
 
     return old_data_changed
 
+def mail_transporteur_to_confirm_email(transporteur):
+    if not transporteur.email:
+        return
+
+    token = tokens.email_confirmation_token.make_token(transporteur)
+    subject = "A Dock - Confirmation de votre adresse électronique"
+    message = """
+Merci d'avoir renseigné votre fiche sur A Dock, l'application
+qui facilite la relation chargeur et transporteur.
+
+https://{website}/transporteur/{siret}
+
+Pour confirmer votre adresse électronique « {email} »
+et ainsi sécuriser votre fiche transporteur, veuillez cliquer
+sur le lien suivant :
+
+https://{website}/transporteur/{siret}/confirmer_adresse/{token}/
+
+Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer ce courriel.
+    """.format(
+        website=settings.WEBSITE,
+        siret=transporteur.siret,
+        email=transporteur.email,
+        token=token
+    )
+    send_mail(subject, message, settings.SERVER_EMAIL, [transporteur.email], fail_silently=True)
+
 def mail_managers_changes(transporteur, old_data_changed):
     # Send a mail to managers to track changes
     # The URL is detail view of the front application
@@ -239,7 +268,30 @@ def transporteur_detail(request, transporteur_siret):
                 )
                 models.TransporteurLog.objects.create(transporteur=transporteur, data=old_data_changed)
 
+            if 'email' in updated_fields:
+                mail_transporteur_to_confirm_email(transporteur)
+
             mail_managers_changes(transporteur, old_data_changed)
 
     transporteur_as_json = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
     return JsonResponse(transporteur_as_json)
+
+
+class EmailConfirmationView(View):
+    def get(self, request, transporteur_siret, token):
+        try:
+            transporteur = models.Transporteur.objects.get(pk=transporteur_siret)
+        except models.Transporteur.DoesNotExist:
+            transporteur = None
+
+        if transporteur is not None and tokens.email_confirmation_token.check_token(transporteur, token):
+            transporteur.email_confirmed_at = timezone.now()
+            transporteur.save()
+            return JsonResponse({
+                'message': "L'adresse électronique est confirmée."
+            })
+        else:
+            return JsonResponse(
+                {'message': "Impossible de confirmer l'adresse électronique."},
+                status=400
+            )

@@ -5,9 +5,9 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from .. import models
-from .. import factories
 from . import test
+from .. import factories
+from .. import models
 
 PHONE = '+33240424546'
 PHONE_DISPLAY = '02 40 42 45 46'
@@ -114,7 +114,6 @@ class TransporteurDetailTestCase(TestCase):
         # Initial status
         self.assertNotEqual(self.transporteur.telephone, PHONE)
         self.assertNotEqual(self.transporteur.email, EMAIL)
-        self.assertEqual(len(mail.outbox), 0)
 
         # Apply changes w/o working area
         with self.settings(MANAGERS=(("Manager", 'manager@example.com'))):
@@ -127,12 +126,22 @@ class TransporteurDetailTestCase(TestCase):
             )
         self.assertEqual(data['telephone'], PHONE_DISPLAY)
         self.assertEqual(data['email'], EMAIL)
-        self.assertEqual(len(mail.outbox), 1)
+
+        # One mail for the user and another for the managers
+        self.assertEqual(len(mail.outbox), 2)
+
+        # Mail user to confirm email
+        self.assertEqual(
+            mail.outbox[0].subject,
+            "A Dock - Confirmation de votre adresse électronique"
+        )
+
+        # Mail manager about applied changes
         message = "[adock] Modification du transporteur %s" % self.transporteur.siret
-        self.assertEqual(mail.outbox[0].subject, message)
-        self.assertIn('telephone', mail.outbox[0].body)
-        self.assertIn('email', mail.outbox[0].body)
-        self.assertNotIn('working', mail.outbox[0].body)
+        self.assertEqual(mail.outbox[1].subject, message)
+        self.assertIn('telephone', mail.outbox[1].body)
+        self.assertIn('email', mail.outbox[1].body)
+        self.assertNotIn('working', mail.outbox[1].body)
 
     def test_patch_partial_completeness(self):
         # Remove other fields
@@ -177,7 +186,7 @@ class TransporteurDetailTestCase(TestCase):
         self.assertListEqual(data['working_area_departements'], ['23', '45', '976'])
         self.assertListEqual(data['specialities'], ['LOT'])
         self.assertEqual(data['completeness'], 100)
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 2)
 
         # Be sure the response is identical to the DB
         self.transporteur.refresh_from_db()
@@ -201,6 +210,11 @@ class TransporteurDetailTestCase(TestCase):
         self.transporteur.refresh_from_db()
         self.assertEqual(self.transporteur.website, WEBSITE)
 
+        # No email changes so only the admin is notified
+        self.assertEqual(len(mail.outbox), 1)
+        message = "[adock] Modification du transporteur %s" % self.transporteur.siret
+        self.assertEqual(mail.outbox[0].subject, message)
+
     def test_patch_invalid_request(self):
         response = self.client.patch(self.detail_url, {'foo': 'foo'})
         self.assertEqual(response.status_code, 400)
@@ -223,7 +237,7 @@ class TransporteurDetailTestCase(TestCase):
         )
         self.assertNotIn('foo', data)
 
-    def test_invalid_phone(self):
+    def test_patch_invalid_phone(self):
         data = self.patch_transporteur(
             {
                 'telephone': '11223344556',
@@ -234,7 +248,7 @@ class TransporteurDetailTestCase(TestCase):
         # Wrong French translation will be fixed in django-phonenumber-field > 2.0 (my patch)
         self.assertEqual(data['telephone'][0], "Entrez un numéro de téléphone valide.")
 
-    def test_not_exists_working_area_departements(self):
+    def test_patch_unexisting_working_area_departements(self):
         data = self.patch_transporteur(
             {
                 'telephone': PHONE,
@@ -247,7 +261,7 @@ class TransporteurDetailTestCase(TestCase):
             "« 20 » n'est pas un département français valide."
         )
 
-    def test_invalid_working_area_departements(self):
+    def test_patch_invalid_working_area_departements(self):
         data = self.patch_transporteur(
             {
                 'telephone': PHONE,
@@ -261,7 +275,7 @@ class TransporteurDetailTestCase(TestCase):
             "Assurez-vous que cette valeur comporte au plus 3 caractères (actuellement 8)."
         )
 
-    def test_no_working_area_departements(self):
+    def test_patch_no_working_area_departements(self):
         data = self.patch_transporteur(
             {
                 'telephone': PHONE,
@@ -275,7 +289,7 @@ class TransporteurDetailTestCase(TestCase):
             "Des départements doivent être renseignés quand l'aire de travail est départementale."
         )
 
-    def test_format_working_area_departements(self):
+    def test_patch_format_working_area_departements(self):
         self.patch_transporteur(
             {
                 'telephone': PHONE,

@@ -64,6 +64,9 @@ class Transporteur(models.Model):
     telephone = PhoneNumberField()
     # mail from GRECO used as default (changed)
     email = models.EmailField(blank=True, default='')
+    # Set when the user clicks on the provided URL with one time token and to
+    # None when the email is modified.
+    email_confirmed_at = models.DateTimeField(blank=True, null=True)
     # dcret from Sirene (inscription_activite from GRECO).
     # Can be null (not present in Sirene)
     date_creation = models.DateField(blank=True, null=True)
