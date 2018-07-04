@@ -1,4 +1,5 @@
 import json
+import random
 import re
 
 from django.conf import settings
@@ -245,5 +246,21 @@ def transporteur_confirm_email(request, transporteur_siret, token):
     else:
         return JsonResponse(
             {'message': "Impossible de confirmer l'adresse électronique."},
+            status=400
+        )
+
+def transporteur_send_edit_code(request, transporteur_siret):
+    transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
+    if (timezone.now() - transporteur.edit_code_at) > settings.EDIT_CODE_TIMEOUT_SECONDS:
+        transporteur.edit_code_at = timezone.now()
+        transporteur.edit_code = random.randint(100000, 999999)
+        transporteur.save()
+        mails.mail_transporteur_edit_code(transporteur)
+        return JsonResponse(
+            {'message': "Un code de modification vous a été envoyé par courriel."}
+        )
+    else:
+        return JsonResponse(
+            {'message': "Un code de modification a été déjà envoyé récemment."},
             status=400
         )

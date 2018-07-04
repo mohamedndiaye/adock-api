@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.core.mail import mail_managers, send_mail
 
@@ -53,3 +55,16 @@ Valeurs modifiées :
             new_value=getattr(transporteur, field)
         )
     mail_managers(subject, message, fail_silently=True)
+
+def mail_transporteur_edit_code(transporteur):
+    subject = "A Dock - Code de modification"
+    max_edit_time = transporteur.edit_code_at + datetime.timedelta(minutes=settings.TRANSPORTEUR_EDIT_CODE_TIMEOUT_MINUTES)
+    message = """
+Votre code de modification est {edit_code}.
+Ce code pour permet de modifier la fiche du transporteur « {enseigne} » jusqu'à {max_edit_time_display}.
+    """.format(
+        enseigne=transporteur.enseigne,
+        edit_code=transporteur.edit_code,
+        max_edit_time_display=max_edit_time.strftime('%H:%M (%x)')
+    )
+    send_mail(subject, message, settings.SERVER_EMAIL, [transporteur.email], fail_silently=True)
