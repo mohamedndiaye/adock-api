@@ -85,6 +85,7 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
             'transporteurs_detail',
             kwargs={'transporteur_siret': self.transporteur.siret}
         )
+
         self.transporteur.set_edit_code()
         self.transporteur.save()
 
@@ -107,4 +108,18 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
                 'edit_code': self.transporteur.edit_code
             },
             200
+        )
+
+    def test_patch_with_useless_edit_code(self):
+        self.detail_url = reverse(
+            'transporteurs_detail',
+            kwargs={'transporteur_siret': self.transporteur.siret}
+        )
+
+        self.patch_transporteur(
+            {
+                'telephone': '0102030405',
+                'edit_code': '666666',
+            },
+            400
         )

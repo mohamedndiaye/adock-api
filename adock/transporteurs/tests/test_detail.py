@@ -93,6 +93,8 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
                 'telephone': PHONE,
                 'email': EMAIL,
                 'working_area_departements': '2A, 57',
+                # Should be ignored from log
+                'edit_code': '123456'
             },
             200
         )

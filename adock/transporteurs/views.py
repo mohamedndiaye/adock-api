@@ -199,6 +199,9 @@ def transporteur_detail(request, transporteur_siret):
         if not form.is_valid():
             return JsonResponse(form.errors, status=400)
 
+        # Exclude edit code from changes if not up to you to define it!
+        form.cleaned_data.pop('edit_code')
+
         # Limit cleaned_data to the keys of the payload but only accept keys of cleaned_data (intersection)
         # to only update the submitted values
         cleaned_payload = {k: form.cleaned_data[k] for k in payload.keys() if k in form.cleaned_data}
