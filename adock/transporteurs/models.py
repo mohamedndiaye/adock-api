@@ -198,8 +198,16 @@ class Transporteur(models.Model):
             # The current edit code is too old
             return False
 
-        if not edit_code or self.edit_code != edit_code:
+        if not edit_code:
             # Wrong edit code
+            return False
+
+        try:
+            edit_code = int(edit_code)
+        except ValueError:
+            return False
+
+        if self.edit_code != edit_code:
             return False
 
         return True
