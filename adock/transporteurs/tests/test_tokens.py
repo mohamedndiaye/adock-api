@@ -6,7 +6,7 @@ from .. import factories
 from .. import tokens
 
 
-class TransporteurDetailTestCase(TestCase):
+class TransporteurEmailConfirmationTestCase(TestCase):
     def setUp(self):
         self.transporteur = factories.TransporteurFactory()
 
