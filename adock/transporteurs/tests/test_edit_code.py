@@ -72,7 +72,7 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
 
         response = self.client.get(url)
         data = response.json()
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(
             data['message'],
             "Un code de modification a été déjà envoyé récemment."

@@ -273,6 +273,5 @@ def transporteur_send_edit_code(request, transporteur_siret):
         )
     else:
         return JsonResponse(
-            {'message': "Un code de modification a été déjà envoyé récemment."},
-            status=400
+            {'message': "Un code de modification a été déjà envoyé récemment."}
         )
