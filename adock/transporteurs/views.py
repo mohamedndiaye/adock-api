@@ -1,6 +1,4 @@
-import datetime
 import json
-import random
 import re
 
 from django.conf import settings
@@ -190,6 +188,13 @@ def transporteur_detail(request, transporteur_siret):
                 status=400
             )
 
+        # Access control to locked transporteur
+        if not transporteur.check_edit_code(payload.get('edit_code')):
+            return JsonResponse(
+                {'message': "La modification de la fiche transporteur a été refusée."},
+                status=403
+            )
+
         # Replace all non digits by ',' and avoid duplicates ','
         raw_departements = payload.get('working_area_departements')
         if raw_departements:
@@ -253,10 +258,14 @@ def transporteur_confirm_email(request, transporteur_siret, token):
 
 def transporteur_send_edit_code(request, transporteur_siret):
     transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
-    if (transporteur.edit_code_at is None or
-            (timezone.now() - transporteur.edit_code_at) > settings.TRANSPORTEUR_EDIT_CODE_INTERVAL):
-        transporteur.edit_code = random.randint(100000, 999999)
-        transporteur.edit_code_at = timezone.now()
+
+    if not transporteur.is_locked():
+        return JsonResponse(
+            {'message': "La fiche est en libre accès."}
+        )
+
+    if transporteur.edit_code_has_expired():
+        transporteur.set_edit_code()
         transporteur.save()
         mails.mail_transporteur_edit_code(transporteur)
         return JsonResponse(

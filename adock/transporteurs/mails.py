@@ -1,5 +1,3 @@
-import datetime
-
 from django.conf import settings
 from django.core.mail import mail_managers, send_mail
 

@@ -1,7 +1,10 @@
+import random
+
+from django.conf import settings
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
 from django.urls import reverse
-from django.conf import settings
+from django.utils import timezone
 
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -170,6 +173,40 @@ class Transporteur(models.Model):
             earned_points += 1
 
         return COMPLETENESS_PERCENT_MIN + earned_points * EARNED_POINT_VALUE
+
+    def is_locked(self):
+        # The email has been confirmed
+        return bool(self.email_confirmed_at)
+
+    def edit_code_has_expired(self):
+        if not self.edit_code:
+            # Unset is considered expired
+            return True
+
+        if (self.edit_code_at + settings.TRANSPORTEUR_EDIT_CODE_INTERVAL) < timezone.now():
+            # The stored edit code has expired
+            return True
+
+        return False
+
+    def check_edit_code(self, edit_code):
+        if not self.is_locked():
+            # Access granted to not locked transporteur
+            return True
+
+        if self.edit_code_has_expired():
+            # The current edit code is too old
+            return False
+
+        if not edit_code or self.edit_code != edit_code:
+            # Wrong edit code
+            return False
+
+        return True
+
+    def set_edit_code(self):
+        self.edit_code = random.randint(100000, 999999)
+        self.edit_code_at = timezone.now()
 
     def save(self, *args, **kwargs):
         self.completeness = self.compute_completeness()

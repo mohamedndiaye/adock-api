@@ -13,7 +13,8 @@ class SubscriptionForm(forms.ModelForm):
             'working_area_departements',
             'specialities',
             'website',
-            'description'
+            'description',
+            'edit_code'
         ]
 
     def clean_working_area_departements(self):
