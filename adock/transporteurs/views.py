@@ -188,21 +188,14 @@ def transporteur_detail(request, transporteur_siret):
                 status=400
             )
 
-        # Access control to locked transporteur
-        if not transporteur.check_edit_code(payload.get('edit_code')):
-            return JsonResponse(
-                {'message': "La modification de la fiche transporteur a été refusée."},
-                status=403
-            )
-
         # Replace all non digits by ',' and avoid duplicates ','
         raw_departements = payload.get('working_area_departements')
         if raw_departements:
             raw_departements = raw_departements.replace(' ', ',')
             payload['working_area_departements'] = RE_MANY_COMMAS.sub(',', raw_departements)
 
-        # Form is not bound to the transporteur instance
-        form = forms.SubscriptionForm(payload)
+        # Form is not bound to the transporteur instance but we need it to check edit code
+        form = forms.SubscriptionForm(payload, transporteur=transporteur)
         if not form.is_valid():
             return JsonResponse(form.errors, status=400)
 

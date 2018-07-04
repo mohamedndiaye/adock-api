@@ -88,11 +88,16 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
         self.transporteur.set_edit_code()
         self.transporteur.save()
 
-        self.patch_transporteur(
+        data = self.patch_transporteur(
             {
+                'telephone': '0102030405',
                 'working_area_departements': '44',
             },
-            403
+            400
+        )
+        self.assertEqual(
+            data['edit_code'][0],
+            "Le code de modification n'est pas valide."
         )
 
         self.patch_transporteur(

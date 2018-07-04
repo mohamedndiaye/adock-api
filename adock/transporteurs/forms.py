@@ -17,13 +17,25 @@ class SubscriptionForm(forms.ModelForm):
             'edit_code'
         ]
 
+    def __init__(self, data, transporteur):
+        super().__init__(data)
+        self.transporteur = transporteur
+
     def clean_working_area_departements(self):
         """Pads departement numbers lesser than 10 with a zero"""
         formated_departements = []
-        departements = self.cleaned_data['working_area_departements']
+        departements = self.cleaned_data.get('working_area_departements')
         for departement in departements:
             formated_departements.append('{:0>2}'.format(departement))
         return formated_departements
+
+    def clean_edit_code(self):
+        # Access control to locked transporteur
+        edit_code = self.cleaned_data.get('edit_code')
+        if not self.transporteur.check_edit_code(edit_code):
+            raise forms.ValidationError("Le code de modification n'est pas valide.")
+
+        return edit_code
 
     def clean(self):
         cleaned_data = super().clean()
