@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
+import datetime
 import os
 
 PROJECT = 'adock'
@@ -151,6 +152,7 @@ TRANSPORTEURS_LIMIT = 200
 # Validity of token to confirm email address
 PASSWORD_RESET_TIMEOUT_DAYS = 2
 TRANSPORTEUR_EDIT_CODE_TIMEOUT_MINUTES = 60
+TRANSPORTEUR_EDIT_CODE_INTERVAL = datetime.timedelta(minutes=TRANSPORTEUR_EDIT_CODE_TIMEOUT_MINUTES)
 
 USE_DEBUG_CONSOLE = False
 USE_DJANGO_EXTENSIONS = False

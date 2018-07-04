@@ -1,3 +1,4 @@
+import datetime
 import json
 import random
 import re
@@ -249,11 +250,13 @@ def transporteur_confirm_email(request, transporteur_siret, token):
             status=400
         )
 
+
 def transporteur_send_edit_code(request, transporteur_siret):
     transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
-    if (timezone.now() - transporteur.edit_code_at) > settings.EDIT_CODE_TIMEOUT_SECONDS:
-        transporteur.edit_code_at = timezone.now()
+    if (transporteur.edit_code_at is None or
+            (timezone.now() - transporteur.edit_code_at) > settings.TRANSPORTEUR_EDIT_CODE_INTERVAL):
         transporteur.edit_code = random.randint(100000, 999999)
+        transporteur.edit_code_at = timezone.now()
         transporteur.save()
         mails.mail_transporteur_edit_code(transporteur)
         return JsonResponse(

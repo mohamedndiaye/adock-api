@@ -77,6 +77,9 @@ class TransporteurDetailTestCase(TestCase):
             data['message'],
             "Un code de modification vous a été envoyé par courriel."
         )
+        self.transporteur.refresh_from_db()
+        edit_code = self.transporteur.edit_code
+        self.assertEqual(len(str(edit_code)), 6)
 
         response = self.client.get(url)
         data = response.json()
@@ -85,4 +88,6 @@ class TransporteurDetailTestCase(TestCase):
             data['message'],
             "Un code de modification a été déjà envoyé récemment."
         )
+        self.transporteur.refresh_from_db()
+        self.assertEqual(self.transporteur.edit_code, edit_code)
 

@@ -58,7 +58,7 @@ Valeurs modifiées :
 
 def mail_transporteur_edit_code(transporteur):
     subject = "A Dock - Code de modification"
-    max_edit_time = transporteur.edit_code_at + datetime.timedelta(minutes=settings.TRANSPORTEUR_EDIT_CODE_TIMEOUT_MINUTES)
+    max_edit_time = transporteur.edit_code_at + settings.TRANSPORTEUR_EDIT_CODE_INTERVAL
     message = """
 Votre code de modification est {edit_code}.
 Ce code pour permet de modifier la fiche du transporteur « {enseigne} » jusqu'à {max_edit_time_display}.
