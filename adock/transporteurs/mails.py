@@ -65,6 +65,6 @@ Ce code pour permet de modifier la fiche du transporteur « {enseigne} » jusqu
     """.format(
         enseigne=transporteur.enseigne,
         edit_code=transporteur.edit_code,
-        max_edit_time_display=max_edit_time.strftime('%H:%M (%x)')
+        max_edit_time_display=max_edit_time.strftime('%H:%M (%d/%m/%Y)')
     )
     send_mail(subject, message, settings.SERVER_EMAIL, [transporteur.email], fail_silently=True)
