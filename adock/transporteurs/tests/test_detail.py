@@ -16,7 +16,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         self.transporteur = factories.TransporteurFactory(siret=test.VALID_SIRET)
         self.detail_url = reverse(
             'transporteurs_detail',
-            kwargs={'transporteur_siret': test.VALID_SIRET}
+            kwargs={'transporteur_siret': self.transporteur.siret}
         )
 
     def test_get(self):

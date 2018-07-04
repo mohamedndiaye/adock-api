@@ -79,3 +79,27 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
         )
         self.transporteur.refresh_from_db()
         self.assertEqual(self.transporteur.edit_code, edit_code)
+
+    def test_patch_locked(self):
+        self.detail_url = reverse(
+            'transporteurs_detail',
+            kwargs={'transporteur_siret': self.transporteur.siret}
+        )
+        self.transporteur.set_edit_code()
+        self.transporteur.save()
+
+        self.patch_transporteur(
+            {
+                'working_area_departements': '44',
+            },
+            403
+        )
+
+        self.patch_transporteur(
+            {
+                'telephone': '0102030405',
+                'working_area_departements': '44',
+                'edit_code': self.transporteur.edit_code
+            },
+            200
+        )
