@@ -32,7 +32,9 @@ TRANSPORTEUR_DETAIL_FIELDS = (
     'lc_numero', 'lc_date_debut', 'lc_date_fin', 'lc_nombre',
     'working_area', 'working_area_departements',
     'specialities', 'website', 'description',
-    'in_sirene', 'deleted_at'
+    'in_sirene', 'deleted_at',
+    # Boolean for real email_confirmed_at field to avoid privacy issue
+    'is_locked'
 )
 
 def get_transporteur_as_json(transporteur, fields):
@@ -43,8 +45,11 @@ def get_transporteur_as_json(transporteur, fields):
             value = '0' + transporteur.telephone.format_as(
                 settings.PHONENUMBER_DEFAULT_REGION
             )
+        elif field == 'is_locked':
+            value = bool(transporteur.email_confirmed_at)
         else:
             value = getattr(transporteur, field)
+
         transporteur_json[field] = value
     return transporteur_json
 

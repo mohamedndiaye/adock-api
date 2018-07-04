@@ -47,6 +47,7 @@ class TransporteurDetailTestCase(TestCase):
         data = response.json()
         self.assertEqual(data['debut_activite'], None)
         self.assertEqual(data['specialities'], None)
+        self.assertEqual(data['is_locked'], False)
 
     def test_get_empty_phone(self):
         self.transporteur.telephone = ''
