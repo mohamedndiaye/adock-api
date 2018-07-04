@@ -177,7 +177,7 @@ Pour confirmer votre adresse électronique « {email} »
 et ainsi sécuriser votre fiche transporteur, veuillez cliquer
 sur le lien suivant :
 
-https://{website}/transporteur/{siret}/confirmer_adresse/{token}/
+https://{website}/transporteur/{siret}/confirm/{token}/
 
 Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer ce courriel.
     """.format(
