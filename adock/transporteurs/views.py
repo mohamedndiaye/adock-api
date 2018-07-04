@@ -10,7 +10,6 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from django.views import View
 
 from . import models
 from . import forms
@@ -282,21 +281,20 @@ def transporteur_detail(request, transporteur_siret):
     return JsonResponse(transporteur_as_json)
 
 
-class EmailConfirmationView(View):
-    def get(self, request, transporteur_siret, token):
-        try:
-            transporteur = models.Transporteur.objects.get(pk=transporteur_siret)
-        except models.Transporteur.DoesNotExist:
-            transporteur = None
+def transporteur_confirm_email(request, transporteur_siret, token):
+    try:
+        transporteur = models.Transporteur.objects.get(pk=transporteur_siret)
+    except models.Transporteur.DoesNotExist:
+        transporteur = None
 
-        if transporteur and tokens.email_confirmation_token.check_token(transporteur, token):
-            transporteur.email_confirmed_at = timezone.now()
-            transporteur.save()
-            return JsonResponse({
-                'message': "L'adresse électronique est confirmée."
-            })
-        else:
-            return JsonResponse(
-                {'message': "Impossible de confirmer l'adresse électronique."},
-                status=400
-            )
+    if transporteur and tokens.email_confirmation_token.check_token(transporteur, token):
+        transporteur.email_confirmed_at = timezone.now()
+        transporteur.save()
+        return JsonResponse({
+            'message': "L'adresse électronique est confirmée."
+        })
+    else:
+        return JsonResponse(
+            {'message': "Impossible de confirmer l'adresse électronique."},
+            status=400
+        )
