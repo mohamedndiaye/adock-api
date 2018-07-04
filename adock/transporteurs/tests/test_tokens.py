@@ -38,7 +38,7 @@ class TransporteurDetailTestCase(TestCase):
     def test_confirm_token(self):
         token = tokens.email_confirmation_token.make_token(self.transporteur)
         url = reverse(
-            'transporteurs_confirm_email',
+            'transporteurs_confirmer_adresse',
             kwargs={
                 'transporteur_siret': self.transporteur.siret,
                 'token': token
@@ -55,7 +55,7 @@ class TransporteurDetailTestCase(TestCase):
     def test_altered_token(self):
         token = tokens.email_confirmation_token.make_token(self.transporteur)
         url = reverse(
-            'transporteurs_confirm_email',
+            'transporteurs_confirmer_adresse',
             kwargs={
                 'transporteur_siret': self.transporteur.siret,
                 'token': token + 'z'
