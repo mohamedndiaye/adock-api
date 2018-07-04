@@ -1,7 +1,4 @@
-import json
-
 from django.core import mail
-from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
@@ -14,7 +11,7 @@ PHONE_DISPLAY = '02 40 42 45 46'
 EMAIL = 'foo@example.com'
 
 
-class TransporteurDetailTestCase(TestCase):
+class TransporteurDetailTestCase(test.TransporteurTestCase):
     def setUp(self):
         self.transporteur = factories.TransporteurFactory(siret=test.VALID_SIRET)
         self.detail_url = reverse(
@@ -55,11 +52,6 @@ class TransporteurDetailTestCase(TestCase):
         response = self.client.get(self.detail_url)
         data = response.json()
         self.assertEqual(data['telephone'], '')
-
-    def patch_transporteur(self, data, status_code):
-        response = self.client.patch(self.detail_url, json.dumps(data), 'application/json')
-        self.assertEqual(response.status_code, status_code)
-        return response.json()
 
     def test_patch_log(self):
         transporteur = self.patch_transporteur(
