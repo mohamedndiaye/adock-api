@@ -290,9 +290,9 @@ def transporteur_confirm_email(request, transporteur_siret, token):
     if transporteur and tokens.email_confirmation_token.check_token(transporteur, token):
         transporteur.email_confirmed_at = timezone.now()
         transporteur.save()
-        return JsonResponse({
-            'message': "L'adresse électronique est confirmée."
-        })
+        return JsonResponse(
+            {'message': "L'adresse électronique est confirmée."}
+        )
     else:
         return JsonResponse(
             {'message': "Impossible de confirmer l'adresse électronique."},
