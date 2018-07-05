@@ -65,7 +65,7 @@ def search(request):
         criteria_list = q.split(',')
         for criteria in criteria_list:
             criteria = criteria.strip()
-            if validators.RE_NOT_DIGIT.search(criteria):
+            if validators.RE_NOT_DIGIT_ONLY.search(criteria):
                 # The search criteria contains at least one not digit character so search on name
                 transporteurs = transporteurs.filter(enseigne__contains=criteria)
             else:
