@@ -212,6 +212,11 @@ def transporteur_detail(request, transporteur_siret):
             # Data has been modified so saving is required
             # Don't use form.save to edit only the submitted fields of the instance
             updated_fields = list(old_data_changed.keys())
+            if 'email' in updated_fields:
+                # New email should invalidate email confirmation
+                cleaned_payload['email_confirmed_at'] = None
+                updated_fields.append('email_confirmed_at')
+
             for field in updated_fields:
                 setattr(transporteur, field, cleaned_payload[field])
 

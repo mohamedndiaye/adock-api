@@ -219,8 +219,9 @@ class Transporteur(models.Model):
     def save(self, *args, **kwargs):
         self.completeness = self.compute_completeness()
         if 'update_fields' in kwargs:
-            # Could be a dict_keys instance so cast as list and be add 'completeness'
-            kwargs['update_fields'] = list(kwargs['update_fields']) + ['completeness']
+            # Could be a dict_keys instance so cast as list and add 'completeness'
+            kwargs['update_fields'] = list(kwargs['update_fields'])
+            kwargs['update_fields'].append('completeness')
         super().save(*args, **kwargs)
 
 
