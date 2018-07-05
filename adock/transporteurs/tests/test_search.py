@@ -56,6 +56,21 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
         transporteurs = self.get_transporteurs({'q': 'rg'})
         self.assertEqual(len(transporteurs), 0)
 
+    def test_search_on_accentuated_enseigne(self):
+        # Only uppercase strings in enseigne
+        factories.TransporteurFactory(enseigne='JEREMIE')
+        factories.TransporteurFactory(enseigne='JÉRÉMIE')
+        factories.TransporteurFactory(enseigne='BERNARD')
+
+        transporteurs = self.get_transporteurs({'q': 'jeremie'})
+        self.assertEqual(len(transporteurs), 2, transporteurs)
+
+        transporteurs = self.get_transporteurs({'q': 'JERemie'})
+        self.assertEqual(len(transporteurs), 2)
+
+        transporteurs = self.get_transporteurs({'q': 'JérÉmie'})
+        self.assertEqual(len(transporteurs), 2)
+
     def test_search_on_code_postal(self):
         factories.TransporteurFactory(
             enseigne='XPO BOIS DISTRIBUTION',

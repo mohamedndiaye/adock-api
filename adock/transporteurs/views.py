@@ -67,7 +67,7 @@ def search(request):
             criteria = criteria.strip()
             if validators.RE_NOT_DIGIT_ONLY.search(criteria):
                 # The search criteria contains at least one not digit character so search on name
-                transporteurs = transporteurs.filter(enseigne__contains=criteria)
+                transporteurs = transporteurs.filter(enseigne__unaccent__contains=criteria)
             else:
                 # Only digit
                 if len(criteria) > 5:
