@@ -13,15 +13,14 @@ def mail_transporteur_to_confirm_email(transporteur):
 Merci d'avoir renseigné votre fiche sur A Dock, l'application
 qui facilite la relation chargeur et transporteur.
 
-https://{website}/transporteur/{siret}
-
-Pour confirmer votre adresse électronique « {email} »
-et ainsi sécuriser votre fiche transporteur, veuillez cliquer
-sur le lien suivant :
+Cliquez sur le lien pour confirmer votre adresse électronique « {email} »
+et ainsi sécuriser votre fiche transporteur :
 
 https://{website}/transporteur/{siret}/confirm/{token}/
 
-Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer ce courriel.
+Cordialement,
+
+L'équipe A Dock
     """.format(
         website=settings.WEBSITE,
         siret=transporteur.siret,
@@ -59,7 +58,8 @@ def mail_transporteur_edit_code(transporteur):
     max_edit_time = transporteur.edit_code_at + settings.TRANSPORTEUR_EDIT_CODE_INTERVAL
     message = """
 Votre code de modification est {edit_code}.
-Ce code pour permet de modifier la fiche du transporteur « {enseigne} » jusqu'à {max_edit_time_display}.
+
+Ce code vous permet de modifier la fiche du transporteur « {enseigne} » jusqu'à {max_edit_time_display}.
     """.format(
         enseigne=transporteur.enseigne,
         edit_code=transporteur.edit_code,
