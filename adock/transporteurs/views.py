@@ -69,12 +69,13 @@ def search(request):
                 # The search criteria contains at least one not digit character so search on name
                 transporteurs = transporteurs.filter(enseigne__contains=criteria)
             else:
+                # Only digit
                 if len(criteria) > 5:
                     # SIREN is longer than 5
                     transporteurs = transporteurs.filter(siret__startswith=criteria)
                 else:
                     # Zip code are shorter than 5 digits, could be a digit in the
-                    # company name too
+                    # company name too (limited to 5)
                     transporteurs = transporteurs.filter(
                         Q(code_postal__startswith=criteria) |
                         Q(enseigne__contains=criteria)

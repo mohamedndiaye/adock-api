@@ -25,21 +25,21 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
         # Useless parameter is ignored
         self.assertEqual(response.status_code, 200)
 
-    def test_empty_results_with_siren(self):
+    def test_empty_results_on_siren(self):
         transporteurs = self.get_transporteurs({'q': '123456789'})
         self.assertEqual(len(transporteurs), 0)
 
-    def test_empty_results_with_siret(self):
+    def test_empty_results_on_siret(self):
         transporteurs = self.get_transporteurs({'q': test.VALID_SIRET})
         self.assertEqual(len(transporteurs), 0)
 
-    def test_search_with_siret(self):
+    def test_search_on_siret(self):
         factories.TransporteurFactory(siret=test.VALID_SIRET)
         transporteurs = self.get_transporteurs({'q': test.VALID_SIRET})
         self.assertEqual(len(transporteurs), 1)
         self.assertEqual(transporteurs[0]['siret'], test.VALID_SIRET)
 
-    def test_search_with_siret_code_postal(self):
+    def test_search_on_siret_code_postal(self):
         # Search on SIRET with spaces
         factories.TransporteurFactory(
             siret=test.VALID_SIRET,
@@ -48,7 +48,7 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
         transporteurs = self.get_transporteurs({'q': ' ' + test.VALID_SIRET[0:6] + ', 35'})
         self.assertEqual(len(transporteurs), 1)
 
-    def test_search_with_raison_sociale(self):
+    def test_search_on_enseigne(self):
         factories.TransporteurFactory(enseigne='SUPER ROGER')
         transporteurs = self.get_transporteurs({'q': 'rog'})
         self.assertEqual(len(transporteurs), 1)
@@ -56,7 +56,7 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
         transporteurs = self.get_transporteurs({'q': 'rg'})
         self.assertEqual(len(transporteurs), 0)
 
-    def test_search_with_code_postal(self):
+    def test_search_on_code_postal(self):
         factories.TransporteurFactory(
             enseigne='XPO BOIS DISTRIBUTION',
             code_postal='49000'
@@ -93,6 +93,7 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
         transporteurs = self.get_transporteurs()
         self.assertEqual(len(transporteurs), 1)
         self.assertEqual(transporteurs[0]['raison_sociale'], 'ACTIVE')
+
 
 class TransporteurSearchLicenseTypeTestCase(TransporteurSearchTestCase):
 
