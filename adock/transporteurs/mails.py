@@ -19,7 +19,6 @@ et ainsi sécuriser votre fiche transporteur :
 https://{website}/transporteur/{siret}/confirm/{token}/
 
 Cordialement,
-
 L'équipe A Dock
     """.format(
         website=settings.WEBSITE,
@@ -60,6 +59,9 @@ def mail_transporteur_edit_code(transporteur):
 Votre code de modification est {edit_code}.
 
 Ce code vous permet de modifier la fiche du transporteur « {enseigne} » jusqu'à {max_edit_time_display}.
+
+Cordialement,
+L'équipe A Dock
     """.format(
         enseigne=transporteur.enseigne,
         edit_code=transporteur.edit_code,
