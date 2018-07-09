@@ -51,6 +51,10 @@ class Transporteur(models.Model):
     raison_sociale = models.CharField(max_length=131)
     # Business name (filled with raison_sociale when undefined)
     enseigne = models.CharField(max_length=131)
+    # Only < 1% of entries use accents but to include them in results w/o
+    # performance penality we create a field with a variant of enseigne w/o
+    # accents. Dynamic use of 'unaccent' is too slow.
+    enseigne_unaccent = models.CharField(max_length=131)
     # from Registre
     categorie_juridique = models.TextField()
     # This company is the siege social
