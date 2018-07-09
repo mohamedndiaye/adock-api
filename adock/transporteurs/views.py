@@ -69,7 +69,7 @@ def search(request):
                 # Dynamic unaccent is too slow (237x slower!) so we created a dedicated field
                 # in DB and use raw SQL too avoid useless replaces added by the ORM.
                 # The search criteria contains at least one not digit character so search on name
-                transporteurs = transporteurs.filter(enseigne__unaccent__contains=criteria)
+                transporteurs = transporteurs.filter(enseigne_unaccent__ucontains=criteria)
             else:
                 # Only digit
                 if len(criteria) > 5:

@@ -3,12 +3,27 @@ import random
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
+from django.db.models import Lookup
+from django.db.models.fields import Field
 from django.urls import reverse
 from django.utils import timezone
 
 from phonenumber_field.modelfields import PhoneNumberField
 
 from . import validators as transporteurs_validators
+
+
+@Field.register_lookup
+class UnaccentContains(Lookup):
+    lookup_name = 'ucontains'
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = lhs_params + rhs_params
+        esc_rhs = r"REPLACE(REPLACE(REPLACE({}, '\', '\\'), '%%', '\%%'), '_', '\_')".format(rhs)
+        return "{} LIKE '%%' || UNACCENT({}) || '%%'".format(lhs, esc_rhs), params
+
 
 COMPLETENESS_PERCENT_MAX = 100
 COMPLETENESS_PERCENT_MIN = 40
@@ -42,6 +57,7 @@ SPECIALITY_CHOICES = (
     ('VEHICULE', 'Transport de véhicules'),
     ('AUTRE', 'Autre')
 )
+
 
 class Transporteur(models.Model):
     siret = models.CharField(max_length=transporteurs_validators.SIRET_LENGTH,
