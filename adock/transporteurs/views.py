@@ -66,6 +66,8 @@ def search(request):
         for criteria in criteria_list:
             criteria = criteria.strip()
             if validators.RE_NOT_DIGIT_ONLY.search(criteria):
+                # Dynamic unaccent is too slow (237x slower!) so we created a dedicated field
+                # in DB and use raw SQL too avoid useless replaces added by the ORM.
                 # The search criteria contains at least one not digit character so search on name
                 transporteurs = transporteurs.filter(enseigne__unaccent__contains=criteria)
             else:

@@ -2,7 +2,8 @@ begin;
 
 insert into transporteur
     (siret,
-     raison_sociale, enseigne,
+     raison_sociale,
+     enseigne, enseigne_unaccent,
      categorie_juridique, is_siege,
      adresse, code_postal, ville,
      departement,
@@ -18,6 +19,7 @@ insert into transporteur
     select r.siret,
            r.raison_sociale,
            coalesce(nullif(s.enseigne, ''), r.raison_sociale),
+           unaccent(coalesce(nullif(s.enseigne, ''), r.raison_sociale)),
            r.categorie_juridique,
            r.is_siege,
            coalesce(
