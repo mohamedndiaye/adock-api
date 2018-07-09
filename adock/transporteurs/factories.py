@@ -1,9 +1,10 @@
-import datetime
-import factory
 from factory import fuzzy
 from faker import Faker
+import datetime
+import factory
 import random
 import string
+import unidecode
 
 from . import models
 from . import validators
@@ -34,6 +35,7 @@ class TransporteurFactory(factory.django.DjangoModelFactory):
     numero_tva = factory.LazyAttribute(lambda o: compute_vat_number(o.siret))
     raison_sociale = factory.LazyAttribute(lambda _: faker.company().upper())
     enseigne = factory.LazyAttribute(lambda o: o.raison_sociale)
+    enseigne_unaccent = factory.LazyAttribute(lambda o: unidecode.unidecode(o.enseigne))
     categorie_juridique = "Société par actions simplifiée (SAS)"
     adresse = factory.LazyAttribute(lambda _: faker.street_address().upper())
     code_postal = factory.Faker('zipcode')

@@ -6,3 +6,4 @@ faker
 ipdb
 pytest
 pytest-django
+unidecode
