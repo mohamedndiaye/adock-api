@@ -12,7 +12,7 @@ insert into transporteur
      lti_numero, lti_date_debut, lti_date_fin, lti_nombre,
      lc_numero, lc_date_debut, lc_date_fin, lc_nombre,
      working_area, working_area_departements,
-     website, completeness,
+     website, completeness, description,
      numero_tva, created_at,
      in_sirene, deleted_at)
     select r.siret,
@@ -51,7 +51,7 @@ insert into transporteur
            'DEPARTEMENT',
            -- Default departement for working area departements in company departement
            case when s.depet is null then null else array[s.depet] end,
-           '', 40,
+           '', 40, '',
            case r.siret::char(1)
            when 'P'
             then ''
