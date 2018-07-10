@@ -75,7 +75,7 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             data['message'],
-            "Un code de modification a été déjà envoyé récemment."
+            "Un code de modification a été envoyé récemment par courriel."
         )
         self.transporteur.refresh_from_db()
         self.assertEqual(self.transporteur.edit_code, edit_code)
