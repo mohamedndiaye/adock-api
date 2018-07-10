@@ -39,14 +39,26 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
         self.assertEqual(len(transporteurs), 1)
         self.assertEqual(transporteurs[0]['siret'], test.VALID_SIRET)
 
-    def test_search_on_siret_code_postal(self):
+    def test_search_on_siret_and_code_postal(self):
         # Search on SIRET with spaces
         factories.TransporteurFactory(
             siret=test.VALID_SIRET,
             code_postal='35000'
         )
+        transporteurs = self.get_transporteurs({'q': ' ' + test.VALID_SIRET[0:6]})
+        self.assertEqual(len(transporteurs), 1)
+
+        transporteurs = self.get_transporteurs({'q': '35 '})
+        self.assertEqual(len(transporteurs), 1)
+
         transporteurs = self.get_transporteurs({'q': ' ' + test.VALID_SIRET[0:6] + ', 35'})
         self.assertEqual(len(transporteurs), 1)
+
+        transporteurs = self.get_transporteurs({'q': ' ' + test.VALID_SIRET[0:6] + ', 37'})
+        self.assertEqual(len(transporteurs), 0)
+
+        transporteurs = self.get_transporteurs({'q': ' 1' + test.VALID_SIRET[0:6] + ', 35'})
+        self.assertEqual(len(transporteurs), 0)
 
     def test_search_on_enseigne(self):
         factories.TransporteurFactory(enseigne='SUPER ROGER')
@@ -55,6 +67,11 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
 
         transporteurs = self.get_transporteurs({'q': 'rg'})
         self.assertEqual(len(transporteurs), 0)
+
+    def test_search_on_short_enseigne(self):
+        factories.TransporteurFactory(enseigne='123GO')
+        transporteurs = self.get_transporteurs({'q': '3GO'})
+        self.assertEqual(len(transporteurs), 1)
 
     def test_search_on_accentuated_enseigne(self):
         # Only uppercase strings in enseigne
