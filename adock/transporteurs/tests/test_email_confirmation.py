@@ -74,14 +74,14 @@ class TransporteurEmailConfirmationTestCase(test.TransporteurTestCase):
             'transporteurs_detail',
             kwargs={'transporteur_siret': self.transporteur.siret}
         )
-        transporteur = self.patch_transporteur(
+        data = self.patch_transporteur(
             {
                 'telephone': '0102030405',
                 'email': 'bar@example.com',
             },
             200
         )
-        self.assertFalse(transporteur['is_locked'])
+        self.assertFalse(data['transporteur']['is_locked'])
         self.transporteur.refresh_from_db()
         self.assertFalse(self.transporteur.is_locked())
         self.assertIsNone(self.transporteur.email_confirmed_at)

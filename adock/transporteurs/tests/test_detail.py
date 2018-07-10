@@ -21,18 +21,18 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
 
     def test_get(self):
         response = self.client.get(self.detail_url)
-        data = response.json()
-        self.assertEqual(data['siret'], test.VALID_SIRET)
-        self.assertEqual(data['raison_sociale'], self.transporteur.raison_sociale)
-        self.assertEqual(data['debut_activite'], str(self.transporteur.debut_activite))
+        transporteur_data = response.json()['transporteur']
+        self.assertEqual(transporteur_data['siret'], test.VALID_SIRET)
+        self.assertEqual(transporteur_data['raison_sociale'], self.transporteur.raison_sociale)
+        self.assertEqual(transporteur_data['debut_activite'], str(self.transporteur.debut_activite))
         # Two original fields not validated, working area and specialities => 3 points
         self.assertEqual(
-            data['completeness'],
+            transporteur_data['completeness'],
             models.COMPLETENESS_PERCENT_MIN + 3 * models.EARNED_POINT_VALUE)
-        self.assertEqual(data['working_area'], 'DEPARTEMENT')
-        self.assertEqual(data['working_area_departements'], ['35', '44'])
+        self.assertEqual(transporteur_data['working_area'], 'DEPARTEMENT')
+        self.assertEqual(transporteur_data['working_area_departements'], ['35', '44'])
         self.assertEqual(
-            sorted(data['specialities']),
+            sorted(transporteur_data['specialities']),
             ['TEMPERATURE', 'URBAIN']
         )
 
@@ -41,17 +41,17 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         self.transporteur.specialities = None
         self.transporteur.save()
         response = self.client.get(self.detail_url)
-        data = response.json()
-        self.assertEqual(data['debut_activite'], None)
-        self.assertEqual(data['specialities'], None)
-        self.assertEqual(data['is_locked'], False)
+        transporteur_data = response.json()['transporteur']
+        self.assertEqual(transporteur_data['debut_activite'], None)
+        self.assertEqual(transporteur_data['specialities'], None)
+        self.assertEqual(transporteur_data['is_locked'], False)
 
     def test_get_empty_phone(self):
         self.transporteur.telephone = ''
         self.transporteur.save()
         response = self.client.get(self.detail_url)
         data = response.json()
-        self.assertEqual(data['telephone'], '')
+        self.assertEqual(data['transporteur']['telephone'], '')
 
     def test_patch_log(self):
         transporteur = self.patch_transporteur(
@@ -59,7 +59,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
                 'telephone': PHONE,
             },
             200
-        )
+        )['transporteur']
         self.assertEqual(models.TransporteurLog.objects.count(), 1)
         transporteur_log = models.TransporteurLog.objects.get()
         # Only one field changed
@@ -70,7 +70,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         self.assertEqual(transporteur['telephone'], PHONE_DISPLAY)
 
         self.transporteur.refresh_from_db()
-        transporteur = self.patch_transporteur(
+        self.patch_transporteur(
             {
                 'telephone': PHONE,
                 'working_area_departements': '2A, 56',
@@ -88,7 +88,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         )
 
         self.transporteur.refresh_from_db()
-        transporteur = self.patch_transporteur(
+        self.patch_transporteur(
             {
                 'telephone': PHONE,
                 'email': EMAIL,
@@ -119,8 +119,10 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
                 },
                 200
             )
-        self.assertEqual(data['telephone'], PHONE_DISPLAY)
-        self.assertEqual(data['email'], EMAIL)
+
+        transporteur = data['transporteur']
+        self.assertEqual(transporteur['telephone'], PHONE_DISPLAY)
+        self.assertEqual(transporteur['email'], EMAIL)
 
         # One mail for the user and another for the managers
         self.assertEqual(len(mail.outbox), 2)
@@ -143,7 +145,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         self.transporteur.working_area = models.WORKING_AREA_UNDEFINED
         self.transporteur.specialities = None
         self.transporteur.save()
-        transporteur = self.patch_transporteur(
+        data = self.patch_transporteur(
             {
                 'telephone': PHONE,
                 'email': EMAIL
@@ -151,7 +153,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
             200
         )
         self.transporteur.refresh_from_db()
-        self.assertEqual(transporteur['completeness'], self.transporteur.completeness)
+        self.assertEqual(data['transporteur']['completeness'], self.transporteur.completeness)
         self.assertEqual(
             self.transporteur.completeness,
             models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE
@@ -175,12 +177,13 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
             )
 
         # Side effects
-        self.assertEqual(data['telephone'], '02 40 42 45 46')
-        self.assertEqual(data['email'], NEW_EMAIL)
-        self.assertEqual(data['working_area'], models.WORKING_AREA_DEPARTEMENT)
-        self.assertListEqual(data['working_area_departements'], ['23', '45', '976'])
-        self.assertListEqual(data['specialities'], ['LOT'])
-        self.assertEqual(data['completeness'], 100)
+        transporteur = data['transporteur']
+        self.assertEqual(transporteur['telephone'], '02 40 42 45 46')
+        self.assertEqual(transporteur['email'], NEW_EMAIL)
+        self.assertEqual(transporteur['working_area'], models.WORKING_AREA_DEPARTEMENT)
+        self.assertListEqual(transporteur['working_area_departements'], ['23', '45', '976'])
+        self.assertListEqual(transporteur['specialities'], ['LOT'])
+        self.assertEqual(transporteur['completeness'], 100)
         self.assertEqual(len(mail.outbox), 2)
 
         # Be sure the response is identical to the DB
@@ -201,7 +204,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
             },
             200
         )
-        self.assertEqual(data['website'], WEBSITE)
+        self.assertEqual(data['transporteur']['website'], WEBSITE)
         self.transporteur.refresh_from_db()
         self.assertEqual(self.transporteur.website, WEBSITE)
 
@@ -230,7 +233,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
             },
             200
         )
-        self.assertNotIn('foo', data)
+        self.assertNotIn('foo', data['transporteur'])
 
     def test_patch_invalid_phone(self):
         data = self.patch_transporteur(

@@ -242,7 +242,9 @@ def transporteur_detail(request, transporteur_siret):
             mails.mail_managers_changes(transporteur, old_data_changed)
 
     transporteur_as_json = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
-    return JsonResponse(transporteur_as_json)
+    return JsonResponse({
+        'transporteur': transporteur_as_json
+    })
 
 
 def transporteur_confirm_email(request, transporteur_siret, token):
