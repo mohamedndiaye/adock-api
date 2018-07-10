@@ -177,6 +177,7 @@ RE_MANY_COMMAS = re.compile(r',+')
 
 @csrf_exempt
 def transporteur_detail(request, transporteur_siret):
+    json_response = {}
     # Access to deleted transporteurs is allowed.
     # Get existing transporteur if any
     transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
@@ -213,6 +214,9 @@ def transporteur_detail(request, transporteur_siret):
         # to only update the submitted values
         cleaned_payload = {k: form.cleaned_data[k] for k in payload.keys() if k in form.cleaned_data}
 
+        # Only set in PATCH request
+        json_response['confirmation_email_sent'] = False
+
         # Only apply the submitted values if they are different in DB
         old_data_changed = get_transporteur_changes(transporteur, cleaned_payload)
         if old_data_changed:
@@ -238,13 +242,12 @@ def transporteur_detail(request, transporteur_siret):
 
             if 'email' in updated_fields:
                 mails.mail_transporteur_to_confirm_email(transporteur)
+                json_response['confirmation_email_sent'] = True
 
             mails.mail_managers_changes(transporteur, old_data_changed)
 
-    transporteur_as_json = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
-    return JsonResponse({
-        'transporteur': transporteur_as_json
-    })
+    json_response['transporteur'] = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
+    return JsonResponse(json_response)
 
 
 def transporteur_confirm_email(request, transporteur_siret, token):

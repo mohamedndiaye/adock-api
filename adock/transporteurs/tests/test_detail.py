@@ -123,6 +123,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         transporteur = data['transporteur']
         self.assertEqual(transporteur['telephone'], PHONE_DISPLAY)
         self.assertEqual(transporteur['email'], EMAIL)
+        self.assertTrue(data['confirmation_email_sent'])
 
         # One mail for the user and another for the managers
         self.assertEqual(len(mail.outbox), 2)
@@ -139,6 +140,18 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         self.assertIn('telephone', mail.outbox[1].body)
         self.assertIn('email', mail.outbox[1].body)
         self.assertNotIn('working', mail.outbox[1].body)
+
+        # Apply same changes so field comparison detects there is no changes
+        with self.settings(MANAGERS=(("Manager", 'manager@example.com'))):
+            data = self.patch_transporteur(
+                {
+                    'telephone': PHONE,
+                    'email': EMAIL
+                },
+                200
+            )
+
+        self.assertFalse(data['confirmation_email_sent'])
 
     def test_patch_partial_completeness(self):
         # Remove other fields
@@ -205,6 +218,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
             200
         )
         self.assertEqual(data['transporteur']['website'], WEBSITE)
+        self.assertFalse(data['confirmation_email_sent'])
         self.transporteur.refresh_from_db()
         self.assertEqual(self.transporteur.website, WEBSITE)
 
