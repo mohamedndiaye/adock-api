@@ -149,16 +149,10 @@ class Transporteur(models.Model):
 
     class Meta:
         db_table = 'transporteur'
-        indexes = [
-            models.Index(
-                name='transporteur_search_order_by',
-                fields=['enseigne', '-completeness']
-            )
-        ]
-        # Take care to create the index, GinIndex is not able to handle it.
-        # One solution is to inherit and adapt the code for that but it's not trivial
-        # so the index is created in a raw SQL migration (0004 and updated in 0025).
-        # CREATE INDEX transporteur_search_trgm_enseigne ON transporteur USING GIN (enseigne GIN_TRGM_OPS);
+        # Take care to create manual index because GinIndex is not able to
+        # handle it. One solution is to inherit and adapt the code for that but
+        # it's not trivial so the index is created in a raw SQL migration and
+        # the required extension is installed by Ansible.
 
     def __str__(self):
         return self.siret
