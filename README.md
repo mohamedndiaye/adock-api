@@ -21,7 +21,7 @@ entreprises](http://www2.transports.equipement.gouv.fr/registres/marchandises/SI
 inscrites au registre des transports français.
 
 Ces données sont complétées à l'insertion dans la base de données du projet A
-Dock par celles issues du projet [Sirène](https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/).
+Dock par celles issues du projet [Sirene](https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/).
 
 Seules les informations de téléphone et adresse électronique sont extraites dans
 un second temps (mise à jour SQL) depuis la base de données GRECO.
@@ -34,7 +34,7 @@ Web) via l'application.
 
 Afin de mettre à jour les informations des entreprises des mises à jour sont
 effectués chaque jour par un traitement automatisé. Ces traitements consistent à
-collecter le flux quotidien de la base de données Sirène et à relire la base de
+collecter le flux quotidien de la base de données Sirene et à relire la base de
 jour actuelle du registre des transports.
 
 Seules les données non modifiables de la base de données A Dock sont mises à
@@ -55,16 +55,16 @@ des commandes Django :
   sur la qualité de la source).
 
 - `import-sirene.sql` importe les 11 millions d'enregistrements de la base
-  Sirène (toutes les entreprises françaises), la table est uniquement utile pour
+  Sirene (toutes les entreprises françaises), la table est uniquement utile pour
   compléter les informations sur les transporteurs au moment de l'import. Les
   informations de raison sociale, code APE, adresse, etc sont issues de cette
   base. Il faut au préalable télécharger la base de données complète au format
   CSV (cf notes dans le script).
 
-- `download_sirene` analyse le site Sirène et télécharge les mises à jour
+- `download_sirene` analyse le site Sirene et télécharge les mises à jour
   quotidiennes qui ne l'ont pas encore été.
 
-- `update_sirene` met à jour la base de données Sirène en appliquant les
+- `update_sirene` met à jour la base de données Sirene en appliquant les
   mises à jour quotidiennes qui n'ont pas encore été appliquées.
 
 - `import-greco.sql` importe la table à partir de la concaténation de l'ensemble
@@ -81,7 +81,7 @@ des commandes Django :
 
 - `update-transporteur.sql` met à jour la table transporteur en insérant tous
   les enregistrements de la table registre étendus si possible avec les
-  informations de la base Sirène. Les transporteurs non présents dans la
+  informations de la base Sirene. Les transporteurs non présents dans la
   registre sont marqués comme supprimés. La table transporteur est la table
   socle de l'application A Dock. Elle est l'agrégation des tables `registre` et
   `sirene` et permet aux utilisateurs d'y ajouter des informations

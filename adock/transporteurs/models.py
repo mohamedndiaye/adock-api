@@ -141,7 +141,7 @@ class Transporteur(models.Model):
     completeness = models.PositiveSmallIntegerField(default=COMPLETENESS_PERCENT_MIN)
     in_sirene = models.BooleanField(
         default=False,
-        help_text="Drapeau indiquant la présence de l'entreprise dans la base de données Sirène."
+        help_text="Drapeau indiquant la présence de l'entreprise dans la base de données Sirene."
     )
     deleted_at = models.DateTimeField(blank=True, null=True)
     edit_code = models.IntegerField(blank=True, null=True)
@@ -250,7 +250,7 @@ class TransporteurLog(models.Model):
 
 
 class TransporteurFeed(models.Model):
-    """The table Transporteur is fed by various sources (Sirène, Registre ou GRECO)"""
+    """The table Transporteur is fed by various sources (Sirene, Registre ou GRECO)"""
     source = models.CharField(max_length=32)
     title = models.CharField(max_length=126)
     url = models.URLField()

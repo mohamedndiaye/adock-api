@@ -2,7 +2,7 @@
 --- There is no intent to update it again so the script has been separated from the daily
 --- update management.
 
---- First query, try to find a corresonding SIRET in Sirène for each GRECO record.
+--- First query, try to find a corresonding SIRET in Sirene for each GRECO record.
 with filtered_greco as (
     select s.siret, g.telephone, g.email
     from greco as g

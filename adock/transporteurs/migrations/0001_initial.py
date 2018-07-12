@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('validated_at', models.DateTimeField(blank=True, null=True)),
                 ('completeness', models.PositiveSmallIntegerField(default=40)),
-                ('in_sirene', models.BooleanField(default=False, help_text="Drapeau indiquant la présence de l'entreprise dans la base de données Sirène.")),
+                ('in_sirene', models.BooleanField(default=False, help_text="Drapeau indiquant la présence de l'entreprise dans la base de données Sirene.")),
                 ('deleted_at', models.DateTimeField(blank=True, null=True)),
             ],
             options={
