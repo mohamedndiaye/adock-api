@@ -48,8 +48,9 @@ class Command(BaseCommand):
                     # Allow sed_ps to receive SIGPIPE if psql_ps exits.
                     sed_ps.stdout.close()
                     try:
-                        # Until 6 millions of records (10 mn max)
-                        rc = psql_ps.wait(timeout=10 * 60)
+                        # Until 6 millions of records for semester updates.
+                        # The others are handled in 2 mn max.
+                        rc = psql_ps.wait(timeout=60 * 60)
                     except subprocess.TimeoutExpired:
                         self.stderr.write(
                             self.style.ERROR("Timeout on running of '%s'" % filename))
