@@ -47,10 +47,10 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
         )
         response = self.client.get(url)
         data = response.json()
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 409)
         self.assertEqual(
             data['message'],
-            "La fiche est en libre accès."
+            "L'adresse électronique n'est pas confirmée."
         )
 
     def test_send_edit_code(self):
@@ -61,10 +61,10 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
         )
         response = self.client.get(url)
         data = response.json()
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(
             data['message'],
-            "Un code de modification vous a été envoyé par courriel."
+            "Un code de modification a été envoyé par courriel."
         )
         self.transporteur.refresh_from_db()
         edit_code = self.transporteur.edit_code
@@ -75,7 +75,7 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             data['message'],
-            "Un code de modification a été envoyé récemment par courriel."
+            "Le précédent code de modification envoyé est toujours valide."
         )
         self.transporteur.refresh_from_db()
         self.assertEqual(self.transporteur.edit_code, edit_code)

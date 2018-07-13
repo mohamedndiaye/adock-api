@@ -192,12 +192,15 @@ class Transporteur(models.Model):
         # The email has been confirmed
         return bool(self.email_confirmed_at)
 
+    def get_edit_code_timeout_at(self):
+        return self.edit_code_at + settings.TRANSPORTEUR_EDIT_CODE_INTERVAL
+
     def edit_code_has_expired(self):
         if not self.edit_code:
             # Unset is considered expired
             return True
 
-        if (self.edit_code_at + settings.TRANSPORTEUR_EDIT_CODE_INTERVAL) < timezone.now():
+        if self.get_edit_code_timeout_at() < timezone.now():
             # The stored edit code has expired
             return True
 

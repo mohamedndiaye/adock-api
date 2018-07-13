@@ -274,17 +274,25 @@ def transporteur_send_edit_code(request, transporteur_siret):
 
     if not transporteur.is_locked():
         return JsonResponse(
-            {'message': "La fiche est en libre accès."}
+            {'message': "L'adresse électronique n'est pas confirmée."},
+            status=409
         )
 
     if transporteur.edit_code_has_expired():
         transporteur.set_edit_code()
         transporteur.save()
         mails.mail_transporteur_edit_code(transporteur)
-        return JsonResponse(
-            {'message': "Un code de modification vous a été envoyé par courriel."}
-        )
+        message = "Un code de modification a été envoyé par courriel."
+        status = 201
     else:
-        return JsonResponse(
-            {'message': "Un code de modification a été envoyé récemment par courriel."}
-        )
+        message = "Le précédent code de modification envoyé est toujours valide."
+        status = 200
+
+    return JsonResponse(
+        {
+            'message': message,
+            'edit_code_at': transporteur.edit_code_at,
+            'edit_code_timeout_at': transporteur.get_edit_code_timeout_at()
+        },
+        status=status
+    )
