@@ -291,6 +291,7 @@ def transporteur_send_edit_code(request, transporteur_siret):
     return JsonResponse(
         {
             'message': message,
+            'email': transporteur.email,
             'edit_code_at': transporteur.edit_code_at,
             'edit_code_timeout_at': transporteur.get_edit_code_timeout_at()
         },

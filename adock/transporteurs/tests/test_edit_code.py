@@ -66,6 +66,10 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
             data['message'],
             "Un code de modification a été envoyé par courriel."
         )
+        self.assertEqual(
+            data['email'],
+            self.transporteur.email
+        )
         self.transporteur.refresh_from_db()
         edit_code = self.transporteur.edit_code
         self.assertEqual(len(str(edit_code)), 6)
