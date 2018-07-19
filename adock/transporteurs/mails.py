@@ -3,7 +3,7 @@ from django.core.mail import mail_managers, send_mail
 
 from . import tokens
 
-def mail_transporteur_to_confirm_email(transporteur):
+def mail_transporteur_to_confirm_email(transporteur, scheme):
     if not transporteur.email:
         return
 
@@ -16,11 +16,12 @@ qui facilite la relation chargeur et transporteur.
 Cliquez sur le lien pour confirmer votre adresse électronique « {email} »
 et ainsi sécuriser votre fiche transporteur :
 
-https://{website}/transporteur/{siret}/confirm/{token}/
+{scheme}://{website}/transporteur/{siret}/confirm/{token}/
 
 Cordialement,
 L'équipe A Dock
     """.format(
+        scheme=scheme,
         website=settings.WEBSITE,
         siret=transporteur.siret,
         email=transporteur.email,
@@ -28,17 +29,18 @@ L'équipe A Dock
     )
     send_mail(subject, message, settings.SERVER_EMAIL, [transporteur.email], fail_silently=True)
 
-def mail_managers_changes(transporteur, old_data_changed):
+def mail_managers_changes(transporteur, old_data_changed, scheme):
     # Send a mail to managers to track changes
     # The URL is detail view of the front application
     subject = "Modification du transporteur {0}".format(transporteur.siret)
     message = """
 Modification du transporteur : {enseigne}
 SIRET : {siret}
-https://{website}/transporteur/{siret}
+{scheme}://{website}/transporteur/{siret}
 
 Valeurs modifiées :
     """.format(
+        scheme=scheme,
         enseigne=transporteur.enseigne,
         siret=transporteur.siret,
         website=settings.WEBSITE,

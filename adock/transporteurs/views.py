@@ -216,6 +216,7 @@ def transporteur_detail(request, transporteur_siret):
 
         # Only set in PATCH request
         confirmation_email_to_send = False
+        scheme = 'https' if request.is_secure() else 'http'
 
         # Special case when the user validates (first time) the already known email address
         if transporteur.validated_at is None and transporteur.email:
@@ -247,10 +248,10 @@ def transporteur_detail(request, transporteur_siret):
             if 'email' in updated_fields:
                 confirmation_email_to_send = True
 
-            mails.mail_managers_changes(transporteur, old_data_changed)
+            mails.mail_managers_changes(transporteur, old_data_changed, scheme)
 
         if confirmation_email_to_send:
-            mails.mail_transporteur_to_confirm_email(transporteur)
+            mails.mail_transporteur_to_confirm_email(transporteur, scheme)
 
         json_response['confirmation_email_sent'] = confirmation_email_to_send
 
