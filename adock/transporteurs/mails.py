@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.mail import mail_managers, send_mail
+from django.utils import timezone
 
 from . import tokens
 
@@ -67,6 +68,6 @@ L'équipe A Dock
     """.format(
         enseigne=transporteur.enseigne,
         edit_code=transporteur.edit_code,
-        max_edit_time_display=max_edit_time.strftime('%H:%M (%d/%m/%Y)')
+        max_edit_time_display=timezone.localtime(max_edit_time).strftime('%H:%M (%d/%m/%Y)')
     )
     send_mail(subject, message, settings.SERVER_EMAIL, [transporteur.email], fail_silently=True)
