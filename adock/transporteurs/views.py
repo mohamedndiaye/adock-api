@@ -232,6 +232,7 @@ def transporteur_detail(request, transporteur_siret):
                 # New email should invalidate email confirmation
                 cleaned_payload['email_confirmed_at'] = None
                 updated_fields.append('email_confirmed_at')
+                confirmation_email_to_send = True
 
             for field in updated_fields:
                 setattr(transporteur, field, cleaned_payload[field])
@@ -244,9 +245,6 @@ def transporteur_detail(request, transporteur_siret):
                     update_fields=updated_fields
                 )
                 models.TransporteurLog.objects.create(transporteur=transporteur, data=old_data_changed)
-
-            if 'email' in updated_fields:
-                confirmation_email_to_send = True
 
             mails.mail_managers_changes(transporteur, old_data_changed, scheme)
 
