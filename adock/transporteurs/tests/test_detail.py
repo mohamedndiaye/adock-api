@@ -111,14 +111,13 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         self.assertNotEqual(self.transporteur.email, EMAIL)
 
         # Apply changes w/o working area
-        with self.settings(MANAGERS=(("Manager", 'manager@example.com'))):
-            data = self.patch_transporteur(
-                {
-                    'telephone': PHONE,
-                    'email': EMAIL
-                },
-                200
-            )
+        data = self.patch_transporteur(
+            {
+                'telephone': PHONE,
+                'email': EMAIL
+            },
+            200
+        )
 
         transporteur = data['transporteur']
         self.assertEqual(transporteur['telephone'], PHONE_DISPLAY)
@@ -142,15 +141,13 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         )
 
         # Apply same changes so field comparison detects there is no changes
-        with self.settings(MANAGERS=(("Manager", 'manager@example.com'))):
-            data = self.patch_transporteur(
-                {
-                    'telephone': PHONE,
-                    'email': EMAIL
-                },
-                200
-            )
-
+        data = self.patch_transporteur(
+            {
+                'telephone': PHONE,
+                'email': EMAIL
+            },
+            200
+        )
         self.assertFalse(data['confirmation_email_sent'])
 
     def test_patch_partial_completeness(self):
@@ -177,17 +174,16 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         NEW_EMAIL = 'foo@example.com'
 
         # Apply changes with working area
-        with self.settings(MANAGERS=(("Manager", 'manager@example.com'))):
-            data = self.patch_transporteur(
-                {
-                    'telephone': NEW_PHONE,
-                    'email': NEW_EMAIL,
-                    'working_area': models.WORKING_AREA_DEPARTEMENT,
-                    'working_area_departements': '23 45 ,,,976',
-                    'specialities': ['LOT'],
-                },
-                200
-            )
+        data = self.patch_transporteur(
+            {
+                'telephone': NEW_PHONE,
+                'email': NEW_EMAIL,
+                'working_area': models.WORKING_AREA_DEPARTEMENT,
+                'working_area_departements': '23 45 ,,,976',
+                'specialities': ['LOT'],
+            },
+            200
+        )
 
         # Side effects
         transporteur = data['transporteur']
