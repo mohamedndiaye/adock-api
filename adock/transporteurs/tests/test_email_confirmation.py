@@ -1,3 +1,4 @@
+from django.core import mail
 from django.utils import timezone
 from django.urls import reverse
 
@@ -9,6 +10,10 @@ from . import test
 class TransporteurEmailConfirmationTestCase(test.TransporteurTestCase):
     def setUp(self):
         self.transporteur = factories.TransporteurFactory()
+        self.detail_url = reverse(
+            'transporteurs_detail',
+            kwargs={'transporteur_siret': self.transporteur.siret}
+        )
 
     def test_idempotent_token(self):
         token = tokens.email_confirmation_token.make_token(self.transporteur)
@@ -66,6 +71,43 @@ class TransporteurEmailConfirmationTestCase(test.TransporteurTestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
+
+    def test_validated_transporteur_wo_mail(self):
+        self.assertIsNone(self.transporteur.validated_at)
+        self.transporteur.email = ''
+        self.transporteur.save()
+
+        self.patch_transporteur(
+            {
+                'telephone': '0102030405'
+            },
+            200
+        )
+        self.assertEqual(len(mail.outbox), 1)
+        message = "[adock] Modification du transporteur %s" % self.transporteur.siret
+        self.assertEqual(mail.outbox[0].subject, message)
+        self.transporteur.refresh_from_db()
+        self.assertIsNotNone(self.transporteur.validated_at)
+
+    def test_validated_transporteur_with_mail(self):
+        self.assertIsNone(self.transporteur.validated_at)
+        self.assertGreaterEqual(len(self.transporteur.email), 1)
+
+        self.patch_transporteur(
+            {
+                'telephone': '0102030405'
+            },
+            200
+        )
+        self.assertEqual(len(mail.outbox), 2)
+        message = "[adock] Modification du transporteur %s" % self.transporteur.siret
+        self.assertEqual(mail.outbox[0].subject, message)
+        self.assertEqual(
+            mail.outbox[1].subject,
+            "A Dock - Confirmation de votre adresse électronique"
+        )
+        self.transporteur.refresh_from_db()
+        self.assertIsNotNone(self.transporteur.validated_at)
 
     def test_changed_email(self):
         self.transporteur.email_confirmed_at = timezone.now()

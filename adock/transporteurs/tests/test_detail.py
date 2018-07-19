@@ -128,18 +128,18 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         # One mail for the user and another for the managers
         self.assertEqual(len(mail.outbox), 2)
 
-        # Mail user to confirm email
-        self.assertEqual(
-            mail.outbox[0].subject,
-            "A Dock - Confirmation de votre adresse électronique"
-        )
-
         # Mail manager about applied changes
         message = "[adock] Modification du transporteur %s" % self.transporteur.siret
-        self.assertEqual(mail.outbox[1].subject, message)
-        self.assertIn('telephone', mail.outbox[1].body)
-        self.assertIn('email', mail.outbox[1].body)
-        self.assertNotIn('working', mail.outbox[1].body)
+        self.assertEqual(mail.outbox[0].subject, message)
+        self.assertIn('telephone', mail.outbox[0].body)
+        self.assertIn('email', mail.outbox[0].body)
+        self.assertNotIn('working', mail.outbox[0].body)
+
+        # Mail user to confirm email
+        self.assertEqual(
+            mail.outbox[1].subject,
+            "A Dock - Confirmation de votre adresse électronique"
+        )
 
         # Apply same changes so field comparison detects there is no changes
         with self.settings(MANAGERS=(("Manager", 'manager@example.com'))):
@@ -218,12 +218,12 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
             200
         )
         self.assertEqual(data['transporteur']['website'], WEBSITE)
-        self.assertFalse(data['confirmation_email_sent'])
+        # Mail sent on first validation
+        self.assertTrue(data['confirmation_email_sent'])
         self.transporteur.refresh_from_db()
         self.assertEqual(self.transporteur.website, WEBSITE)
 
-        # No email changes so only the admin is notified
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 2)
         message = "[adock] Modification du transporteur %s" % self.transporteur.siret
         self.assertEqual(mail.outbox[0].subject, message)
 

@@ -215,7 +215,11 @@ def transporteur_detail(request, transporteur_siret):
         cleaned_payload = {k: form.cleaned_data[k] for k in payload.keys() if k in form.cleaned_data}
 
         # Only set in PATCH request
-        json_response['confirmation_email_sent'] = False
+        confirmation_email_to_send = False
+
+        # Special case when the user validates (first time) the already known email address
+        if transporteur.validated_at is None and transporteur.email:
+            confirmation_email_to_send = True
 
         # Only apply the submitted values if they are different in DB
         old_data_changed = get_transporteur_changes(transporteur, cleaned_payload)
@@ -241,14 +245,17 @@ def transporteur_detail(request, transporteur_siret):
                 models.TransporteurLog.objects.create(transporteur=transporteur, data=old_data_changed)
 
             if 'email' in updated_fields:
-                mails.mail_transporteur_to_confirm_email(transporteur)
-                json_response['confirmation_email_sent'] = True
+                confirmation_email_to_send = True
 
             mails.mail_managers_changes(transporteur, old_data_changed)
 
+        if confirmation_email_to_send:
+            mails.mail_transporteur_to_confirm_email(transporteur)
+
+        json_response['confirmation_email_sent'] = confirmation_email_to_send
+
     json_response['transporteur'] = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
     return JsonResponse(json_response)
-
 
 def transporteur_confirm_email(request, transporteur_siret, token):
     try:
