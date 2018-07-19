@@ -127,3 +127,28 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
             },
             400
         )
+
+    def test_patch_email_reset_edit_code(self):
+        self.transporteur.email_confirmed_at = timezone.now()
+        self.transporteur.set_edit_code()
+        self.transporteur.save()
+
+        self.detail_url = reverse(
+            'transporteurs_detail',
+            kwargs={'transporteur_siret': self.transporteur.siret}
+        )
+        self.patch_transporteur(
+            {
+                'telephone': '0102030405',
+                'email': 'foo@example.com',
+                'edit_code': self.transporteur.edit_code
+            },
+            200
+        )
+        self.transporteur.refresh_from_db()
+
+        self.assertIsNone(self.transporteur.email_confirmed_at)
+        self.assertIsNone(self.transporteur.edit_code)
+        self.assertIsNone(self.transporteur.edit_code_at)
+        self.assertFalse(self.transporteur.is_locked())
+        self.assertTrue(self.transporteur.edit_code_has_expired())

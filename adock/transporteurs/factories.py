@@ -27,6 +27,7 @@ def compute_vat_number(siret):
     except ValueError:
         return ''
 
+
 class TransporteurFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Transporteur

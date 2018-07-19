@@ -228,11 +228,6 @@ def transporteur_detail(request, transporteur_siret):
             # Data has been modified so saving is required
             # Don't use form.save to edit only the submitted fields of the instance
             updated_fields = list(old_data_changed.keys())
-            if 'email' in updated_fields:
-                # New email should invalidate email confirmation
-                cleaned_payload['email_confirmed_at'] = None
-                updated_fields.append('email_confirmed_at')
-                confirmation_email_to_send = True
 
             for field in updated_fields:
                 setattr(transporteur, field, cleaned_payload[field])
@@ -240,6 +235,15 @@ def transporteur_detail(request, transporteur_siret):
             with transaction.atomic(savepoint=False):
                 transporteur.validated_at = timezone.now()
                 updated_fields.append('validated_at')
+
+                if 'email' in updated_fields:
+                    # New email should invalidate email confirmation and edit code
+                    transporteur.email_confirmed_at = None
+                    transporteur.edit_code = None
+                    transporteur.edit_code_at = None
+                    updated_fields.extend(['email_confirmed_at', 'edit_code', 'edit_code_at'])
+                    confirmation_email_to_send = True
+
                 transporteur.save(
                     force_update=True,
                     update_fields=updated_fields
