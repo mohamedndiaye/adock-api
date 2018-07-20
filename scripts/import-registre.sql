@@ -70,10 +70,10 @@ alter table registre
 -- It's possible to have duplicated SIRET in the registre (bug)!
 -- We choose the delete the one with the older license date (lc or lti)
 delete from registre
-      where id = (
+      where id in (
           select id
             from registre
-           where siret = (select siret from registre group by siret having count(siret) > 1)
+           where siret in (select siret from registre group by siret having count(siret) > 1)
            order by coalesce(date_debut_validite_lc, date_debut_validite_lti) desc
            offset 1);
 
