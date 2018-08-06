@@ -230,7 +230,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         self.assertEqual(data['message'], 'Seules les requêtes PATCH en JSON sont prises en charge.')
 
     def test_patch_invalid_payload(self):
-        response = self.client.patch(self.detail_url, {'foo': 'foo'}, 'application/json')
+        response = self.client.patch(self.detail_url, 'foo', 'application/json')
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertEqual(data['message'], 'Les données ne sont pas valides.')
