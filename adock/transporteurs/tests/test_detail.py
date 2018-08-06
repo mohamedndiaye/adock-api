@@ -279,7 +279,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         )
         self.assertEqual(
             data['working_area_departements'][0],
-            "L'élément n°0 du tableau n'est pas valide :"
+            "L'élément n°1 du tableau n'est pas valide : "
             "Assurez-vous que cette valeur comporte au plus 3 caractères (actuellement 8)."
         )
 
