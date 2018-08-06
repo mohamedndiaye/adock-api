@@ -1,0 +1,12 @@
+[MASTER]
+load-plugins=pylint_django
+
+[MESSAGES CONTROL]
+#   C0111 = Missing docstring
+#   C0103 =
+disable=C0111,C0103,R0801
+
+[FORMAT]
+
+# Maximum number of characters on a single line.
+max-line-length=120

@@ -33,8 +33,10 @@ class Command(BaseCommand):
             if zip_search:
                 year = int(zip_search.groups()[0])
                 day_of_year = int(zip_search.groups()[1])
-                zip_date = (datetime.datetime(year=year, month=1, day=1) +
-                    datetime.timedelta(days=day_of_year - 1))
+                zip_date = (
+                    datetime.datetime(year=year, month=1, day=1) +
+                    datetime.timedelta(days=day_of_year - 1)
+                )
                 title = 'Sirene : mise à jour quotidienne du %s' % zip_date.strftime('%d/%m/%Y')
                 zip_files.append({
                     'title': title,

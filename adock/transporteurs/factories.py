@@ -1,10 +1,12 @@
-from factory import fuzzy
-from faker import Faker
+#pylint: disable=E1101
 import datetime
-import factory
 import random
 import string
 import unidecode
+
+import factory
+from factory import fuzzy
+from faker import Faker
 
 from . import models
 from . import validators

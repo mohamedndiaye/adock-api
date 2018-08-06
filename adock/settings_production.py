@@ -4,11 +4,11 @@ import raven
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': PROJECT,  # noqa
+        'NAME': PROJECT,  # pylint: disable=E0602
         'USER': 'deploy',
         # For logs
         'OPTIONS': {
-            'application_name': PROJECT  # noqa
+            'application_name': PROJECT  # pylint: disable=E0602
         },
     }
 }
@@ -22,7 +22,7 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
-SERVER_NAME = WEBSITE
+SERVER_NAME = WEBSITE  # pylint: disable=E0602
 SERVER_EMAIL = 'no-reply@' + SERVER_NAME
 
 CORS_ORIGIN_WHITELIST = (

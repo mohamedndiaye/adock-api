@@ -1,3 +1,4 @@
+# pylint: disable=W0201
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
@@ -40,7 +41,8 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
         """Edit code shouldn't be sent to not confirmed address"""
         self.transporteur.email_confirmed_at = None
         self.transporteur.save()
-        url = reverse('transporteurs_envoyer_code',
+        url = reverse(
+            'transporteurs_envoyer_code',
             kwargs={
                 'transporteur_siret': self.transporteur.siret
             }
@@ -54,7 +56,8 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
         )
 
     def test_send_edit_code(self):
-        url = reverse('transporteurs_envoyer_code',
+        url = reverse(
+            'transporteurs_envoyer_code',
             kwargs={
                 'transporteur_siret': self.transporteur.siret
             }

@@ -1,3 +1,4 @@
+# pylint: disable=W0614
 """
 Django settings for adock project.
 
@@ -159,7 +160,7 @@ USE_DJANGO_EXTENSIONS = False
 USE_RAVEN = True
 
 try:
-    from .settings_local import *  # noqa
+    from .settings_local import *  # pylint: disable=W0401
 except ImportError:  # pragma: no cover
     pass
 

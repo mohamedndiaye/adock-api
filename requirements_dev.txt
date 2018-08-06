@@ -4,6 +4,6 @@ django-extensions
 factory_boy
 faker
 ipdb
-pytest
-pytest-django
+pylint
+pylint-django
 unidecode

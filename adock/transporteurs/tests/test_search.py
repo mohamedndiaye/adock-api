@@ -145,15 +145,17 @@ class TransporteurSearchLicenseTypeTestCase(TransporteurSearchTestCase):
         transporteurs = self.get_transporteurs({'licence-types[]': ['lti']})
         self.assertEqual(len(transporteurs), 2)
         self.assertSetEqual(
-            set([self.lti_only.siret, self.both.siret]),
-            set([transporteur['siret'] for transporteur in transporteurs]))
+            {self.lti_only.siret, self.both.siret},
+            {transporteur['siret'] for transporteur in transporteurs}
+        )
 
     def test_lc_only(self):
         transporteurs = self.get_transporteurs({'licence-types[]': ['lc']})
         self.assertEqual(len(transporteurs), 2)
         self.assertSetEqual(
-            set([self.lc_only.siret, self.both.siret]),
-            set([transporteur['siret'] for transporteur in transporteurs]))
+            {self.lc_only.siret, self.both.siret},
+            {transporteur['siret'] for transporteur in transporteurs}
+        )
 
     def test_both(self):
         transporteurs = self.get_transporteurs({'licence-types[]': ['lti', 'lc']})

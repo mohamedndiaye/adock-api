@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from . import tokens
 
+
 def mail_transporteur_to_confirm_email(transporteur, scheme):
     if not transporteur.email:
         return

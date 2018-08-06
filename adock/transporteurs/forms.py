@@ -40,7 +40,7 @@ class SubscriptionForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         if (cleaned_data.get('working_area') == WORKING_AREA_DEPARTEMENT and
-                len(cleaned_data.get('working_area_departements', [])) == 0):
+                not cleaned_data.get('working_area_departements', [])):
             self.add_error(
                 'working_area_departements',
                 "Des départements doivent être renseignés quand l'aire de travail est départementale."

@@ -60,7 +60,8 @@ SPECIALITY_CHOICES = (
 
 
 class Transporteur(models.Model):
-    siret = models.CharField(max_length=transporteurs_validators.SIRET_LENGTH,
+    siret = models.CharField(
+        max_length=transporteurs_validators.SIRET_LENGTH,
         primary_key=True, db_index=True, editable=False)
     # nomen_long from Sirene (raison_sociale in Registre)
     # Always in uppercase
@@ -233,7 +234,7 @@ class Transporteur(models.Model):
         self.edit_code = random.randint(100000, 999999)
         self.edit_code_at = timezone.now()
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs): # pylint: disable=W0221
         self.completeness = self.compute_completeness()
         if 'update_fields' in kwargs:
             # Could be a dict_keys instance so cast as list and add 'completeness'

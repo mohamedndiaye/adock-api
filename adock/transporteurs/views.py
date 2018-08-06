@@ -149,7 +149,8 @@ def search(request):
         '-completeness',
         'enseigne'
     ))
-    transporteurs = (transporteurs
+    transporteurs = (
+        transporteurs
         .order_by(*order_by_list)
         .values(*TRANSPORTEUR_LIST_FIELDS)
         [:settings.TRANSPORTEURS_LIMIT]
@@ -272,11 +273,11 @@ def transporteur_confirm_email(request, transporteur_siret, token):
         return JsonResponse(
             {'message': "L'adresse électronique est confirmée."}
         )
-    else:
-        return JsonResponse(
-            {'message': "Impossible de confirmer l'adresse électronique."},
-            status=400
-        )
+
+    return JsonResponse(
+        {'message': "Impossible de confirmer l'adresse électronique."},
+        status=400
+    )
 
 
 def transporteur_send_edit_code(request, transporteur_siret):
