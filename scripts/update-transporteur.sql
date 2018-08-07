@@ -21,7 +21,7 @@ insert into transporteur
            coalesce(nullif(s.enseigne, ''), r.raison_sociale),
            unaccent(coalesce(nullif(s.enseigne, ''), r.raison_sociale)),
            r.categorie_juridique,
-           r.is_siege,
+           coalesce(s.siege = '1', r.is_siege) as is_siege,
            coalesce(
             s.numvoie ||
             case s.indrep
