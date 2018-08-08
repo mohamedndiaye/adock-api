@@ -5,6 +5,7 @@ from django.utils import timezone
 from . import test
 from .. import factories
 from .. import models
+from .. import validators
 
 PHONE = '+33240424546'
 PHONE_DISPLAY = '02 40 42 45 46'
@@ -45,6 +46,16 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         self.assertEqual(transporteur_data['debut_activite'], None)
         self.assertEqual(transporteur_data['specialities'], None)
         self.assertEqual(transporteur_data['is_locked'], False)
+        self.assertEqual(transporteur_data['subsidiaries'], [])
+
+    def test_get_subsidiaries(self):
+        for i in range(3):
+            siret = "{siren}{i:05}".format(siren=self.transporteur.siret[:validators.SIREN_LENGTH], i=i)
+            factories.TransporteurFactory(siret=siret)
+
+        response = self.client.get(self.detail_url)
+        transporteur_data = response.json()['transporteur']
+        self.assertEqual(len(transporteur_data['subsidiaries']), 3)
 
     def test_get_empty_phone(self):
         self.transporteur.telephone = ''

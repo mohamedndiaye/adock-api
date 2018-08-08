@@ -52,6 +52,15 @@ def get_transporteur_as_json(transporteur, fields):
         transporteur_json[field] = value
     return transporteur_json
 
+def get_transporteur_subsidiaries_as_json(transporteur):
+    subsidiaries = (
+        models.Transporteur.objects
+        .filter(siret__startswith=transporteur.siret[:validators.SIREN_LENGTH])
+        .exclude(pk=transporteur.pk)
+        .values_list('siret', 'code_postal', 'debut_activite')
+    )
+    return list(subsidiaries)
+
 def search(request):
     """The search allows to filter on:
        - partial enseigne or SIRET
@@ -178,7 +187,7 @@ RE_MANY_COMMAS = re.compile(r',+')
 
 @csrf_exempt
 def transporteur_detail(request, transporteur_siret):
-    json_response = {}
+    response_json = {}
     # Access to deleted transporteurs is allowed.
     # Get existing transporteur if any
     transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
@@ -256,10 +265,12 @@ def transporteur_detail(request, transporteur_siret):
         if confirmation_email_to_send:
             mails.mail_transporteur_to_confirm_email(transporteur, scheme)
 
-        json_response['confirmation_email_sent'] = confirmation_email_to_send
+        response_json['confirmation_email_sent'] = confirmation_email_to_send
 
-    json_response['transporteur'] = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
-    return JsonResponse(json_response)
+    transporteur_json = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
+    transporteur_json['subsidiaries'] = get_transporteur_subsidiaries_as_json(transporteur)
+    response_json['transporteur'] = transporteur_json
+    return JsonResponse(response_json)
 
 def transporteur_confirm_email(request, transporteur_siret, token):
     try:
