@@ -51,6 +51,7 @@ SPECIALITY_CHOICES = (
     ('VRAC_LIQUIDE', 'Vrac liquide'),
     ('TEMPERATURE', 'Température dirigée'),
     ('PLATEAU', 'Plateau bachés et spécifiques'),
+    ('MESSAGERIE', 'Messagerie express'),
     ('MULTIMODAL', 'Multimodal'),
     ('LOCATION', 'Location'),
     ('ANIMAL', 'Animaux vivants'),
