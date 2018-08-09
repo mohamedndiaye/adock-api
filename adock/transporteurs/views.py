@@ -57,7 +57,7 @@ def get_transporteur_subsidiaries_as_json(transporteur):
         models.Transporteur.objects
         .filter(siret__startswith=transporteur.siret[:validators.SIREN_LENGTH])
         .exclude(pk=transporteur.pk)
-        .values_list('siret', 'code_postal', 'debut_activite')
+        .values('siret', 'code_postal', 'ville', 'debut_activite', 'is_siege')
     )
     return list(subsidiaries)
 

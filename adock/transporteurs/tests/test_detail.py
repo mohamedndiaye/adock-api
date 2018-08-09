@@ -50,12 +50,16 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
 
     def test_get_subsidiaries(self):
         for i in range(3):
-            siret = "{siren}{i:05}".format(siren=self.transporteur.siret[:validators.SIREN_LENGTH], i=i)
+            siret = "{siren}{i:05}".format(
+                siren=self.transporteur.siret[:validators.SIREN_LENGTH], # pylint: disable=E1136
+                i=i
+            )
             factories.TransporteurFactory(siret=siret)
 
         response = self.client.get(self.detail_url)
         transporteur_data = response.json()['transporteur']
         self.assertEqual(len(transporteur_data['subsidiaries']), 3)
+        self.assertIn('siret', transporteur_data['subsidiaries'][0])
 
     def test_get_empty_phone(self):
         self.transporteur.telephone = ''
