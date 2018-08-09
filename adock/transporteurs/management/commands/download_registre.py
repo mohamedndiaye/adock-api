@@ -6,8 +6,8 @@ from django.core.management.base import BaseCommand
 
 from adock.transporteurs import models as transporteurs_models
 
-REGISTRE_URL = 'http://www2.transports.equipement.gouv.fr/registres/marchandises/'
-'SITR_Liste_des_entreprises_Marchandises_sortie_CSV.zip'
+REGISTRE_URL = ('http://www2.transports.equipement.gouv.fr/registres/marchandises/'
+                'SITR_Liste_des_entreprises_Marchandises_sortie_CSV.zip')
 
 
 class Command(BaseCommand):
