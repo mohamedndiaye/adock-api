@@ -83,7 +83,7 @@ class Transporteur(models.Model):
     code_postal = models.CharField(max_length=5)
     # libcom from Sirene (commune in Registre)
     ville = models.CharField(max_length=32)
-    # depet from Sirene - Departement of the siege social
+    # code_departement from Registre
     departement = models.CharField(max_length=3, blank=True, null=False, default='')
     # telephone from GRECO used as default (changed)
     telephone = PhoneNumberField()

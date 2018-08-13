@@ -35,7 +35,7 @@ insert into transporteur
            coalesce(s.codpos, r.code_postal),
            coalesce(s.libcom, r.commune),
            -- Departement is used for ranking
-           case when s.depet is null then '' else s.depet end,
+           r.code_departement as departement,
            '', '',
            case s.dcret when '' then null else to_date(s.dcret, 'YYYYMMDD') end,
            case s.ddebact when '' then null else to_date(s.ddebact, 'YYYYMMDD') end,
@@ -52,7 +52,7 @@ insert into transporteur
            r.nombre_de_copies_lc_valides,
            'DEPARTEMENT',
            -- Default departement for working area departements in company departement
-           case when s.depet is null then null else array[s.depet] end,
+           case when r.code_departement is null then null else array[r.code_departement] end,
            '', 40, '',
            case r.siret::char(1)
            when 'P'

@@ -9,7 +9,7 @@ drop table if exists registre cascade;
 
 create table registre (
     _situation text,
-    _code_departement text,
+    code_departement text,
     _nom_departement text,
     siret char(14),
     raison_sociale text,
@@ -33,7 +33,6 @@ create table registre (
 
 alter table registre
     drop _situation,
-    drop _code_departement,
     drop _nom_departement,
 
     add id serial primary key,
