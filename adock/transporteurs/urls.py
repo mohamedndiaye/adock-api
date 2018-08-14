@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path('recherche/', views.search, name='transporteurs_recherche'),
+    path('stats/', views.get_stats, name='transporteurs_stats'),
     path('<str:transporteur_siret>/', views.transporteur_detail, name='transporteurs_detail'),
     path(
         '<str:transporteur_siret>/confirmer_adresse/<token>/',

@@ -2,7 +2,7 @@ import json
 import re
 
 from django.conf import settings
-from django.db import transaction
+from django.db import connection, transaction
 from django.db.models import Q
 from django.db.models.expressions import OrderBy, RawSQL
 from django.http import JsonResponse
@@ -319,3 +319,34 @@ def transporteur_send_edit_code(request, transporteur_siret):
         },
         status=status
     )
+
+def get_stats(request):
+    # A bit slow, 18ms...
+    stats = []
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT
+                gs.generated_month::date,
+                count(t.siret)
+            FROM
+                (SELECT date_trunc('month', calendar.date) as generated_month
+                FROM generate_series(
+                        now() - interval '1 year',
+                        now() - interval '1 month',
+                        interval '1 month') AS calendar(date)) gs
+                LEFT JOIN transporteur t
+                    ON t.validated_at is not null AND
+                        date_trunc('month', t.validated_at) = generated_month
+            GROUP BY generated_month
+            ORDER BY generated_month""")
+        for row in cursor.fetchall():
+            stats.append(
+                {
+                    'month': row[0],
+                    'count': row[1]
+                }
+            )
+
+    return JsonResponse({
+        'validated_transporteurs': stats
+    })
