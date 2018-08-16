@@ -27,14 +27,14 @@ class TransporteurStatsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         stats = response.json()
 
-        validated_transporteurs = stats['validated_transporteurs']
+        validated_carriers = stats['validated_carriers_per_month']
         # 12 months
-        self.assertEqual(len(validated_transporteurs), nb_months)
-        self.assertEqual(sum([item['count'] for item in validated_transporteurs]), 1)
+        self.assertEqual(len(validated_carriers), nb_months)
+        self.assertEqual(sum([item['count'] for item in validated_carriers]), 1)
         validated_date_str = str(validated_date.date())
 
         # Filter on month of the factory (one validation)
-        filtered_months = list(filter(lambda item: item['month'] == validated_date_str, validated_transporteurs))
+        filtered_months = list(filter(lambda item: item['month'] == validated_date_str, validated_carriers))
         self.assertEqual(filtered_months[0]['count'], 1)
 
-        self.assertEqual(stats['confirmed_transporteurs'], 1)
+        self.assertEqual(stats['confirmed_carriers'], 1)
