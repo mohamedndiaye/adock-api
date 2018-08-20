@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='transporteur',
             name='objectif_co2',
-            field=models.CharField(blank=True, choices=[('ENLISTED', 'Engagé'), ('LABELED', 'Labellisé')], default='', max_length=8),
+            field=models.CharField(blank=True, choices=[('ENLISTED', 'Engagé'), ('LABELLED', 'Labellisé')], default='', max_length=8),
         ),
     ]

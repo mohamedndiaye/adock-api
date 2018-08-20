@@ -59,6 +59,14 @@ SPECIALITY_CHOICES = (
     ('AUTRE', 'Autre')
 )
 
+OBJECTIF_CO2_ENLISTED = 'ENLISTED'
+OBJECTIF_CO2_LABELLED = 'LABELLED'
+
+OBJECTIF_CO2_CHOICES = (
+    (OBJECTIF_CO2_ENLISTED, 'Engagé'),
+    (OBJECTIF_CO2_LABELLED, 'Labellisé')
+)
+
 
 class Transporteur(models.Model):
     siret = models.CharField(
@@ -148,6 +156,13 @@ class Transporteur(models.Model):
     deleted_at = models.DateTimeField(blank=True, null=True)
     edit_code = models.IntegerField(blank=True, null=True)
     edit_code_at = models.DateTimeField(blank=True, null=True)
+    objectif_co2 = models.CharField(
+        max_length=8, choices=OBJECTIF_CO2_CHOICES,
+        blank=True, null=False, default=''
+    )
+    objectif_co2_begin = models.DateField(blank=True, null=True)
+    # Usually begin plus 3 years
+    objectif_co2_end = models.DateField(blank=True, null=True)
 
     class Meta:
         db_table = 'transporteur'
