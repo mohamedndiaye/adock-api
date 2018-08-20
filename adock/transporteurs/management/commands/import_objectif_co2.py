@@ -23,7 +23,7 @@ class Command(LabelCommand):
 
         counters = {
             'siren_not_found': 0,
-            'siren_and_county_not_found': 0,
+            'county_not_found': 0,
             'found': 0
         }
         # raw_row are tuples (read only)
@@ -62,7 +62,7 @@ class Command(LabelCommand):
 
             transporteurs = transporteurs.filter(departement=row['departement'])
             if not transporteurs:
-                counters['siren_and_county_not_found'] += 1
+                counters['county_not_found'] += 1
                 self.stdout.write(
                     self.style.WARNING("Row %d: SIREN %s and county %s of %s not found." % (
                         i + 1, row['siren'], row['departement'], row['entreprise']
