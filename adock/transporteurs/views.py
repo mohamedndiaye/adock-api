@@ -31,6 +31,7 @@ TRANSPORTEUR_DETAIL_FIELDS = (
     'lc_numero', 'lc_date_debut', 'lc_date_fin', 'lc_nombre',
     'working_area', 'working_area_departements',
     'specialities', 'website', 'description',
+    'objectif_co2', 'objectif_co2_begin', 'objectif_co2_end',
     'in_sirene', 'deleted_at',
     # Boolean for real email_confirmed_at field to avoid privacy issue
     'is_locked'
