@@ -15,6 +15,7 @@ def meta_index(request):
         'choices': {
             'WORKING_AREA_CHOICES': collections.OrderedDict(transporteurs_models.WORKING_AREA_CHOICES),
             'SPECIALITY_CHOICES': collections.OrderedDict(transporteurs_models.SPECIALITY_CHOICES),
+            'OBJECTIF_CO2_CHOICES': collections.OrderedDict(transporteurs_models.OBJECTIF_CO2_CHOICES)
         },
         'version': settings.VERSION,
     }
