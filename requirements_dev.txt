@@ -7,5 +7,3 @@ ipdb
 pylint
 pylint-django
 unidecode
-# To import labeled carriers
-openpyxl
