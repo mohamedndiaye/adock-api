@@ -7,7 +7,7 @@ ADD requirements.txt requirements_dev.txt /app/
 RUN pip install --trusted-host pypi.python.org -r requirements_dev.txt
 
 ADD . /app
-COPY adock/settings_test.py /app/adock/settings_local.py
+COPY adock/settings_docker.py /app/adock/settings_local.py
 
 # EXPOSE 8000
 # CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
