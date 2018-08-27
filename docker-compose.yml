@@ -1,0 +1,12 @@
+# "docker-compose run web" runs test with same Python and PostgreSQL versions as Debian 9
+version: "3"
+services:
+  db:
+    image: postgres:9.6.10-alpine
+  web:
+    build: .
+    command: python3 manage.py test
+    volumes:
+      - .:/code
+    depends_on:
+      - db
