@@ -110,3 +110,19 @@ des commandes Django :
 [django]: https://www.djangoproject.com/
 [python]: https://www.python.org/
 [postgresql]: https://www.postgresql.org/
+
+## Tests
+
+Pour lancer les tests en local, installer les dépendances du projet dans un
+virtualenv et lancer la commande Django :
+
+```shell
+pip install -r requirements_dev.txt
+./manage.py test
+```
+
+Il est aussi possible de lancer les tests via Docker avec :
+
+```docker-compose run web```
+
+Le projet utilise le service d'intégration continu de [CircleCI](https://circleci.com/gh/MTES-MCT/adock-api).
