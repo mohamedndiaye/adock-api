@@ -28,6 +28,9 @@ Dock par celles issues du projet [Sirene](https://www.data.gouv.fr/fr/datasets/b
 Seules les informations de téléphone et adresse électronique sont extraites dans
 un second temps (mise à jour SQL) depuis la base de données GRECO.
 
+Les données sont aussi complétées avec l'import des entreprises labellisées par
+la charte [Objectif CO2](http://www.objectifco2.fr/index/documents#categ-6).
+
 Les informations sont ensuite modifiées (champs téléphone et adresse
 électronique) et étendues (aire de travail, départements, spécialités et site
 Web) via l'application.
@@ -49,7 +52,9 @@ des commandes Django :
 
 - `import-all.sh` créé la base de données initiale, l'ensemble des tables et
   effectue tous les imports et les mises à jour. Ce script est uniquement utile
-  pour créer une base vierge pour le développement.
+  pour créer une base vierge pour le développement. Il nécessite d'avoir au
+  préalable téléchargé le dernier fichier *stock* Sirene et de disposer du
+  fichier CSV de la base de données GRECO.
 
 - `import-greco.sql` importe le fichier `greco.csv` contenant tous les exports
   CSV de la base de données GRECO dans une table spécifique pour l'extraction des
@@ -63,19 +68,19 @@ des commandes Django :
   base. Il faut au préalable télécharger la base de données complète au format
   CSV (cf notes dans le script).
 
-- `download_sirene` analyse le site Sirene et télécharge les mises à jour
+- `download_sirene` (Django) analyse le site Sirene et télécharge les mises à jour
   quotidiennes qui ne l'ont pas encore été.
 
-- `update_sirene` met à jour la base de données Sirene en appliquant les
+- `update_sirene` (Django) met à jour la base de données Sirene en appliquant les
   mises à jour quotidiennes qui n'ont pas encore été appliquées.
 
-- `import-greco.sql` importe la table à partir de la concaténation de l'ensemble
+- `import-greco.sql` (Django) importe la table à partir de la concaténation de l'ensemble
   des fichiers CSV de chaque région et un nettoyage préalable.
 
-- `download_registre` télécharge la dernière version du registre des transports
+- `download_registre` (Django) télécharge la dernière version du registre des transports
   de marchandise et créé une entrée en base de données.
 
-- `import_registre` importe les entreprises inscrites au registre du commerce
+- `import_registre` (Django) importe les entreprises inscrites au registre du commerce
   dans une table spécifique. Les informations sur les licences (LC, LTI),
   numéro, dates de validité, nombre ainsi que le gestionnaire sont issues de
   cette table. En cas de succès, le téléchargement est marqué comme appliqué
@@ -91,6 +96,10 @@ des commandes Django :
   départements couverts, etc) avec les numéros de téléphone et les adresses
   électroniques issues de GRECO uniquement s'ils n'ont pas été renseignés sur A
   Dock par l'utilisateur.
+
+- `import_objectif_co2` (Django) reçoit en argument le fichier Excel de la liste
+  des entreprises **labellisées** de le section Transport de marchandises de la
+  page http://www.objectifco2.fr/index/documents#categ-6.
 
 ## Dépendances
 
