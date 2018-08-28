@@ -15,7 +15,8 @@ insert into transporteur
      working_area, working_area_departements,
      website, completeness, description,
      numero_tva, created_at,
-     in_sirene, deleted_at)
+     in_sirene, deleted_at,
+     objectif_co2)
     select r.siret,
            r.raison_sociale,
            coalesce(nullif(s.enseigne, ''), r.raison_sociale),
@@ -63,7 +64,9 @@ insert into transporteur
            -- In Sirene DB or not
            s.apen700 is not null,
            -- Deleted
-           null
+           null,
+           -- Objectif CO2
+           ''
     from registre as r
     left join sirene as s
        on s.siret = r.siret
