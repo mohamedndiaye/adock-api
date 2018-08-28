@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/MTES-MCT/adock-api.svg?style=svg)](https://circleci.com/gh/MTES-MCT/adock-api)
+
 # A Dock
 
 > Simplifions les relations transporteurs/chargeurs
