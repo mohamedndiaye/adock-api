@@ -5,12 +5,12 @@ USE_RAVEN = False
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': '',  # pylint: disable=E0602
+        'NAME': 'circleci_test',
         'HOST': '127.0.0.1',
         'PORT': '5432',
         # For logs
         'OPTIONS': {
-            'application_name': 'adock'  # pylint: disable=E0602
+            'application_name': 'adock'
         },
     }
 }
