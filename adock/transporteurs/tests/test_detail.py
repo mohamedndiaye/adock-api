@@ -194,7 +194,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
                 'telephone': NEW_PHONE,
                 'email': NEW_EMAIL,
                 'working_area': models.WORKING_AREA_DEPARTEMENT,
-                'working_area_departements': '23 45 ,,,976',
+                'working_area_departements': ['45', '23', '976'],
                 'specialities': ['LOT'],
             },
             200
@@ -205,7 +205,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         self.assertEqual(transporteur['telephone'], '02 40 42 45 46')
         self.assertEqual(transporteur['email'], NEW_EMAIL)
         self.assertEqual(transporteur['working_area'], models.WORKING_AREA_DEPARTEMENT)
-        self.assertListEqual(transporteur['working_area_departements'], ['23', '45', '976'])
+        self.assertEqual(transporteur['working_area_departements'], ['23', '45', '976'])
         self.assertListEqual(transporteur['specialities'], ['LOT'])
         self.assertEqual(transporteur['completeness'], 100)
         self.assertEqual(len(mail.outbox), 2)
@@ -275,7 +275,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         data = self.patch_transporteur(
             {
                 'telephone': PHONE,
-                'working_area_departements': '20',
+                'working_area_departements': ['20'],
             },
             400
         )
@@ -288,7 +288,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         data = self.patch_transporteur(
             {
                 'telephone': PHONE,
-                'working_area_departements': '2034;454',
+                'working_area_departements': ['2034;454'],
             },
             400
         )
@@ -317,7 +317,7 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
             {
                 'telephone': PHONE,
                 'working_area': models.WORKING_AREA_DEPARTEMENT,
-                'working_area_departements': '1, 5, 10, 2A, 976',
+                'working_area_departements': '2A, 5, 1, 10, 976',
             },
             200
         )

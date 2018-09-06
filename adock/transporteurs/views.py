@@ -207,12 +207,6 @@ def transporteur_detail(request, transporteur_siret):
                 status=400
             )
 
-        # Replace all non digits by ',' and avoid duplicates ','
-        raw_departements = payload.get('working_area_departements')
-        if raw_departements:
-            raw_departements = raw_departements.replace(' ', ',')
-            payload['working_area_departements'] = RE_MANY_COMMAS.sub(',', raw_departements)
-
         # Form is not bound to the transporteur instance but we need it to check edit code
         form = forms.SubscriptionForm(payload, transporteur=transporteur)
         if not form.is_valid():

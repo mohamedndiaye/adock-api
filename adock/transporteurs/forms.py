@@ -27,7 +27,8 @@ class SubscriptionForm(forms.ModelForm):
         departements = self.cleaned_data.get('working_area_departements')
         for departement in departements:
             formated_departements.append('{:0>2}'.format(departement))
-        return formated_departements
+        # Unique and sorted
+        return sorted(set(formated_departements))
 
     def clean_edit_code(self):
         # Access control to locked transporteur
