@@ -29,6 +29,7 @@ CORS_ORIGIN_WHITELIST = (
     SERVER_NAME,
 )
 ALLOWED_HOSTS = [SERVER_NAME]
+# Web tool or ./manage.py generate_secret_key with Django extensions
 SECRET_KEY = ''
 
 RAVEN_CONFIG = {
