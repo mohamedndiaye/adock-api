@@ -1,28 +1,18 @@
 import os
 import raven
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': PROJECT,  # pylint: disable=E0602
-        'USER': 'deploy',
-        # For logs
-        'OPTIONS': {
-            'application_name': PROJECT  # pylint: disable=E0602
-        },
-    }
-}
-
-EMAIL_PORT = 25
-
 STATIC_URL = '/api/static/'
 
 ADMINS = (
-    (u"Name", 'contact@example.com'),
+    (u"Stéphane Raimbault", 'stephane.raimbault@webstack.fr'),
 )
-MANAGERS = ADMINS
 
-SERVER_NAME = WEBSITE  # pylint: disable=E0602
+MANAGERS = (
+    ("Stéphane Raimbault", 'stephane.raimbault@webstack.fr'),
+    ("Alexandre Dupont", 'alexandre.dupont@developpement-durable.gouv.fr'),
+)
+
+SERVER_NAME = 'adock.beta.gouv.fr'
 SERVER_EMAIL = 'no-reply@' + SERVER_NAME
 
 CORS_ORIGIN_WHITELIST = (
