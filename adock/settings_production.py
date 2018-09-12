@@ -3,6 +3,18 @@ import raven
 
 STATIC_URL = '/api/static/'
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'adock',
+        'USER': 'deploy',
+        # For logs
+        'OPTIONS': {
+            'application_name': 'adock'
+        },
+    }
+}
+
 ADMINS = (
     (u"Stéphane Raimbault", 'stephane.raimbault@webstack.fr'),
 )
