@@ -274,7 +274,7 @@ class TransporteurFeed(models.Model):
     source = models.CharField(max_length=32)
     title = models.CharField(max_length=126)
     url = models.URLField()
-    filename = models.FilePathField(path=settings.DATAFILES_ROOT)
+    filename = models.FileField()
     downloaded_at = models.DateTimeField(auto_now_add=True)
     applied_at = models.DateTimeField(blank=True, null=True)
 
