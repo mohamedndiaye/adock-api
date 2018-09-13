@@ -149,11 +149,14 @@ class Transporteur(models.Model):
     validated_at = models.DateTimeField(blank=True, null=True)
     # Level of completeness of the carrier profile in percent
     completeness = models.PositiveSmallIntegerField(default=COMPLETENESS_PERCENT_MIN)
-    in_sirene = models.BooleanField(
-        default=False,
-        help_text="Drapeau indiquant la présence de l'entreprise dans la base de données Sirene."
+    deleted_at = models.DateTimeField(
+        blank=True, null=True,
+        help_text="Date de la supression de l'établissement du registre des transports."
     )
-    deleted_at = models.DateTimeField(blank=True, null=True)
+    sirene_deleted_at = models.DateTimeField(
+        blank=True, null=True,
+        help_text="Date de la suppression de l'établissement de la base Sirène."
+    )
     edit_code = models.IntegerField(blank=True, null=True)
     edit_code_at = models.DateTimeField(blank=True, null=True)
     objectif_co2 = models.CharField(

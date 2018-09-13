@@ -32,7 +32,7 @@ TRANSPORTEUR_DETAIL_FIELDS = (
     'working_area', 'working_area_departements',
     'specialities', 'website', 'description',
     'objectif_co2', 'objectif_co2_begin', 'objectif_co2_end',
-    'in_sirene', 'deleted_at',
+    'deleted_at', 'sirene_deleted_at',
     # Boolean for real email_confirmed_at field to avoid privacy issue
     'is_locked'
 )

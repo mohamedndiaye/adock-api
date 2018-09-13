@@ -4,9 +4,10 @@ import random
 import string
 import unidecode
 
-import factory
+from django.utils import timezone
 from factory import fuzzy
 from faker import Faker
+import factory
 
 from . import models
 from . import validators
@@ -58,4 +59,3 @@ class TransporteurFactory(factory.django.DjangoModelFactory):
     working_area = models.WORKING_AREA_DEPARTEMENT
     working_area_departements = ['35', '44']
     specialities = ['TEMPERATURE', 'URBAIN']
-    in_sirene = True
