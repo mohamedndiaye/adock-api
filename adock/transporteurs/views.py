@@ -120,7 +120,10 @@ def search(request):
         transporteurs = transporteurs.filter(
             Q(working_area=models.WORKING_AREA_INTERNATIONAL) |
             Q(working_area=models.WORKING_AREA_FRANCE) |
-            Q(working_area=models.WORKING_AREA_DEPARTEMENT, working_area_departements__contains=departements)
+            Q(
+                working_area__in=(models.WORKING_AREA_DEPARTEMENT, models.WORKING_AREA_REGION),
+                working_area_departements__contains=departements
+            )
         )
 
     # Filtering on specialities
@@ -135,6 +138,7 @@ def search(request):
         RawSQL("""
             CASE working_area
             WHEN 'DEPARTEMENT' THEN array_length(working_area_departements, 1)
+            WHEN 'REGION' THEN array_length(working_area_departements, 1)
             WHEN 'FRANCE' THEN 101
             WHEN 'INTERNATIONAL' THEN 102
             END
