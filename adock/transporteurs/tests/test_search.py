@@ -126,6 +126,13 @@ class TransporteurSearchQueryTestCase(TransporteurSearchTestCase):
         self.assertEqual(len(transporteurs), 1)
         self.assertEqual(transporteurs[0]['raison_sociale'], 'ACTIVE')
 
+    def test_sirene_deleted(self):
+        factories.TransporteurFactory(raison_sociale='ACTIVE')
+        factories.TransporteurFactory(raison_sociale='DELETED', sirene_deleted_at=timezone.now())
+        transporteurs = self.get_transporteurs()
+        self.assertEqual(len(transporteurs), 1)
+        self.assertEqual(transporteurs[0]['raison_sociale'], 'ACTIVE')
+
 
 class TransporteurSearchLicenseTypeTestCase(TransporteurSearchTestCase):
 

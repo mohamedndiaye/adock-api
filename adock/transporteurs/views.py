@@ -67,7 +67,7 @@ def search(request):
        - partial enseigne or SIRET
        - type of the license (LC heavy or LTI light)
     """
-    transporteurs = models.Transporteur.objects.filter(deleted_at=None)
+    transporteurs = models.Transporteur.objects.filter(deleted_at=None, sirene_deleted_at=None)
     q = request.GET.get('q')
     if q:
         # Filtering on enseigne or SIRET

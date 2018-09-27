@@ -114,7 +114,7 @@ update transporteur
 
 -- Update meta stats
 with json_data as (
-  select json_build_object('count', count(*), 'date', current_date) from transporteur where deleted_at is null
+  select json_build_object('count', count(*), 'date', current_date) from transporteur where deleted_at is null and sirene_deleted_at is null
 )
 insert into meta (name, data)
     values (
