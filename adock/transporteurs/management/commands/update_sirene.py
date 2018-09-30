@@ -21,12 +21,12 @@ class Command(BaseCommand):
             source='sirene', applied_at=None).order_by('filename')
         for feed in feeds:
             with tempfile.TemporaryDirectory() as tmp_dirname:
-                zip_filename = os.path.join(settings.DATAFILES_ROOT, feed.filename)
+                zip_filename = os.path.join(settings.DATAFILES_ROOT, feed.filename.name)
                 with zipfile.ZipFile(zip_filename, 'r') as zf:
                     zf.extractall(tmp_dirname)
 
                 # List CSV files
-                self.stdout.write("%s - %s" % (feed.title, feed.filename))
+                self.stdout.write("%s - %s" % (feed.title, feed.filename.name))
                 for filename in glob(tmp_dirname + '/*.csv'):
                     # Call SQL script on it...
                     sed_ps = subprocess.Popen(
