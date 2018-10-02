@@ -26,7 +26,7 @@ class Command(BaseCommand):
             sys.exit(1)
 
         with tempfile.TemporaryDirectory() as tmp_dirname:
-            zip_filename = os.path.join(settings.DATAFILES_ROOT, feed.filename)
+            zip_filename = os.path.join(settings.DATAFILES_ROOT, feed.filename.name)
             with zipfile.ZipFile(zip_filename, 'r') as zf:
                 zf.extractall(tmp_dirname)
 
@@ -34,7 +34,7 @@ class Command(BaseCommand):
             filenames = glob(tmp_dirname + '/*.csv')
             if len(filenames) > 1:
                 self.stderr.write(
-                    self.style.ERROR("The zip file '%s' contains several files (%s)." % (feed.filename, filenames))
+                    self.style.ERROR("The zip file '%s' contains several files (%s)." % (feed.filename.name, filenames))
                 )
                 sys.exit(1)
 
