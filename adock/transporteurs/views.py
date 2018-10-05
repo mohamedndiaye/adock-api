@@ -196,6 +196,7 @@ def transporteur_detail(request, transporteur_siret):
     # Access to deleted transporteurs is allowed.
     # Get existing transporteur if any
     transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
+
     if request.method == 'PATCH':
         if not request.content_type == 'application/json':
             return JsonResponse(

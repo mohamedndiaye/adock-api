@@ -223,7 +223,6 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         WEBSITE = 'http://www.example.com'
         data = self.patch_transporteur(
             {
-                'telephone': PHONE,
                 'website': 'www.example.com',
             },
             200
@@ -253,12 +252,41 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
     def test_patch_unknow_payload(self):
         data = self.patch_transporteur(
             {
-                'telephone': PHONE,
                 'foo': '42',
             },
             200
         )
         self.assertNotIn('foo', data['transporteur'])
+
+    def test_patch_phone_required(self):
+        # Accepted
+        data = self.patch_transporteur(
+            {
+                'email': self.transporteur.email,
+            },
+            200
+        )
+
+        # Remove phone on the instance
+        self.transporteur.telephone = ''
+        self.transporteur.save()
+
+        # Only possible to PATCH w/o phone when the transporteur already contains a phone
+        data = self.patch_transporteur(
+            {
+                'email': self.transporteur.email,
+            },
+            400
+        )
+        self.assertEqual(data['telephone'][0], "Ce champ est obligatoire.")
+
+        data = self.patch_transporteur(
+            {
+                'telephone': PHONE,
+                'email': self.transporteur.email,
+            },
+            200
+        )
 
     def test_patch_invalid_phone(self):
         data = self.patch_transporteur(
@@ -274,7 +302,6 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
     def test_patch_unexisting_working_area_departements(self):
         data = self.patch_transporteur(
             {
-                'telephone': PHONE,
                 'working_area_departements': ['20'],
             },
             400
@@ -287,7 +314,6 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
     def test_patch_invalid_working_area_departements(self):
         data = self.patch_transporteur(
             {
-                'telephone': PHONE,
                 'working_area_departements': ['2034;454'],
             },
             400
@@ -301,7 +327,6 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
     def test_patch_no_working_area_departements(self):
         data = self.patch_transporteur(
             {
-                'telephone': PHONE,
                 'working_area': models.WORKING_AREA_DEPARTEMENT,
                 'working_area_departements': '',
             },
@@ -315,7 +340,6 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
     def test_patch_format_working_area_departements(self):
         self.patch_transporteur(
             {
-                'telephone': PHONE,
                 'working_area': models.WORKING_AREA_DEPARTEMENT,
                 'working_area_departements': '2A, 5, 1, 10, 976',
             },

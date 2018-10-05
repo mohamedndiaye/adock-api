@@ -21,6 +21,14 @@ class SubscriptionForm(forms.ModelForm):
         super().__init__(data)
         self.transporteur = transporteur
 
+    def clean_telephone(self):
+        """Should be submitted or present in instance"""
+        telephone = self.cleaned_data.get('telephone') or self.transporteur.telephone
+        if not telephone:
+            raise forms.ValidationError("Ce champ est obligatoire.")
+
+        return telephone
+
     def clean_working_area_departements(self):
         """Pads departement numbers lesser than 10 with a zero"""
         formated_departements = []

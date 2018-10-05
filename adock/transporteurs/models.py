@@ -96,7 +96,7 @@ class Transporteur(models.Model):
     # code_departement from Registre
     departement = models.CharField(max_length=3, blank=True, null=False, default='')
     # telephone from GRECO used as default (changed)
-    telephone = PhoneNumberField()
+    telephone = PhoneNumberField(blank=True, default='')
     # mail from GRECO used as default (changed)
     email = models.EmailField(blank=True, default='')
     # Set when the user clicks on the provided URL with one time token and to
