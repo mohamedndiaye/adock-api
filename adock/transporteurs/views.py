@@ -332,8 +332,8 @@ def get_stats(request):
             FROM
                 (SELECT date_trunc('month', calendar.date) as generated_month
                 FROM generate_series(
-                        now() - interval '6 month',
-                        now() - interval '1 month',
+                        now() - interval '5 month',
+                        now(),
                         interval '1 month') AS calendar(date)) gs
                 LEFT JOIN transporteur t
                     ON t.validated_at is not null AND
