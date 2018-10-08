@@ -321,9 +321,13 @@ def transporteur_send_edit_code(request, transporteur_siret):
     )
 
 def get_stats(request):
+    # Counters (total)
+    validated_carriers = models.Transporteur.objects.filter(validated_at__isnull=False).count()
+    locked_carriers = models.Transporteur.objects.filter(email_confirmed_at__isnull=False).count()
+
     validated_carriers_per_month = []
     with connection.cursor() as cursor:
-        # Collect the number of validated sheets by month.
+        # Collect the number of validated sheets by month for the last 6 months
         # A bit slow, 18ms...
         cursor.execute("""
             SELECT
@@ -348,9 +352,10 @@ def get_stats(request):
                 }
             )
 
-    # Number of locked sheets
-    confirmed_carriers = models.Transporteur.objects.filter(email_confirmed_at__isnull=False).count()
     return JsonResponse({
+        # Total
+        'validated_carriers': validated_carriers,
+        'locked_carriers': locked_carriers,
+        # Only for the recent period (6 months)
         'validated_carriers_per_month': validated_carriers_per_month,
-        'confirmed_carriers': confirmed_carriers
     })
