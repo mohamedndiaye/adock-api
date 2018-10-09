@@ -36,7 +36,7 @@ class TransporteurEmailConfirmationTestCase(test.TransporteurTestCase):
 
     def test_already_confirmed_email_token(self):
         old_token = tokens.email_confirmation_token.make_token(self.transporteur)
-        self.transporteur.email_confirmed_at = timezone.now()
+        self.transporteur.lock()
         new_token = tokens.email_confirmation_token.make_token(self.transporteur)
         self.assertNotEqual(old_token, new_token)
 
@@ -110,16 +110,31 @@ class TransporteurEmailConfirmationTestCase(test.TransporteurTestCase):
         self.assertIsNotNone(self.transporteur.validated_at)
 
     def test_changed_email(self):
-        self.transporteur.email_confirmed_at = timezone.now()
+        self.transporteur.lock()
+        self.transporteur.save()
         self.assertTrue(self.transporteur.is_locked())
+
         self.detail_url = reverse(
             'transporteurs_detail',
             kwargs={'transporteur_siret': self.transporteur.siret}
         )
+        # Unable to change it w/o edit code
         data = self.patch_transporteur(
             {
                 'telephone': '0102030405',
                 'email': 'bar@example.com',
+            },
+            400
+        )
+
+        self.transporteur.set_edit_code()
+        self.transporteur.save()
+        # Invalidate previous lock by changing email
+        data = self.patch_transporteur(
+            {
+                'telephone': '0102030405',
+                'email': 'bar@example.com',
+                'edit_code': self.transporteur.edit_code
             },
             200
         )

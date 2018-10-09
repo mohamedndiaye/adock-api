@@ -210,6 +210,10 @@ class Transporteur(models.Model):
 
         return COMPLETENESS_PERCENT_MIN + earned_points * EARNED_POINT_VALUE
 
+    def lock(self):
+        self.email_confirmed_at = timezone.now()
+        self.save()
+
     def is_locked(self):
         # The email has been confirmed
         return bool(self.email_confirmed_at)
