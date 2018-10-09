@@ -56,6 +56,23 @@ Valeurs modifiées :
         )
     mail_managers(subject, message, fail_silently=True)
 
+def mail_managers_lock(transporteur, scheme):
+    subject = "Verrouillage du transporteur {0}".format(transporteur.siret)
+    message = """
+Verrouillage du transporteur : {enseigne}
+SIRET : {siret}
+{scheme}://{website}/transporteur/{siret}
+
+Adresse électronique confirmée : {email}
+    """.format(
+        scheme=scheme,
+        enseigne=transporteur.enseigne,
+        siret=transporteur.siret,
+        website=settings.WEBSITE,
+        email=transporteur.email
+    )
+    mail_managers(subject, message, fail_silently=True)
+
 def mail_transporteur_edit_code(transporteur):
     subject = "A Dock - Code de modification"
     max_edit_time = transporteur.edit_code_at + settings.TRANSPORTEUR_EDIT_CODE_INTERVAL

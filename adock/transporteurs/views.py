@@ -281,6 +281,8 @@ def transporteur_confirm_email(request, transporteur_siret, token):
     if transporteur and tokens.email_confirmation_token.check_token(transporteur, token):
         transporteur.lock()
         transporteur.save()
+        scheme = 'https' if request.is_secure() else 'http'
+        mails.mail_managers_lock(transporteur, scheme)
         return JsonResponse(
             {'message': "L'adresse électronique est confirmée."}
         )

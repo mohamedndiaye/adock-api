@@ -60,6 +60,10 @@ class TransporteurEmailConfirmationTestCase(test.TransporteurTestCase):
         self.transporteur.refresh_from_db()
         self.assertTrue(self.transporteur.is_locked())
 
+        self.assertEqual(len(mail.outbox), 1)
+        subject = "[adock] Verrouillage du transporteur %s" % self.transporteur.siret
+        self.assertEqual(mail.outbox[0].subject, subject)
+
     def test_altered_token(self):
         token = tokens.email_confirmation_token.make_token(self.transporteur)
         url = reverse(
