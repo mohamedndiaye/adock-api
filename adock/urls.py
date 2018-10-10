@@ -13,11 +13,18 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.urls import include, path
 
 from adock.meta import views as meta_views
+from adock.selftest import views as selftest_views
 
 urlpatterns = [
     path('transporteurs/', include('adock.transporteurs.urls')),
-    path('meta/', meta_views.meta_index, name='meta')
+    path('meta/', meta_views.meta_index, name='meta'),
 ]
+
+if settings.USE_SELFTEST:
+    urlpatterns.append(
+        path('selftest', selftest_views.selftest_index, name='selftest')
+    )

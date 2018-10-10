@@ -40,8 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'corsheaders',
     'phonenumber_field',
-    'adock.transporteurs.apps.TransporteursConfig',
     'adock.meta.apps.MetaConfig',
+    'adock.transporteurs.apps.TransporteursConfig',
+    'adock.selftest.apps.SelftestConfig',
 ]
 
 MIDDLEWARE = [
@@ -157,6 +158,7 @@ TRANSPORTEUR_EDIT_CODE_INTERVAL = datetime.timedelta(minutes=TRANSPORTEUR_EDIT_C
 USE_DEBUG_CONSOLE = False
 USE_DJANGO_EXTENSIONS = False
 USE_RAVEN = True
+USE_SELFTEST = True
 
 try:
     from .settings_local import *  # pylint: disable=W0401
