@@ -20,8 +20,9 @@ from adock.meta import views as meta_views
 from adock.selftest import views as selftest_views
 
 urlpatterns = [
-    path('transporteurs/', include('adock.transporteurs.urls')),
+    path('accounts/', include('adock.accounts.urls')),
     path('meta/', meta_views.meta_index, name='meta'),
+    path('transporteurs/', include('adock.transporteurs.urls')),
 ]
 
 if settings.USE_SELFTEST:

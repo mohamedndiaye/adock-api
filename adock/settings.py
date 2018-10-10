@@ -40,9 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'corsheaders',
     'phonenumber_field',
+    'adock.accounts.apps.AccountsConfig',
     'adock.meta.apps.MetaConfig',
-    'adock.transporteurs.apps.TransporteursConfig',
     'adock.selftest.apps.SelftestConfig',
+    'adock.transporteurs.apps.TransporteursConfig',
 ]
 
 MIDDLEWARE = [
@@ -64,13 +65,8 @@ TEMPLATES = [
         'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
+            'environment': 'adock.core.jinja2.environment'
+        }
     },
 ]
 
