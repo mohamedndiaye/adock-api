@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import mail_managers
 from django.shortcuts import render
 
+from sentry_sdk import capture_message
+
 from ..meta import models as meta_models
 
 logger = logging.getLogger(__name__)
@@ -33,6 +35,9 @@ def selftest_index(request):
                 results = "No Meta entries in DB."
         elif 'raise_exception' in request.POST:
             raise Exception("Raised by selftest page (safe to ignore).")
+        elif 'capture_event' in request.POST:
+            capture_message("Event captured in selftest page.")
+            results = 'Event captured.'
 
     return render(
         request, 'selftest.html',
