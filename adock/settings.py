@@ -155,8 +155,12 @@ TRANSPORTEUR_EDIT_CODE_INTERVAL = datetime.timedelta(minutes=TRANSPORTEUR_EDIT_C
 
 USE_DEBUG_CONSOLE = False
 USE_DJANGO_EXTENSIONS = False
-USE_RAVEN = True
+USE_SENTRY = True
 USE_SELFTEST = True
+
+SENTRY_CONFIG = {
+    'dsn': ''
+}
 
 try:
     from .settings_local import *  # pylint: disable=W0401
@@ -196,6 +200,6 @@ if USE_DEBUG_CONSOLE:
 if USE_DJANGO_EXTENSIONS:
     INSTALLED_APPS += ('django_extensions',)
 
-if USE_RAVEN:
-    INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
-    # RAVEN_CONFIG should be provided by production settings
+if USE_SENTRY:
+    import sentry_sdk
+    sentry_sdk.init(SENTRY_CONFIG['dsn'])

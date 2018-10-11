@@ -1,6 +1,3 @@
-import os
-import raven
-
 STATIC_URL = '/api/static/'
 
 DATABASES = {
@@ -34,7 +31,6 @@ ALLOWED_HOSTS = [SERVER_NAME]
 # Web tool or ./manage.py generate_secret_key with Django extensions
 SECRET_KEY = ''
 
-RAVEN_CONFIG = {
-    'dsn': 'https://URL-TO-PASTE-FROM-SENTRY-IO',
-    'release': raven.fetch_git_sha(os.path.dirname(os.pardir)),
+SENTRY_CONFIG = {
+    'dsn': 'https://URL-TO-PASTE-FROM-SENTRY-IO'
 }

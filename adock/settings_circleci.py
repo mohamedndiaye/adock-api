@@ -1,6 +1,6 @@
 DEBUG = True
 USE_DEBUG_CONSOLE = True
-USE_RAVEN = False
+USE_SENTRY = False
 
 DATABASES = {
     'default': {

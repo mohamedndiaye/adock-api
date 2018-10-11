@@ -3,7 +3,7 @@ psycopg2-binary>=2.7.5
 jinja2
 django-cors-headers>=2.4
 django-phonenumber-field>=2.0.1
-raven>=6.9.0
+sentry_sdk==0.4.0
 bs4
 requests>=2.19.1
 # To import labelled carriers of Objectif CO2

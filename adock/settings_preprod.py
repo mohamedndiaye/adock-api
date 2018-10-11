@@ -1,6 +1,3 @@
-import os
-import raven
-
 STATIC_URL = '/api/static/'
 
 DATABASES = {
@@ -34,7 +31,6 @@ SECRET_KEY = ''
 # Disable mails (or listen on local port)
 EMAIL_PORT = 1025
 
-RAVEN_CONFIG = {
-    'dsn': 'https://URL-TO-PASTE-FROM-SENTRY-IO',
-    'release': raven.fetch_git_sha(os.path.dirname(os.pardir)),
+SENTRY_CONFIG = {
+    'dsn': 'https://URL-TO-PASTE-FROM-SENTRY-IO'
 }
