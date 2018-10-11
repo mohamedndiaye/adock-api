@@ -26,7 +26,7 @@ def selftest_index(request):
                 website=settings.WEBSITE
             )
             mail_managers(subject, message, fail_silently=False)
-            results = "Mail sent to %s" % settings.MANAGERS
+            results = "Mail sent to %s." % ", ".join(manager[0] for manager in settings.MANAGERS)
         elif 'connect_db' in request.POST:
             metas = meta_models.Meta.objects.all()
             if metas:
