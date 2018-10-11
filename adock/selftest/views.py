@@ -36,8 +36,8 @@ def selftest_index(request):
         elif 'raise_exception' in request.POST:
             raise Exception("Raised by selftest page (safe to ignore).")
         elif 'capture_event' in request.POST:
-            capture_message("Event captured in selftest page.")
-            results = 'Event captured.'
+            event_id = capture_message("Event captured in selftest page.")
+            results = 'Event captured #%s' % event_id
 
     return render(
         request, 'selftest.html',
