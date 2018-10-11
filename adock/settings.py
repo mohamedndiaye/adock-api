@@ -126,6 +126,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+LOGIN_URL = 'accounts_log_in'
+
 DATAFILES_ROOT = os.path.join(BASE_DIR, 'datafiles')
 
 WEBSITE = 'adock.beta.gouv.fr'
