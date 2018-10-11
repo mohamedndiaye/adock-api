@@ -158,9 +158,7 @@ USE_DJANGO_EXTENSIONS = False
 USE_SENTRY = True
 USE_SELFTEST = True
 
-SENTRY_CONFIG = {
-    'dsn': ''
-}
+SENTRY_DSN = ''
 
 try:
     from .settings_local import *  # pylint: disable=W0401
@@ -202,4 +200,9 @@ if USE_DJANGO_EXTENSIONS:
 
 if USE_SENTRY:
     import sentry_sdk
-    sentry_sdk.init(SENTRY_CONFIG['dsn'])
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        SENTRY_DSN,
+        integrations=[DjangoIntegration()]
+    )

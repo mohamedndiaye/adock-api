@@ -31,6 +31,4 @@ ALLOWED_HOSTS = [SERVER_NAME]
 # Web tool or ./manage.py generate_secret_key with Django extensions
 SECRET_KEY = ''
 
-SENTRY_CONFIG = {
-    'dsn': 'https://URL-TO-PASTE-FROM-SENTRY-IO'
-}
+SENTRY_DSN = 'https://URL-TO-PASTE-FROM-SENTRY-IO'

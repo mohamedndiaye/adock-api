@@ -31,6 +31,4 @@ SECRET_KEY = ''
 # Disable mails (or listen on local port)
 EMAIL_PORT = 1025
 
-SENTRY_CONFIG = {
-    'dsn': 'https://URL-TO-PASTE-FROM-SENTRY-IO'
-}
+SENTRY_DSN = 'https://URL-TO-PASTE-FROM-SENTRY-IO'
