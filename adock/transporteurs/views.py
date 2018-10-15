@@ -178,8 +178,8 @@ def search(request):
     return JsonResponse(payload)
 
 def get_transporteur_changes(transporteur, cleaned_payload):
-    old_data = {field: getattr(transporteur, field) for field in cleaned_payload}
     old_data_changed = {}
+    old_data = {field: getattr(transporteur, field) for field in cleaned_payload}
     for k, v in old_data.items():
         if v != cleaned_payload[k]:
             # Serialize for JSON
@@ -187,6 +187,18 @@ def get_transporteur_changes(transporteur, cleaned_payload):
 
     return old_data_changed
 
+def add_transporteur_log(transporteur, old_data_changed, cleaned_payload):
+    """
+    Add an entry to transporteur log. Take care to create an initial entry
+    with old data when no entries exist yet.
+    """
+    if not models.TransporteurLog.objects.filter(transporteur=transporteur).exists():
+        models.TransporteurLog.objects.create(transporteur=transporteur, data=old_data_changed)
+
+    new_data_changed = {
+        k: str(cleaned_payload[k]) if k == 'telephone' else cleaned_payload[k] for k in old_data_changed.keys()
+    }
+    models.TransporteurLog.objects.create(transporteur=transporteur, data=new_data_changed)
 
 RE_MANY_COMMAS = re.compile(r',+')
 
@@ -258,7 +270,7 @@ def transporteur_detail(request, transporteur_siret):
                     force_update=True,
                     update_fields=updated_fields
                 )
-                models.TransporteurLog.objects.create(transporteur=transporteur, data=old_data_changed)
+                add_transporteur_log(transporteur, old_data_changed, cleaned_payload)
 
             mails.mail_managers_changes(transporteur, old_data_changed, scheme)
 

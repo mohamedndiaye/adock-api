@@ -69,19 +69,23 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
         self.assertEqual(data['transporteur']['telephone'], '')
 
     def test_patch_log(self):
+        old_phone = self.transporteur.telephone
         transporteur = self.patch_transporteur(
             {
                 'telephone': PHONE,
             },
             200
         )['transporteur']
-        self.assertEqual(models.TransporteurLog.objects.count(), 1)
-        transporteur_log = models.TransporteurLog.objects.get()
+        # Initial and new entry
+        self.assertEqual(models.TransporteurLog.objects.count(), 2)
+        transporteur_log = models.TransporteurLog.objects.earliest('pk')
         # Only one field changed
         self.assertEqual(len(transporteur_log.data), 1)
         # Old value
-        self.assertEqual(transporteur_log.data['telephone'], str(self.transporteur.telephone))
+        self.assertEqual(transporteur_log.data['telephone'], str(old_phone))
         # New value
+        transporteur_log = models.TransporteurLog.objects.latest('pk')
+        self.assertEqual(transporteur_log.data['telephone'], PHONE)
         self.assertEqual(transporteur['telephone'], PHONE_DISPLAY)
 
         self.transporteur.refresh_from_db()
@@ -92,17 +96,17 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
             },
             200
         )
-        self.assertEqual(models.TransporteurLog.objects.count(), 2)
+        # Only one new entry
+        self.assertEqual(models.TransporteurLog.objects.count(), 3)
         # Only working area has changed
-        transporteur_log = models.TransporteurLog.objects.order_by('-pk').first()
+        transporteur_log = models.TransporteurLog.objects.latest('pk')
         self.assertEqual(len(transporteur_log.data), 1)
-        # Old value
+        # New value
         self.assertEqual(
             transporteur_log.data['working_area_departements'],
-            str(self.transporteur.working_area_departements)
+            ['2A', '56']
         )
 
-        self.transporteur.refresh_from_db()
         self.patch_transporteur(
             {
                 'telephone': PHONE,
@@ -113,9 +117,9 @@ class TransporteurDetailTestCase(test.TransporteurTestCase):
             },
             200
         )
-        self.assertEqual(models.TransporteurLog.objects.count(), 3)
+        self.assertEqual(models.TransporteurLog.objects.count(), 4)
         # Only working area and email have changed
-        transporteur_log = models.TransporteurLog.objects.order_by('-pk').first()
+        transporteur_log = models.TransporteurLog.objects.latest('pk')
         self.assertEqual(len(transporteur_log.data), 2)
         self.assertIn('email', transporteur_log.data)
         self.assertIn('working_area_departements', transporteur_log.data)
