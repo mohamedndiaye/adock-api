@@ -12,7 +12,7 @@ def fix_transporteur_log_json(apps, _schema_editor):
             if v != '' and v[0] == '[':
                 v = ast.literal_eval(v)
             elif v == 'None':
-                v = []
+                v = None
 
             cleaned_data[k] = v
 
