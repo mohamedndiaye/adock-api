@@ -182,8 +182,8 @@ def get_transporteur_changes(transporteur, cleaned_payload):
     old_data = {field: getattr(transporteur, field) for field in cleaned_payload}
     for k, v in old_data.items():
         if v != cleaned_payload[k]:
-            # Serialize for JSON
-            old_data_changed[k] = str(v)
+            # FIXME Dry
+            old_data_changed[k] = str(v) if k == 'telephone' else v
 
     return old_data_changed
 
@@ -195,6 +195,7 @@ def add_transporteur_log(transporteur, old_data_changed, cleaned_payload):
     if not models.TransporteurLog.objects.filter(transporteur=transporteur).exists():
         models.TransporteurLog.objects.create(transporteur=transporteur, data=old_data_changed)
 
+    # FIXME Dry
     new_data_changed = {
         k: str(cleaned_payload[k]) if k == 'telephone' else cleaned_payload[k] for k in old_data_changed.keys()
     }
