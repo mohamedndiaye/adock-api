@@ -29,7 +29,7 @@ L'équipe A Dock
         email=transporteur.email,
         token=token
     )
-    recipient_list = settings.MANAGERS if settings.PREPRODUCTION else [transporteur.email]
+    recipient_list = settings.MANAGERS if settings.PREPRODUCTION else (transporteur.email,)
     send_mail(subject, message, settings.SERVER_EMAIL, recipient_list, fail_silently=True)
 
 def mail_managers_changes(transporteur, old_data_changed, scheme):
@@ -89,5 +89,5 @@ L'équipe A Dock
         edit_code=transporteur.edit_code,
         max_edit_time_display=timezone.localtime(max_edit_time).strftime('%H:%M (%d/%m/%Y)')
     )
-    recipient_list = settings.MANAGERS if settings.PREPRODUCTION else [transporteur.email]
+    recipient_list = settings.MANAGERS if settings.PREPRODUCTION else (transporteur.email,)
     send_mail(subject, message, settings.SERVER_EMAIL, recipient_list, fail_silently=True)
