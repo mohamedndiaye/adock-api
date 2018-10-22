@@ -1,5 +1,4 @@
 from django.core import mail
-from django.utils import timezone
 from django.urls import reverse
 
 from .. import factories

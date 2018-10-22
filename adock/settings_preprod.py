@@ -1,3 +1,4 @@
+PREPRODUCTION = True
 STATIC_URL = '/api/static/'
 
 DATABASES = {
@@ -27,8 +28,5 @@ CORS_ORIGIN_WHITELIST = (
 ALLOWED_HOSTS = [SERVER_NAME]
 # Web tool or ./manage.py generate_secret_key with Django extensions
 SECRET_KEY = ''
-
-# Disable mails (or listen on local port)
-EMAIL_PORT = 1025
 
 SENTRY_DSN = 'https://URL-TO-PASTE-FROM-SENTRY-IO'
