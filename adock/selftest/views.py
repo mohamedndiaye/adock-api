@@ -4,7 +4,6 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.mail import mail_managers
 from django.shortcuts import render
-
 from sentry_sdk import capture_message
 
 from ..meta import models as meta_models

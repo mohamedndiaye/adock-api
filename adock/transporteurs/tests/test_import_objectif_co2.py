@@ -1,13 +1,11 @@
 import datetime
-
 from io import StringIO
-from django.test import TestCase
-from django.core.management import call_command
 
-from .. import models
-from .. import factories
+from django.core.management import call_command
+from django.test import TestCase
 
 from . import test
+from .. import factories, models
 
 
 class ImportObjectifCO2TestCase(TestCase):

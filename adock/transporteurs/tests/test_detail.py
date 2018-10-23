@@ -3,9 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from . import test
-from .. import factories
-from .. import models
-from .. import validators
+from .. import factories, models, validators
 
 PHONE = "+33240424546"
 PHONE_DISPLAY = "02 40 42 45 46"

@@ -10,11 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from . import forms
-from . import mails
-from . import models
-from . import tokens
-from . import validators
+from . import forms, mails, models, tokens, validators
 
 TRANSPORTEUR_LIST_FIELDS = (
     "siret",

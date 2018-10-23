@@ -2,15 +2,14 @@
 import datetime
 import random
 import string
-import unidecode
 
+import factory
+import unidecode
 from django.utils import timezone
 from factory import fuzzy
 from faker import Faker
-import factory
 
-from . import models
-from . import validators
+from . import models, validators
 
 faker = Faker("fr_FR")
 

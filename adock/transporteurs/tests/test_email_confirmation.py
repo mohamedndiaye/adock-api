@@ -1,9 +1,8 @@
 from django.core import mail
 from django.urls import reverse
 
-from .. import factories
-from .. import tokens
 from . import test
+from .. import factories, tokens
 
 
 class TransporteurEmailConfirmationTestCase(test.TransporteurTestCase):

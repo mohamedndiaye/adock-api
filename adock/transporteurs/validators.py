@@ -1,4 +1,5 @@
 import re
+
 from django.core.exceptions import ValidationError
 
 SIREN_LENGTH = 9

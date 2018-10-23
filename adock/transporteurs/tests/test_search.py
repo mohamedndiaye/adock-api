@@ -2,9 +2,8 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
-from .. import factories
-from .. import models
 from . import test
+from .. import factories, models
 
 
 class TransporteurSearchTestCase(TestCase):

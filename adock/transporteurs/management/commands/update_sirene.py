@@ -1,9 +1,9 @@
-from glob import glob
 import os
 import subprocess
 import sys
 import tempfile
 import zipfile
+from glob import glob
 
 from django.conf import settings
 from django.core.management.base import BaseCommand

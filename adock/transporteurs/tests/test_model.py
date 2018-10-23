@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from .. import factories
 from . import test
+from .. import factories
 
 
 class TransporteurModelTestCase(TestCase):

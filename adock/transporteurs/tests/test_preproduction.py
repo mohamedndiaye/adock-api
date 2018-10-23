@@ -1,9 +1,9 @@
-from django.core import mail
 from django.conf import settings
+from django.core import mail
 from django.test import TestCase, override_settings
 from django.utils import timezone
-from .. import mails
-from .. import factories
+
+from .. import factories, mails
 
 
 class PreproductionTestCase(TestCase):

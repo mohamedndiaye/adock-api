@@ -3,8 +3,8 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 
-from .. import factories
 from . import test
+from .. import factories
 
 
 class TransporteurEditCodeTestCase(test.TransporteurTestCase):

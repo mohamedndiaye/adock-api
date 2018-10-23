@@ -7,7 +7,6 @@ from django.db.models import Lookup
 from django.db.models.fields import Field
 from django.urls import reverse
 from django.utils import timezone
-
 from phonenumber_field.modelfields import PhoneNumberField
 
 from . import validators as transporteurs_validators
