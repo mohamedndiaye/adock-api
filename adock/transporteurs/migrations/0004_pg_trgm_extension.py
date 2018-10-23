@@ -3,12 +3,9 @@
 from django.db import migrations
 from django.contrib.postgres.operations import TrigramExtension
 
+
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0003_auto_20180704_0913'),
-    ]
+    dependencies = [("transporteurs", "0003_auto_20180704_0913")]
 
-    operations = [
-        TrigramExtension()
-    ]
+    operations = [TrigramExtension()]

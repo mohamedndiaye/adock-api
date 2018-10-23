@@ -3,30 +3,43 @@ import datetime
 
 from django.db import migrations
 
+
 def rewrite_transporteur_log(apps, _schema_editor):
-    Transporteur = apps.get_model('transporteurs', 'Transporteur')
-    TransporteurLog = apps.get_model('transporteurs', 'TransporteurLog')
+    Transporteur = apps.get_model("transporteurs", "Transporteur")
+    TransporteurLog = apps.get_model("transporteurs", "TransporteurLog")
     previous_transporteur_log = None
 
-    for transporteur_log in TransporteurLog.objects.order_by('transporteur_id', 'created_at'):
-        if previous_transporteur_log is None or \
-            transporteur_log.transporteur_id != previous_transporteur_log.transporteur_id:
+    for transporteur_log in TransporteurLog.objects.order_by(
+        "transporteur_id", "created_at"
+    ):
+        if (
+            previous_transporteur_log is None
+            or transporteur_log.transporteur_id
+            != previous_transporteur_log.transporteur_id
+        ):
 
             if previous_transporteur_log is None:
                 previous_transporteur_log = transporteur_log
                 continue
 
             # Create a new entry with current values for previous carrier
-            transporteur = Transporteur.objects.get(siret=previous_transporteur_log.transporteur_id)
+            transporteur = Transporteur.objects.get(
+                siret=previous_transporteur_log.transporteur_id
+            )
             new_data = {
-                k: str(getattr(transporteur, k)) if k == 'telephone' else getattr(transporteur, k) for k in previous_transporteur_log.data.keys()
+                k: str(getattr(transporteur, k))
+                if k == "telephone"
+                else getattr(transporteur, k)
+                for k in previous_transporteur_log.data.keys()
             }
             new_transporteur_log = TransporteurLog.objects.create(
-                transporteur=previous_transporteur_log.transporteur,
-                data=new_data
+                transporteur=previous_transporteur_log.transporteur, data=new_data
             )
             # Workaround auto_now_add that blocks setting of created_at in create()
-            new_transporteur_log.created_at = previous_transporteur_log.created_at + datetime.timedelta(milliseconds=0.001)
+            new_transporteur_log.created_at = (
+                previous_transporteur_log.created_at
+                + datetime.timedelta(milliseconds=0.001)
+            )
             new_transporteur_log.save()
         else:
             # Shift created_at to previous
@@ -38,10 +51,6 @@ def rewrite_transporteur_log(apps, _schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0020_auto_20181015_1753'),
-    ]
+    dependencies = [("transporteurs", "0020_auto_20181015_1753")]
 
-    operations = [
-        migrations.RunPython(rewrite_transporteur_log)
-    ]
+    operations = [migrations.RunPython(rewrite_transporteur_log)]

@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0001_initial'),
-    ]
+    dependencies = [("transporteurs", "0001_initial")]
 
     operations = [
         migrations.AddField(
-            model_name='transporteur',
-            name='email_confirmed_at',
+            model_name="transporteur",
+            name="email_confirmed_at",
             field=models.DateTimeField(blank=True, null=True),
-        ),
+        )
     ]

@@ -3,21 +3,17 @@ USE_DEBUG_CONSOLE = True
 USE_SENTRY = False
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'circleci_test',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "circleci_test",
+        "HOST": "127.0.0.1",
+        "PORT": "5432",
         # For logs
-        'OPTIONS': {
-            'application_name': 'adock'
-        },
+        "OPTIONS": {"application_name": "adock"},
     }
 }
 
 EMAIL_PORT = 1025
 
-ADMINS = (
-    (u"Name", 'test@example.com'),
-)
+ADMINS = ((u"Name", "test@example.com"),)
 MANAGERS = ADMINS

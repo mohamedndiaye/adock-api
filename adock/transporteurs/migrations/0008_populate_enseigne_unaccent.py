@@ -5,10 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0007_transporteur_enseigne_unaccent'),
-    ]
+    dependencies = [("transporteurs", "0007_transporteur_enseigne_unaccent")]
 
     operations = [
-        migrations.RunSQL("UPDATE transporteur SET enseigne_unaccent = UNACCENT(enseigne);")
+        migrations.RunSQL(
+            "UPDATE transporteur SET enseigne_unaccent = UNACCENT(enseigne);"
+        )
     ]

@@ -11,6 +11,7 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
     """
     An edit code (sent by mail) is required to be allowed to edit a locked transporteur.
     """
+
     def setUp(self):
         self.transporteur = factories.TransporteurFactory(
             email_confirmed_at=timezone.now()
@@ -42,37 +43,26 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
         self.transporteur.email_confirmed_at = None
         self.transporteur.save()
         url = reverse(
-            'transporteurs_envoyer_code',
-            kwargs={
-                'transporteur_siret': self.transporteur.siret
-            }
+            "transporteurs_envoyer_code",
+            kwargs={"transporteur_siret": self.transporteur.siret},
         )
         response = self.client.get(url)
         data = response.json()
         self.assertEqual(response.status_code, 409)
-        self.assertEqual(
-            data['message'],
-            "L'adresse électronique n'est pas confirmée."
-        )
+        self.assertEqual(data["message"], "L'adresse électronique n'est pas confirmée.")
 
     def test_send_edit_code(self):
         url = reverse(
-            'transporteurs_envoyer_code',
-            kwargs={
-                'transporteur_siret': self.transporteur.siret
-            }
+            "transporteurs_envoyer_code",
+            kwargs={"transporteur_siret": self.transporteur.siret},
         )
         response = self.client.get(url)
         data = response.json()
         self.assertEqual(response.status_code, 201)
         self.assertEqual(
-            data['message'],
-            "Un code de modification a été envoyé par courriel."
+            data["message"], "Un code de modification a été envoyé par courriel."
         )
-        self.assertEqual(
-            data['email'],
-            self.transporteur.email
-        )
+        self.assertEqual(data["email"], self.transporteur.email)
         self.transporteur.refresh_from_db()
         edit_code = self.transporteur.edit_code
         self.assertEqual(len(str(edit_code)), 6)
@@ -81,55 +71,44 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
         data = response.json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            data['message'],
-            "Le précédent code de modification envoyé est toujours valide."
+            data["message"],
+            "Le précédent code de modification envoyé est toujours valide.",
         )
         self.transporteur.refresh_from_db()
         self.assertEqual(self.transporteur.edit_code, edit_code)
 
     def test_patch_locked(self):
         self.detail_url = reverse(
-            'transporteurs_detail',
-            kwargs={'transporteur_siret': self.transporteur.siret}
+            "transporteurs_detail",
+            kwargs={"transporteur_siret": self.transporteur.siret},
         )
 
         self.transporteur.set_edit_code()
         self.transporteur.save()
 
         data = self.patch_transporteur(
-            {
-                'telephone': '0102030405',
-                'working_area_departements': '44',
-            },
-            400
+            {"telephone": "0102030405", "working_area_departements": "44"}, 400
         )
         self.assertEqual(
-            data['edit_code'][0],
-            "Le code de modification n'est pas valide."
+            data["edit_code"][0], "Le code de modification n'est pas valide."
         )
 
         self.patch_transporteur(
             {
-                'telephone': '0102030405',
-                'working_area_departements': '44',
-                'edit_code': self.transporteur.edit_code
+                "telephone": "0102030405",
+                "working_area_departements": "44",
+                "edit_code": self.transporteur.edit_code,
             },
-            200
+            200,
         )
 
     def test_patch_with_useless_edit_code(self):
         self.detail_url = reverse(
-            'transporteurs_detail',
-            kwargs={'transporteur_siret': self.transporteur.siret}
+            "transporteurs_detail",
+            kwargs={"transporteur_siret": self.transporteur.siret},
         )
 
-        self.patch_transporteur(
-            {
-                'telephone': '0102030405',
-                'edit_code': '666666',
-            },
-            400
-        )
+        self.patch_transporteur({"telephone": "0102030405", "edit_code": "666666"}, 400)
 
     def test_patch_email_reset_edit_code(self):
         self.transporteur.email_confirmed_at = timezone.now()
@@ -137,16 +116,16 @@ class TransporteurEditCodeTestCase(test.TransporteurTestCase):
         self.transporteur.save()
 
         self.detail_url = reverse(
-            'transporteurs_detail',
-            kwargs={'transporteur_siret': self.transporteur.siret}
+            "transporteurs_detail",
+            kwargs={"transporteur_siret": self.transporteur.siret},
         )
         self.patch_transporteur(
             {
-                'telephone': '0102030405',
-                'email': 'foo@example.com',
-                'edit_code': self.transporteur.edit_code
+                "telephone": "0102030405",
+                "email": "foo@example.com",
+                "edit_code": self.transporteur.edit_code,
             },
-            200
+            200,
         )
         self.transporteur.refresh_from_db()
 

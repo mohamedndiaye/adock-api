@@ -27,10 +27,15 @@ L'équipe A Dock
         website=settings.WEBSITE,
         siret=transporteur.siret,
         email=transporteur.email,
-        token=token
+        token=token,
     )
-    recipient_list = settings.MANAGERS if settings.PREPRODUCTION else (transporteur.email,)
-    send_mail(subject, message, settings.SERVER_EMAIL, recipient_list, fail_silently=True)
+    recipient_list = (
+        settings.MANAGERS if settings.PREPRODUCTION else (transporteur.email,)
+    )
+    send_mail(
+        subject, message, settings.SERVER_EMAIL, recipient_list, fail_silently=True
+    )
+
 
 def mail_managers_changes(transporteur, old_data_changed, scheme):
     # Send a mail to managers to track changes
@@ -51,11 +56,10 @@ Valeurs modifiées :
 
     for field, old_value in old_data_changed.items():
         message += "\n- {field} : {old_value} => {new_value}".format(
-            field=field,
-            old_value=old_value,
-            new_value=getattr(transporteur, field)
+            field=field, old_value=old_value, new_value=getattr(transporteur, field)
         )
     mail_managers(subject, message, fail_silently=True)
+
 
 def mail_managers_lock(transporteur, scheme):
     subject = "Verrouillage du transporteur {0}".format(transporteur.siret)
@@ -70,9 +74,10 @@ Adresse électronique confirmée : {email}
         enseigne=transporteur.enseigne,
         siret=transporteur.siret,
         website=settings.WEBSITE,
-        email=transporteur.email
+        email=transporteur.email,
     )
     mail_managers(subject, message, fail_silently=True)
+
 
 def mail_transporteur_edit_code(transporteur):
     subject = "A Dock - Code de modification"
@@ -87,7 +92,13 @@ L'équipe A Dock
     """.format(
         enseigne=transporteur.enseigne,
         edit_code=transporteur.edit_code,
-        max_edit_time_display=timezone.localtime(max_edit_time).strftime('%H:%M (%d/%m/%Y)')
+        max_edit_time_display=timezone.localtime(max_edit_time).strftime(
+            "%H:%M (%d/%m/%Y)"
+        ),
     )
-    recipient_list = settings.MANAGERS if settings.PREPRODUCTION else (transporteur.email,)
-    send_mail(subject, message, settings.SERVER_EMAIL, recipient_list, fail_silently=True)
+    recipient_list = (
+        settings.MANAGERS if settings.PREPRODUCTION else (transporteur.email,)
+    )
+    send_mail(
+        subject, message, settings.SERVER_EMAIL, recipient_list, fail_silently=True
+    )

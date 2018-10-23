@@ -7,14 +7,14 @@ class SubscriptionForm(forms.ModelForm):
     class Meta:
         model = Transporteur
         fields = [
-            'email',
-            'telephone',
-            'working_area',
-            'working_area_departements',
-            'specialities',
-            'website',
-            'description',
-            'edit_code'
+            "email",
+            "telephone",
+            "working_area",
+            "working_area_departements",
+            "specialities",
+            "website",
+            "description",
+            "edit_code",
         ]
 
     def __init__(self, data, transporteur):
@@ -23,7 +23,7 @@ class SubscriptionForm(forms.ModelForm):
 
     def clean_telephone(self):
         """Should be submitted or present in instance"""
-        telephone = self.cleaned_data.get('telephone') or self.transporteur.telephone
+        telephone = self.cleaned_data.get("telephone") or self.transporteur.telephone
         if not telephone:
             raise forms.ValidationError("Ce champ est obligatoire.")
 
@@ -32,15 +32,15 @@ class SubscriptionForm(forms.ModelForm):
     def clean_working_area_departements(self):
         """Pads departement numbers lesser than 10 with a zero"""
         formated_departements = []
-        departements = self.cleaned_data.get('working_area_departements')
+        departements = self.cleaned_data.get("working_area_departements")
         for departement in departements:
-            formated_departements.append('{:0>2}'.format(departement))
+            formated_departements.append("{:0>2}".format(departement))
         # Unique and sorted
         return sorted(set(formated_departements))
 
     def clean_edit_code(self):
         # Access control to locked transporteur
-        edit_code = self.cleaned_data.get('edit_code')
+        edit_code = self.cleaned_data.get("edit_code")
         if not self.transporteur.check_edit_code(edit_code):
             raise forms.ValidationError("Le code de modification n'est pas valide.")
 
@@ -48,9 +48,12 @@ class SubscriptionForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if (cleaned_data.get('working_area') == WORKING_AREA_DEPARTEMENT and
-                not cleaned_data.get('working_area_departements', [])):
+        if cleaned_data.get(
+            "working_area"
+        ) == WORKING_AREA_DEPARTEMENT and not cleaned_data.get(
+            "working_area_departements", []
+        ):
             self.add_error(
-                'working_area_departements',
-                "Des départements doivent être renseignés quand l'aire de travail est départementale."
+                "working_area_departements",
+                "Des départements doivent être renseignés quand l'aire de travail est départementale.",
             )

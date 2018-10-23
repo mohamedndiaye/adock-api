@@ -7,9 +7,8 @@ from .. import factories
 
 
 class PreproductionTestCase(TestCase):
-
     def get_mail_transporteur_to_confirm_email(self, transporteur):
-        mails.mail_transporteur_to_confirm_email(transporteur, 'http')
+        mails.mail_transporteur_to_confirm_email(transporteur, "http")
         self.assertEqual(len(mail.outbox), 1)
         return mail.outbox[0]
 

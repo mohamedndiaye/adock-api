@@ -5,13 +5,13 @@ from django.db import migrations
 
 
 def fix_transporteur_log_json(apps, _schema_editor):
-    TransporteurLog = apps.get_model('transporteurs', 'TransporteurLog')
+    TransporteurLog = apps.get_model("transporteurs", "TransporteurLog")
     for transporteur_log in TransporteurLog.objects.all():
         cleaned_data = {}
         for k, v in transporteur_log.data.items():
-            if v != '' and v[0] == '[':
+            if v != "" and v[0] == "[":
                 v = ast.literal_eval(v)
-            elif v == 'None':
+            elif v == "None":
                 v = None
 
             cleaned_data[k] = v
@@ -19,12 +19,9 @@ def fix_transporteur_log_json(apps, _schema_editor):
         transporteur_log.data = cleaned_data
         transporteur_log.save()
 
+
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0019_auto_20181005_1610'),
-    ]
+    dependencies = [("transporteurs", "0019_auto_20181005_1610")]
 
-    operations = [
-        migrations.RunPython(fix_transporteur_log_json)
-    ]
+    operations = [migrations.RunPython(fix_transporteur_log_json)]

@@ -5,13 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0004_pg_trgm_extension'),
-    ]
+    dependencies = [("transporteurs", "0004_pg_trgm_extension")]
 
     operations = [
         migrations.RunSQL(
             "CREATE INDEX IF NOT EXISTS transporteur_search_trgm_enseigne ON transporteur USING GIN (enseigne GIN_TRGM_OPS);"
         )
     ]
-

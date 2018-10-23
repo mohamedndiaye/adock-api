@@ -18,32 +18,32 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Filename are composed of the year and day of year so they are sortable
         feeds = transporteurs_models.TransporteurFeed.objects.filter(
-            source='sirene', applied_at=None).order_by('filename')
+            source="sirene", applied_at=None
+        ).order_by("filename")
         for feed in feeds:
             with tempfile.TemporaryDirectory() as tmp_dirname:
                 zip_filename = os.path.join(settings.DATAFILES_ROOT, feed.filename.name)
-                with zipfile.ZipFile(zip_filename, 'r') as zf:
+                with zipfile.ZipFile(zip_filename, "r") as zf:
                     zf.extractall(tmp_dirname)
 
                 # List CSV files
                 self.stdout.write("%s - %s" % (feed.title, feed.filename.name))
-                for filename in glob(tmp_dirname + '/*.csv'):
+                for filename in glob(tmp_dirname + "/*.csv"):
                     # Call SQL script on it...
                     sed_ps = subprocess.Popen(
                         [
-                            'sed',
-                            's:FILENAMEPLACEHOLDER:' + filename + ':g',
-                            os.path.join(settings.BASE_DIR, 'scripts', 'update-sirene.sql')
+                            "sed",
+                            "s:FILENAMEPLACEHOLDER:" + filename + ":g",
+                            os.path.join(
+                                settings.BASE_DIR, "scripts", "update-sirene.sql"
+                            ),
                         ],
                         stdout=subprocess.PIPE,
                     )
                     psql_ps = subprocess.Popen(
-                        [
-                            'psql',
-                            settings.DATABASES['default']['NAME']
-                        ],
+                        ["psql", settings.DATABASES["default"]["NAME"]],
                         stdin=sed_ps.stdout,
-                        stdout=subprocess.PIPE
+                        stdout=subprocess.PIPE,
                     )
                     # Allow sed_ps to receive SIGPIPE if psql_ps exits.
                     sed_ps.stdout.close()
@@ -53,14 +53,22 @@ class Command(BaseCommand):
                         rc = psql_ps.wait(timeout=60 * 60)
                     except subprocess.TimeoutExpired:
                         self.stderr.write(
-                            self.style.ERROR("Timeout on running of '%s'" % filename))
+                            self.style.ERROR("Timeout on running of '%s'" % filename)
+                        )
                         sys.exit(1)
 
                     if rc == 0:
                         feed.applied_at = timezone.now()
                         feed.save()
                         self.stdout.write(
-                            self.style.SUCCESS("Filename '%s' imported with success." % filename))
+                            self.style.SUCCESS(
+                                "Filename '%s' imported with success." % filename
+                            )
+                        )
                     else:
                         self.stderr.write(
-                            self.style.ERROR("Failed to run 'update-sirene.sql' with the CSV file '%s'." % filename))
+                            self.style.ERROR(
+                                "Failed to run 'update-sirene.sql' with the CSV file '%s'."
+                                % filename
+                            )
+                        )

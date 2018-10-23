@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class MetaConfig(AppConfig):
-    name = 'adock.meta'
+    name = "adock.meta"

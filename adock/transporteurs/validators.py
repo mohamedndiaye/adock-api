@@ -5,10 +5,11 @@ SIREN_LENGTH = 9
 NIC_LENGTH = 5
 SIRET_LENGTH = SIREN_LENGTH + NIC_LENGTH
 
-RE_NOT_DIGIT_ONLY = re.compile(r'\D')
+RE_NOT_DIGIT_ONLY = re.compile(r"\D")
+
 
 def is_french_departement(departement):
-    if departement in ('2A', '2B'):
+    if departement in ("2A", "2B"):
         return True
 
     try:
@@ -29,10 +30,11 @@ def is_french_departement(departement):
 
     return False
 
+
 def validate_french_departement(departements):
     for departement in departements:
         if not is_french_departement(departement):
             raise ValidationError(
                 "« %(value)s » n'est pas un département français valide.",
-                params={'value': departement}
+                params={"value": departement},
             )

@@ -5,14 +5,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0013_better_working_area_departements'),
-    ]
+    dependencies = [("transporteurs", "0013_better_working_area_departements")]
 
     operations = [
         migrations.AddField(
-            model_name='transporteur',
-            name='objectif_co2',
-            field=models.CharField(blank=True, choices=[('ENLISTED', 'Engagé'), ('LABELLED', 'Labellisé')], default='', max_length=8),
-        ),
+            model_name="transporteur",
+            name="objectif_co2",
+            field=models.CharField(
+                blank=True,
+                choices=[("ENLISTED", "Engagé"), ("LABELLED", "Labellisé")],
+                default="",
+                max_length=8,
+            ),
+        )
     ]

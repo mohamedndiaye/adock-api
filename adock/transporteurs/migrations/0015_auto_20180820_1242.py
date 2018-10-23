@@ -5,19 +5,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0014_transporteur_objectif_co2'),
-    ]
+    dependencies = [("transporteurs", "0014_transporteur_objectif_co2")]
 
     operations = [
         migrations.AddField(
-            model_name='transporteur',
-            name='objectif_co2_begin',
+            model_name="transporteur",
+            name="objectif_co2_begin",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='transporteur',
-            name='objectif_co2_end',
+            model_name="transporteur",
+            name="objectif_co2_end",
             field=models.DateField(blank=True, null=True),
-        )
+        ),
     ]

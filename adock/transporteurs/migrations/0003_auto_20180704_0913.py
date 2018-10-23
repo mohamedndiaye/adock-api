@@ -5,19 +5,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0002_transporteur_email_confirmed_at'),
-    ]
+    dependencies = [("transporteurs", "0002_transporteur_email_confirmed_at")]
 
     operations = [
         migrations.AddField(
-            model_name='transporteur',
-            name='edit_code',
+            model_name="transporteur",
+            name="edit_code",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='transporteur',
-            name='edit_code_at',
+            model_name="transporteur",
+            name="edit_code_at",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

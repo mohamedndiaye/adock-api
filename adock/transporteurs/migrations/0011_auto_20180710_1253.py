@@ -5,13 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0010_drop_index_search_trgm_enseigne'),
-    ]
+    dependencies = [("transporteurs", "0010_drop_index_search_trgm_enseigne")]
 
     operations = [
         migrations.RemoveIndex(
-            model_name='transporteur',
-            name='transporteur_search_order_by',
-        ),
+            model_name="transporteur", name="transporteur_search_order_by"
+        )
     ]

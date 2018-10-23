@@ -5,14 +5,23 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0017_auto_20180913_2219'),
-    ]
+    dependencies = [("transporteurs", "0017_auto_20180913_2219")]
 
     operations = [
         migrations.AlterField(
-            model_name='transporteur',
-            name='working_area',
-            field=models.CharField(blank=True, choices=[('', 'Non définie'), ('INTERNATIONAL', 'Internationale'), ('FRANCE', 'France'), ('REGION', 'Régionale'), ('DEPARTEMENT', 'Départementale')], default='', max_length=15),
-        ),
+            model_name="transporteur",
+            name="working_area",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("", "Non définie"),
+                    ("INTERNATIONAL", "Internationale"),
+                    ("FRANCE", "France"),
+                    ("REGION", "Régionale"),
+                    ("DEPARTEMENT", "Départementale"),
+                ],
+                default="",
+                max_length=15,
+            ),
+        )
     ]

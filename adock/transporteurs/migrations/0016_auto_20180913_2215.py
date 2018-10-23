@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0015_auto_20180820_1242'),
-    ]
+    dependencies = [("transporteurs", "0015_auto_20180820_1242")]
 
     operations = [
         migrations.AlterField(
-            model_name='transporteurfeed',
-            name='filename',
-            field=models.FileField(upload_to=''),
-        ),
+            model_name="transporteurfeed",
+            name="filename",
+            field=models.FileField(upload_to=""),
+        )
     ]

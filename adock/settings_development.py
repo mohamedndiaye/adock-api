@@ -3,14 +3,10 @@ USE_DEBUG_CONSOLE = True
 USE_DJANGO_EXTENSIONS = True
 USE_SENTRY = False
 
-WEBSITE = 'localhost:8080'
-CORS_ORIGIN_WHITELIST = (
-    WEBSITE,
-)
+WEBSITE = "localhost:8080"
+CORS_ORIGIN_WHITELIST = (WEBSITE,)
 
 EMAIL_PORT = 1025
 
-ADMINS = (
-    (u"Name", 'contact@example.com'),
-)
+ADMINS = ((u"Name", "contact@example.com"),)
 MANAGERS = ADMINS

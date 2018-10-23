@@ -17,35 +17,65 @@ from . import tokens
 from . import validators
 
 TRANSPORTEUR_LIST_FIELDS = (
-    'siret', 'raison_sociale', 'enseigne', 'adresse', 'code_postal', 'ville',
-    'completeness', 'lti_nombre', 'lc_nombre', 'working_area'
+    "siret",
+    "raison_sociale",
+    "enseigne",
+    "adresse",
+    "code_postal",
+    "ville",
+    "completeness",
+    "lti_nombre",
+    "lc_nombre",
+    "working_area",
 )
 
 TRANSPORTEUR_DETAIL_FIELDS = (
-    'siret', 'raison_sociale', 'enseigne', 'gestionnaire',
-    'adresse', 'code_postal', 'ville',
-    'telephone', 'email',
-    'debut_activite', 'code_ape', 'libelle_ape',
-    'numero_tva', 'completeness',
-    'lti_numero', 'lti_date_debut', 'lti_date_fin', 'lti_nombre',
-    'lc_numero', 'lc_date_debut', 'lc_date_fin', 'lc_nombre',
-    'working_area', 'working_area_departements',
-    'specialities', 'website', 'description',
-    'objectif_co2', 'objectif_co2_begin', 'objectif_co2_end',
-    'deleted_at', 'sirene_deleted_at',
+    "siret",
+    "raison_sociale",
+    "enseigne",
+    "gestionnaire",
+    "adresse",
+    "code_postal",
+    "ville",
+    "telephone",
+    "email",
+    "debut_activite",
+    "code_ape",
+    "libelle_ape",
+    "numero_tva",
+    "completeness",
+    "lti_numero",
+    "lti_date_debut",
+    "lti_date_fin",
+    "lti_nombre",
+    "lc_numero",
+    "lc_date_debut",
+    "lc_date_fin",
+    "lc_nombre",
+    "working_area",
+    "working_area_departements",
+    "specialities",
+    "website",
+    "description",
+    "objectif_co2",
+    "objectif_co2_begin",
+    "objectif_co2_end",
+    "deleted_at",
+    "sirene_deleted_at",
     # Boolean for real email_confirmed_at field to avoid privacy issue
-    'is_locked'
+    "is_locked",
 )
+
 
 def get_transporteur_as_json(transporteur, fields):
     transporteur_json = {}
     for field in fields:
-        if field == 'telephone' and not isinstance(transporteur.telephone, str):
+        if field == "telephone" and not isinstance(transporteur.telephone, str):
             # Exception for PhoneNumberField
-            value = '0' + transporteur.telephone.format_as(
+            value = "0" + transporteur.telephone.format_as(
                 settings.PHONENUMBER_DEFAULT_REGION
             )
-        elif field == 'is_locked':
+        elif field == "is_locked":
             value = bool(transporteur.email_confirmed_at)
         else:
             value = getattr(transporteur, field)
@@ -53,33 +83,42 @@ def get_transporteur_as_json(transporteur, fields):
         transporteur_json[field] = value
     return transporteur_json
 
+
 def get_transporteur_subsidiaries_as_json(transporteur):
     subsidiaries = (
-        models.Transporteur.objects
-        .filter(siret__startswith=transporteur.siret[:validators.SIREN_LENGTH])
+        models.Transporteur.objects.filter(
+            siret__startswith=transporteur.siret[: validators.SIREN_LENGTH]
+        )
         .exclude(pk=transporteur.pk)
-        .values('siret', 'code_postal', 'ville', 'debut_activite', 'is_siege', 'deleted_at')
+        .values(
+            "siret", "code_postal", "ville", "debut_activite", "is_siege", "deleted_at"
+        )
     )
     return list(subsidiaries)
+
 
 def search(request):
     """The search allows to filter on:
        - partial enseigne or SIRET
        - type of the license (LC heavy or LTI light)
     """
-    transporteurs = models.Transporteur.objects.filter(deleted_at=None, sirene_deleted_at=None)
-    q = request.GET.get('q')
+    transporteurs = models.Transporteur.objects.filter(
+        deleted_at=None, sirene_deleted_at=None
+    )
+    q = request.GET.get("q")
     if q:
         # Filtering on enseigne or SIRET
         q = q.upper()
-        criteria_list = q.split(',')
+        criteria_list = q.split(",")
         for criteria in criteria_list:
             criteria = criteria.strip()
             if validators.RE_NOT_DIGIT_ONLY.search(criteria):
                 # Dynamic unaccent is too slow (237x slower!) so we created a dedicated field
                 # in DB and use raw SQL too avoid useless replaces added by the ORM.
                 # The search criteria contains at least one not digit character so search on name
-                transporteurs = transporteurs.filter(enseigne_unaccent__ucontains=criteria)
+                transporteurs = transporteurs.filter(
+                    enseigne_unaccent__ucontains=criteria
+                )
             else:
                 # criteria contains only digits
                 if len(criteria) > 5:
@@ -93,41 +132,47 @@ def search(request):
                     # better to compare against enseigne_unaccent to reduce the
                     # number of DB indexes.
                     transporteurs = transporteurs.filter(
-                        Q(code_postal__startswith=criteria) |
-                        Q(enseigne_unaccent__contains=criteria)
+                        Q(code_postal__startswith=criteria)
+                        | Q(enseigne_unaccent__contains=criteria)
                     )
 
     # Filtering on type of license
-    license_types = request.GET.getlist('licence-types[]')
+    license_types = request.GET.getlist("licence-types[]")
     for license_type in license_types:
-        if license_type == 'lc':
-            transporteurs = transporteurs.exclude(lc_numero='')
-        elif license_type == 'lti':
-            transporteurs = transporteurs.exclude(lti_numero='')
+        if license_type == "lc":
+            transporteurs = transporteurs.exclude(lc_numero="")
+        elif license_type == "lti":
+            transporteurs = transporteurs.exclude(lti_numero="")
 
     # Filtering on departements
     departements = []
-    for field in ('departement-depart', 'departement-arrivee'):
+    for field in ("departement-depart", "departement-arrivee"):
         departement = request.GET.get(field)
         if departement:
             if validators.is_french_departement(departement):
                 departements.append(departement)
             else:
-                message = "Le numéro de département français « %s » n'est pas valide." % request.GET.get(field)
-                return JsonResponse({'message': message}, status=400)
+                message = (
+                    "Le numéro de département français « %s » n'est pas valide."
+                    % request.GET.get(field)
+                )
+                return JsonResponse({"message": message}, status=400)
 
     if departements:
         transporteurs = transporteurs.filter(
-            Q(working_area=models.WORKING_AREA_INTERNATIONAL) |
-            Q(working_area=models.WORKING_AREA_FRANCE) |
-            Q(
-                working_area__in=(models.WORKING_AREA_DEPARTEMENT, models.WORKING_AREA_REGION),
-                working_area_departements__contains=departements
+            Q(working_area=models.WORKING_AREA_INTERNATIONAL)
+            | Q(working_area=models.WORKING_AREA_FRANCE)
+            | Q(
+                working_area__in=(
+                    models.WORKING_AREA_DEPARTEMENT,
+                    models.WORKING_AREA_REGION,
+                ),
+                working_area_departements__contains=departements,
             )
         )
 
     # Filtering on specialities
-    specialities = request.GET.getlist('specialities[]')
+    specialities = request.GET.getlist("specialities[]")
     if specialities:
         transporteurs = transporteurs.filter(specialities__contains=specialities)
 
@@ -135,50 +180,44 @@ def search(request):
 
     # Raw SQL is more simple here than Case, When, etc
     order_departement_counter = OrderBy(
-        RawSQL("""
+        RawSQL(
+            """
             CASE working_area
             WHEN 'DEPARTEMENT' THEN array_length(working_area_departements, 1)
             WHEN 'REGION' THEN array_length(working_area_departements, 1)
             WHEN 'FRANCE' THEN 101
             WHEN 'INTERNATIONAL' THEN 102
             END
-        """, ()),
-        nulls_last=True
+        """,
+            (),
+        ),
+        nulls_last=True,
     )
 
-    order_by_list = [
-        order_departement_counter,
-    ]
+    order_by_list = [order_departement_counter]
 
     # By departement of the company if relevant
     if departements:
         order_departement_company = RawSQL(
-            "CASE WHEN departement IN (%s) THEN 1 ELSE 2 END",
-            (','.join(departements),)
+            "CASE WHEN departement IN (%s) THEN 1 ELSE 2 END", (",".join(departements),)
         )
         order_by_list.append(order_departement_company)
 
     # By completeness and enseigne
-    order_by_list.extend((
-        '-completeness',
-        'enseigne'
-    ))
-    transporteurs = (
-        transporteurs
-        .order_by(*order_by_list)
-        .values(*TRANSPORTEUR_LIST_FIELDS)
-        [:settings.TRANSPORTEURS_LIMIT]
-    )
+    order_by_list.extend(("-completeness", "enseigne"))
+    transporteurs = transporteurs.order_by(*order_by_list).values(
+        *TRANSPORTEUR_LIST_FIELDS
+    )[: settings.TRANSPORTEURS_LIMIT]
 
-    payload = {
-        'results': list(transporteurs)
-    }
-    if len(payload['results']) == settings.TRANSPORTEURS_LIMIT:
-        payload['limit'] = settings.TRANSPORTEURS_LIMIT
+    payload = {"results": list(transporteurs)}
+    if len(payload["results"]) == settings.TRANSPORTEURS_LIMIT:
+        payload["limit"] = settings.TRANSPORTEURS_LIMIT
     return JsonResponse(payload)
 
+
 def get_transporteur_value_for_json(k, v):
-    return str(v) if k == 'telephone' else v
+    return str(v) if k == "telephone" else v
+
 
 def get_transporteur_changes(transporteur, cleaned_payload):
     old_data_changed = {}
@@ -189,20 +228,28 @@ def get_transporteur_changes(transporteur, cleaned_payload):
 
     return old_data_changed
 
+
 def add_transporteur_log(transporteur, old_data_changed, cleaned_payload):
     """
     Add an entry to transporteur log. Take care to create an initial entry
     with old data when no entries exist yet.
     """
     if not models.TransporteurLog.objects.filter(transporteur=transporteur).exists():
-        models.TransporteurLog.objects.create(transporteur=transporteur, data=old_data_changed)
+        models.TransporteurLog.objects.create(
+            transporteur=transporteur, data=old_data_changed
+        )
 
     new_data_changed = {
-        k: get_transporteur_value_for_json(k, cleaned_payload[k]) for k in old_data_changed.keys()
+        k: get_transporteur_value_for_json(k, cleaned_payload[k])
+        for k in old_data_changed.keys()
     }
-    models.TransporteurLog.objects.create(transporteur=transporteur, data=new_data_changed)
+    models.TransporteurLog.objects.create(
+        transporteur=transporteur, data=new_data_changed
+    )
 
-RE_MANY_COMMAS = re.compile(r',+')
+
+RE_MANY_COMMAS = re.compile(r",+")
+
 
 @csrf_exempt
 def transporteur_detail(request, transporteur_siret):
@@ -211,19 +258,18 @@ def transporteur_detail(request, transporteur_siret):
     # Get existing transporteur if any
     transporteur = get_object_or_404(models.Transporteur, siret=transporteur_siret)
 
-    if request.method == 'PATCH':
-        if not request.content_type == 'application/json':
+    if request.method == "PATCH":
+        if not request.content_type == "application/json":
             return JsonResponse(
-                {'message': 'Seules les requêtes PATCH en JSON sont prises en charge.'},
-                status=400
+                {"message": "Seules les requêtes PATCH en JSON sont prises en charge."},
+                status=400,
             )
 
         try:
-            payload = json.loads(request.body.decode('utf-8'))
+            payload = json.loads(request.body.decode("utf-8"))
         except json.decoder.JSONDecodeError:
             return JsonResponse(
-                {'message': "Les données ne sont pas valides."},
-                status=400
+                {"message": "Les données ne sont pas valides."}, status=400
             )
 
         # Form is not bound to the transporteur instance but we need it to check edit code
@@ -232,15 +278,17 @@ def transporteur_detail(request, transporteur_siret):
             return JsonResponse(form.errors, status=400)
 
         # Exclude edit code from changes if not up to you to define it!
-        form.cleaned_data.pop('edit_code')
+        form.cleaned_data.pop("edit_code")
 
         # Limit cleaned_data to the keys of the payload but only accept keys of cleaned_data (intersection)
         # to only update the submitted values
-        cleaned_payload = {k: form.cleaned_data[k] for k in payload.keys() if k in form.cleaned_data}
+        cleaned_payload = {
+            k: form.cleaned_data[k] for k in payload.keys() if k in form.cleaned_data
+        }
 
         # Only set in PATCH request
         confirmation_email_to_send = False
-        scheme = 'https' if request.is_secure() else 'http'
+        scheme = "https" if request.is_secure() else "http"
 
         # Special case when the user validates (first time) the already known email address
         if transporteur.validated_at is None and transporteur.email:
@@ -258,20 +306,19 @@ def transporteur_detail(request, transporteur_siret):
 
             with transaction.atomic(savepoint=False):
                 transporteur.validated_at = timezone.now()
-                updated_fields.append('validated_at')
+                updated_fields.append("validated_at")
 
-                if 'email' in updated_fields:
+                if "email" in updated_fields:
                     # New email should invalidate email confirmation and edit code
                     transporteur.email_confirmed_at = None
                     transporteur.edit_code = None
                     transporteur.edit_code_at = None
-                    updated_fields.extend(['email_confirmed_at', 'edit_code', 'edit_code_at'])
+                    updated_fields.extend(
+                        ["email_confirmed_at", "edit_code", "edit_code_at"]
+                    )
                     confirmation_email_to_send = True
 
-                transporteur.save(
-                    force_update=True,
-                    update_fields=updated_fields
-                )
+                transporteur.save(force_update=True, update_fields=updated_fields)
                 add_transporteur_log(transporteur, old_data_changed, cleaned_payload)
 
             mails.mail_managers_changes(transporteur, old_data_changed, scheme)
@@ -279,12 +326,17 @@ def transporteur_detail(request, transporteur_siret):
         if confirmation_email_to_send:
             mails.mail_transporteur_to_confirm_email(transporteur, scheme)
 
-        response_json['confirmation_email_sent'] = confirmation_email_to_send
+        response_json["confirmation_email_sent"] = confirmation_email_to_send
 
-    transporteur_json = get_transporteur_as_json(transporteur, TRANSPORTEUR_DETAIL_FIELDS)
-    transporteur_json['subsidiaries'] = get_transporteur_subsidiaries_as_json(transporteur)
-    response_json['transporteur'] = transporteur_json
+    transporteur_json = get_transporteur_as_json(
+        transporteur, TRANSPORTEUR_DETAIL_FIELDS
+    )
+    transporteur_json["subsidiaries"] = get_transporteur_subsidiaries_as_json(
+        transporteur
+    )
+    response_json["transporteur"] = transporteur_json
     return JsonResponse(response_json)
+
 
 def transporteur_confirm_email(request, transporteur_siret, token):
     try:
@@ -292,18 +344,17 @@ def transporteur_confirm_email(request, transporteur_siret, token):
     except models.Transporteur.DoesNotExist:
         transporteur = None
 
-    if transporteur and tokens.email_confirmation_token.check_token(transporteur, token):
+    if transporteur and tokens.email_confirmation_token.check_token(
+        transporteur, token
+    ):
         transporteur.lock()
         transporteur.save()
-        scheme = 'https' if request.is_secure() else 'http'
+        scheme = "https" if request.is_secure() else "http"
         mails.mail_managers_lock(transporteur, scheme)
-        return JsonResponse(
-            {'message': "L'adresse électronique est confirmée."}
-        )
+        return JsonResponse({"message": "L'adresse électronique est confirmée."})
 
     return JsonResponse(
-        {'message': "Impossible de confirmer l'adresse électronique."},
-        status=400
+        {"message": "Impossible de confirmer l'adresse électronique."}, status=400
     )
 
 
@@ -312,8 +363,7 @@ def transporteur_send_edit_code(request, transporteur_siret):
 
     if not transporteur.is_locked():
         return JsonResponse(
-            {'message': "L'adresse électronique n'est pas confirmée."},
-            status=409
+            {"message": "L'adresse électronique n'est pas confirmée."}, status=409
         )
 
     if transporteur.edit_code_has_expired():
@@ -328,24 +378,30 @@ def transporteur_send_edit_code(request, transporteur_siret):
 
     return JsonResponse(
         {
-            'message': message,
-            'email': transporteur.email,
-            'edit_code_at': transporteur.edit_code_at,
-            'edit_code_timeout_at': transporteur.get_edit_code_timeout_at()
+            "message": message,
+            "email": transporteur.email,
+            "edit_code_at": transporteur.edit_code_at,
+            "edit_code_timeout_at": transporteur.get_edit_code_timeout_at(),
         },
-        status=status
+        status=status,
     )
+
 
 def get_stats(request):
     # Counters (total)
-    validated_carriers = models.Transporteur.objects.filter(validated_at__isnull=False).count()
-    locked_carriers = models.Transporteur.objects.filter(email_confirmed_at__isnull=False).count()
+    validated_carriers = models.Transporteur.objects.filter(
+        validated_at__isnull=False
+    ).count()
+    locked_carriers = models.Transporteur.objects.filter(
+        email_confirmed_at__isnull=False
+    ).count()
 
     validated_carriers_per_month = []
     with connection.cursor() as cursor:
         # Collect the number of validated sheets by month for the last 6 months
         # A bit slow, 18ms...
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 gs.generated_month::date,
                 count(t.siret)
@@ -359,19 +415,17 @@ def get_stats(request):
                     ON t.validated_at is not null AND
                         date_trunc('month', t.validated_at) = generated_month
             GROUP BY generated_month
-            ORDER BY generated_month""")
+            ORDER BY generated_month"""
+        )
         for row in cursor.fetchall():
-            validated_carriers_per_month.append(
-                {
-                    'month': row[0],
-                    'count': row[1]
-                }
-            )
+            validated_carriers_per_month.append({"month": row[0], "count": row[1]})
 
-    return JsonResponse({
-        # Total
-        'validated_carriers': validated_carriers,
-        'locked_carriers': locked_carriers,
-        # Only for the recent period (6 months)
-        'validated_carriers_per_month': validated_carriers_per_month,
-    })
+    return JsonResponse(
+        {
+            # Total
+            "validated_carriers": validated_carriers,
+            "locked_carriers": locked_carriers,
+            # Only for the recent period (6 months)
+            "validated_carriers_per_month": validated_carriers_per_month,
+        }
+    )

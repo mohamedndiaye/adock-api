@@ -5,9 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0008_populate_enseigne_unaccent'),
-    ]
+    dependencies = [("transporteurs", "0008_populate_enseigne_unaccent")]
 
     operations = [
         migrations.RunSQL(

@@ -5,10 +5,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0009_index_enseigne_unaccent'),
-    ]
+    dependencies = [("transporteurs", "0009_index_enseigne_unaccent")]
 
-    operations = [
-        migrations.RunSQL('DROP INDEX transporteur_search_trgm_enseigne;')
-    ]
+    operations = [migrations.RunSQL("DROP INDEX transporteur_search_trgm_enseigne;")]

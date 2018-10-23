@@ -5,23 +5,26 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0016_auto_20180913_2215'),
-    ]
+    dependencies = [("transporteurs", "0016_auto_20180913_2215")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='transporteur',
-            name='in_sirene',
-        ),
+        migrations.RemoveField(model_name="transporteur", name="in_sirene"),
         migrations.AddField(
-            model_name='transporteur',
-            name='sirene_deleted_at',
-            field=models.DateTimeField(blank=True, help_text="Date de la suppression de l'établissement de la base Sirène.", null=True),
+            model_name="transporteur",
+            name="sirene_deleted_at",
+            field=models.DateTimeField(
+                blank=True,
+                help_text="Date de la suppression de l'établissement de la base Sirène.",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='transporteur',
-            name='deleted_at',
-            field=models.DateTimeField(blank=True, help_text="Date de la supression de l'établissement du registre des transports.", null=True),
+            model_name="transporteur",
+            name="deleted_at",
+            field=models.DateTimeField(
+                blank=True,
+                help_text="Date de la supression de l'établissement du registre des transports.",
+                null=True,
+            ),
         ),
     ]

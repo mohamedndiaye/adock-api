@@ -3,12 +3,9 @@
 from django.db import migrations
 from django.contrib.postgres.operations import UnaccentExtension
 
+
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('transporteurs', '0005_search_trgm_enseigne'),
-    ]
+    dependencies = [("transporteurs", "0005_search_trgm_enseigne")]
 
-    operations = [
-        UnaccentExtension()
-    ]
+    operations = [UnaccentExtension()]
