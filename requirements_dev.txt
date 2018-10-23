@@ -1,9 +1,8 @@
--r requirements.txt
-coverage
+-r requirements_test.txt
+black
+bumpversion
 django-extensions
-factory_boy
-faker
 ipdb
+isort
 pylint
 pylint-django
-unidecode
