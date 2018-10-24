@@ -32,9 +32,7 @@ L'équipe A Dock
     recipient_list = (
         settings.MANAGERS if settings.PREPRODUCTION else (transporteur.email,)
     )
-    send_mail(
-        subject, message, settings.SERVER_EMAIL, recipient_list, fail_silently=True
-    )
+    send_mail(subject, message, settings.SERVER_EMAIL, recipient_list)
 
 
 def mail_managers_changes(transporteur, old_data_changed, scheme):
@@ -99,6 +97,4 @@ L'équipe A Dock
     recipient_list = (
         settings.MANAGERS if settings.PREPRODUCTION else (transporteur.email,)
     )
-    send_mail(
-        subject, message, settings.SERVER_EMAIL, recipient_list, fail_silently=True
-    )
+    send_mail(subject, message, settings.SERVER_EMAIL, recipient_list)

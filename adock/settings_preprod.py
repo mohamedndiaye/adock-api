@@ -11,7 +11,7 @@ DATABASES = {
     }
 }
 
-ADMINS = ((u"Stéphane Raimbault", "stephane.raimbault@webstack.fr"),)
+ADMINS = (("Stéphane Raimbault", "stephane.raimbault@webstack.fr"),)
 
 MANAGERS = ADMINS
 
