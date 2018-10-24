@@ -17,6 +17,9 @@ MANAGERS = ADMINS
 
 SERVER_NAME = "adock.webstack.fr"
 SERVER_EMAIL = "no-reply@" + SERVER_NAME
+EMAIL_SUBJECT_PREFIX = "[adock-preprod]"
+
+WEBSITE = "adock.webstack.fr"
 
 CORS_ORIGIN_WHITELIST = (SERVER_NAME,)
 ALLOWED_HOSTS = [SERVER_NAME]
