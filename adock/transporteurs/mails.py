@@ -5,6 +5,13 @@ from django.utils import timezone
 from . import tokens
 
 
+def get_recipient_list_from_env(transporteur):
+    if settings.PREPRODUCTION:
+        return (email for (name, email) in settings.MANAGERS)
+
+    return (transporteur.email,)
+
+
 def mail_transporteur_to_confirm_email(transporteur, scheme):
     if not transporteur.email:
         return
@@ -29,9 +36,7 @@ L'équipe A Dock
         email=transporteur.email,
         token=token,
     )
-    recipient_list = (
-        settings.MANAGERS if settings.PREPRODUCTION else (transporteur.email,)
-    )
+    recipient_list = get_recipient_list_from_env(transporteur)
     send_mail(subject, message, settings.SERVER_EMAIL, recipient_list)
 
 
@@ -94,7 +99,5 @@ L'équipe A Dock
             "%H:%M (%d/%m/%Y)"
         ),
     )
-    recipient_list = (
-        settings.MANAGERS if settings.PREPRODUCTION else (transporteur.email,)
-    )
+    recipient_list = get_recipient_list_from_env(transporteur)
     send_mail(subject, message, settings.SERVER_EMAIL, recipient_list)

@@ -30,7 +30,11 @@ class PreproductionTestCase(TestCase):
     def test_mail_to_transporteur_preproduction(self):
         transporteur = factories.TransporteurFactory(edit_code_at=timezone.now())
         mail_sent = self.get_mail_transporteur_to_confirm_email(transporteur)
-        self.assertEqual(mail_sent.recipients(), list(settings.MANAGERS))
+        self.assertEqual(
+            mail_sent.recipients(), [email for (name, email) in settings.MANAGERS]
+        )
         mail.outbox = []
         mail_sent = self.get_mail_transporteur_edit_code(transporteur)
-        self.assertEqual(mail_sent.recipients(), list(settings.MANAGERS))
+        self.assertEqual(
+            mail_sent.recipients(), [email for (name, email) in settings.MANAGERS]
+        )
