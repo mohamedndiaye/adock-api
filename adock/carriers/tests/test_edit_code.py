@@ -47,7 +47,7 @@ class CarrierEditCodeTestCase(test.CarrierTestCase):
         self.carrier.email_confirmed_at = None
         self.carrier.save()
         url = reverse(
-            "carriers_envoyer_code", kwargs={"carrier_siret": self.carrier.siret}
+            "carriers_send_code", kwargs={"carrier_siret": self.carrier.siret}
         )
         response = self.client.get(url)
         data = response.json()
@@ -56,7 +56,7 @@ class CarrierEditCodeTestCase(test.CarrierTestCase):
 
     def test_send_edit_code(self):
         url = reverse(
-            "carriers_envoyer_code", kwargs={"carrier_siret": self.carrier.siret}
+            "carriers_send_code", kwargs={"carrier_siret": self.carrier.siret}
         )
         response = self.client.get(url)
         data = response.json()

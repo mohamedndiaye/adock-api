@@ -7,13 +7,13 @@ urlpatterns = [
     path("stats/", views.get_stats, name="carriers_stats"),
     path("<str:carrier_siret>/", views.carrier_detail, name="carriers_detail"),
     path(
-        "<str:carrier_siret>/confirmer_adresse/<token>/",
+        "<str:carrier_siret>/confirm_email/<token>/",
         views.carrier_confirm_email,
-        name="carriers_confirmer_adresse",
+        name="carriers_confirm_email",
     ),
     path(
-        "<str:carrier_siret>/envoyer_code/",
+        "<str:carrier_siret>/send_code/",
         views.carrier_send_edit_code,
-        name="carriers_envoyer_code",
+        name="carriers_send_code",
     ),
 ]

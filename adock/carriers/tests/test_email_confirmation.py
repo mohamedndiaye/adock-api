@@ -41,7 +41,7 @@ class CarrierEmailConfirmationTestCase(test.CarrierTestCase):
         self.assertFalse(self.carrier.is_locked())
         token = tokens.email_confirmation_token.make_token(self.carrier)
         url = reverse(
-            "carriers_confirmer_adresse",
+            "carriers_confirm_email",
             kwargs={"carrier_siret": self.carrier.siret, "token": token},
         )
         response = self.client.get(url)
@@ -58,7 +58,7 @@ class CarrierEmailConfirmationTestCase(test.CarrierTestCase):
     def test_altered_token(self):
         token = tokens.email_confirmation_token.make_token(self.carrier)
         url = reverse(
-            "carriers_confirmer_adresse",
+            "carriers_confirm_email",
             kwargs={"carrier_siret": self.carrier.siret, "token": token + "z"},
         )
         response = self.client.get(url)
