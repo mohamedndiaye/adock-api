@@ -9,7 +9,7 @@ from .. import factories, models
 class CarrierSearchTestCase(TestCase):
     def setUp(self):
         super().setUp()
-        self.search_url = reverse("carriers_recherche")
+        self.search_url = reverse("carriers_search")
 
     def get_carriers(self, params=None):
         """Helper"""
