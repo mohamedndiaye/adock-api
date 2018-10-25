@@ -86,10 +86,10 @@ des commandes Django :
   cette table. En cas de succès, le téléchargement est marqué comme appliqué
   dans la base de données.
 
-- `update-transporteur.sql` met à jour la table transporteur en insérant tous
+- `update-carrier.sql` met à jour la table carrier en insérant tous
   les enregistrements de la table registre étendus si possible avec les
   informations de la base Sirene. Les transporteurs non présents dans la
-  registre sont marqués comme supprimés. La table transporteur est la table
+  registre sont marqués comme supprimés. La table carrier est la table
   socle de l'application A Dock. Elle est l'agrégation des tables `registre` et
   `sirene` et permet aux utilisateurs d'y ajouter des informations
   complémentaires (téléphone, adresse électronique, aire de travail,

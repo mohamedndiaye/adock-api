@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     "adock.accounts.apps.AccountsConfig",
     "adock.meta.apps.MetaConfig",
     "adock.selftest.apps.SelftestConfig",
-    "adock.transporteurs.apps.TransporteursConfig",
+    "adock.carriers.apps.CarriersConfig",
 ]
 
 MIDDLEWARE = [

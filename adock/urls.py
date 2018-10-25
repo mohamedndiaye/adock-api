@@ -22,7 +22,7 @@ from adock.selftest import views as selftest_views
 urlpatterns = [
     path("accounts/", include("adock.accounts.urls")),
     path("meta/", meta_views.meta_index, name="meta"),
-    path("transporteurs/", include("adock.transporteurs.urls")),
+    path("carriers/", include("adock.carriers.urls")),
 ]
 
 if settings.USE_SELFTEST:

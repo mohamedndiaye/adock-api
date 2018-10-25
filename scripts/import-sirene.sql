@@ -7,7 +7,7 @@ begin;
 
 drop table if exists sirene;
 
--- Fields copied into transporteur table are marked with the letter 'U' for 'Used'
+-- Fields copied into carrier table are marked with the letter 'U' for 'Used'
 create table sirene (
     -- U
     siren char(9),

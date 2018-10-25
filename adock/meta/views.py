@@ -5,19 +5,17 @@ from django.http import JsonResponse
 from django.views.decorators.cache import cache_page
 
 from . import models as meta_models
-from ..transporteurs import models as transporteurs_models
+from ..carriers import models as carriers_models
 
 # Exclude empty choice for working areas
 META_WORKING_AREA_CHOICES = collections.OrderedDict(
     (k, v)
-    for k, v in transporteurs_models.WORKING_AREA_CHOICES
-    if k != transporteurs_models.WORKING_AREA_UNDEFINED
+    for k, v in carriers_models.WORKING_AREA_CHOICES
+    if k != carriers_models.WORKING_AREA_UNDEFINED
 )
-META_SPECIALITY_CHOICES = collections.OrderedDict(
-    transporteurs_models.SPECIALITY_CHOICES
-)
+META_SPECIALITY_CHOICES = collections.OrderedDict(carriers_models.SPECIALITY_CHOICES)
 META_OBJECTIF_CO2_CHOICES = collections.OrderedDict(
-    transporteurs_models.OBJECTIF_CO2_CHOICES
+    carriers_models.OBJECTIF_CO2_CHOICES
 )
 
 
