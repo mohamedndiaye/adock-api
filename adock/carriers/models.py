@@ -231,6 +231,9 @@ class Carrier(models.Model):
         return bool(self.email_confirmed_at)
 
     def get_edit_code_timeout_at(self):
+        if self.edit_code_at is None:
+            return None
+
         return self.edit_code_at + settings.TRANSPORTEUR_EDIT_CODE_INTERVAL
 
     def edit_code_has_expired(self):
@@ -270,6 +273,10 @@ class Carrier(models.Model):
     def set_edit_code(self):
         self.edit_code = random.randint(100000, 999999)
         self.edit_code_at = timezone.now()
+
+    def reset_edit_code(self):
+        self.edit_code = None
+        self.edit_code_at = None
 
     def save(self, *args, **kwargs):  # pylint: disable=W0221
         self.completeness = self.compute_completeness()

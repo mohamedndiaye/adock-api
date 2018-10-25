@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+import sentry_sdk
 
 from . import forms, mails, models, tokens, validators
 
@@ -299,8 +300,7 @@ def carrier_detail(request, carrier_siret):
                 if "email" in updated_fields:
                     # New email should invalidate email confirmation and edit code
                     carrier.email_confirmed_at = None
-                    carrier.edit_code = None
-                    carrier.edit_code_at = None
+                    carrier.reset_edit_code()
                     updated_fields.extend(
                         ["email_confirmed_at", "edit_code", "edit_code_at"]
                     )
@@ -350,10 +350,17 @@ def carrier_send_edit_code(request, carrier_siret):
 
     if carrier.edit_code_has_expired():
         carrier.set_edit_code()
-        carrier.save()
-        mails.mail_carrier_edit_code(carrier)
-        message = "Un code de modification a été envoyé par courriel."
-        status = 201
+        try:
+            mails.mail_carrier_edit_code(carrier)
+        except ConnectionRefusedError as e:
+            carrier.reset_edit_code()
+            sentry_sdk.capture_exception(e)
+            message = "Impossible d'envoyer le code de modification."
+            status = 503
+        else:
+            carrier.save()
+            message = "Un code de modification a été envoyé par courriel."
+            status = 201
     else:
         message = "Le précédent code de modification envoyé est toujours valide."
         status = 200

@@ -36,6 +36,12 @@ class CarrierEditCodeTestCase(test.CarrierTestCase):
         self.assertTrue(self.carrier.is_locked())
         self.assertTrue(self.carrier.edit_code_has_expired())
 
+    def test_reset_edit_code(self):
+        self.carrier.set_edit_code()
+        self.assertIsNotNone(self.carrier.get_edit_code_timeout_at())
+        self.carrier.reset_edit_code()
+        self.assertIsNone(self.carrier.get_edit_code_timeout_at())
+
     def test_dont_send_edit_code(self):
         """Edit code shouldn't be sent to not confirmed address"""
         self.carrier.email_confirmed_at = None
