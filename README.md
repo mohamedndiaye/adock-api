@@ -126,3 +126,9 @@ Il est aussi possible de lancer les tests via Docker avec :
 ```docker-compose run web```
 
 Le projet utilise le service d'intégration continu de [CircleCI](https://circleci.com/gh/MTES-MCT/adock-api).
+
+## Versions
+
+Les numéros de version sont gérés par [bumpversion](https://github.com/peritus/bumpversion).
+Le développement s'effectue sur la branche `master` et seule la branche `prod` est déployée en production.
+
