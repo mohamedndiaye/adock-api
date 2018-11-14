@@ -3,7 +3,7 @@ from django import forms
 from .models import WORKING_AREA_DEPARTEMENT, Carrier
 
 
-class SubscriptionForm(forms.ModelForm):
+class DetailForm(forms.ModelForm):
     class Meta:
         model = Carrier
         fields = [

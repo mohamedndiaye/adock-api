@@ -262,7 +262,7 @@ def carrier_detail(request, carrier_siret):
             )
 
         # Form is not bound to the carrier instance but we need it to check edit code
-        form = forms.SubscriptionForm(payload, carrier=carrier)
+        form = forms.DetailForm(payload, carrier=carrier)
         if not form.is_valid():
             return JsonResponse(form.errors, status=400)
 
