@@ -53,7 +53,7 @@ des commandes Django :
 - `import-all.sh` créé la base de données initiale, l'ensemble des tables et
   effectue tous les imports et les mises à jour. Ce script est uniquement utile
   pour créer une base vierge pour le développement. Il nécessite d'avoir au
-  préalable téléchargé le dernier fichier *stock* Sirene et de disposer du
+  préalable téléchargé le dernier fichier _stock_ Sirene et de disposer du
   fichier CSV de la base de données GRECO.
 
 - `import-greco.sql` importe le fichier `greco.csv` contenant tous les exports
@@ -123,7 +123,7 @@ pip install -r requirements_dev.txt
 
 Il est aussi possible de lancer les tests via Docker avec :
 
-```docker-compose run web```
+`docker-compose run web`
 
 Le projet utilise le service d'intégration continu de [CircleCI](https://circleci.com/gh/MTES-MCT/adock-api).
 
@@ -132,3 +132,8 @@ Le projet utilise le service d'intégration continu de [CircleCI](https://circle
 Les numéros de version sont gérés par [bumpversion](https://github.com/peritus/bumpversion).
 Le développement s'effectue sur la branche `master` et seule la branche `prod` est déployée en production.
 
+## API
+
+L'API est décrite au format OpenAPI v3, la documentation est publiée sur
+[swaggerHub](https://app.swaggerhub.com/apis/stephaner/adock/1.0.0-oas3) et le
+fichier YAML correspondant est enregistré dans le fichier `docs/openapi.yaml`.

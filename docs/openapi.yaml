@@ -1,0 +1,608 @@
+---
+openapi: 3.0.0
+info:
+  title: API du service A Dock
+  description: |
+    Documentation de l'utilisation de l'API du service A Dock https://github.com/MTES-MCT/adock-api/.
+  contact:
+    email: contact@adock.beta.gouv.fr
+  license:
+    name: GNU Affero General Public License v3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.en.html
+  version: 1.0.0-oas3
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: https://virtserver.swaggerhub.com/stephaner/adock/1.0.0
+- url: http://virtserver.swaggerhub.com/stephaner/adock/1.0.0
+tags:
+- name: carriers
+  description: Recherche et modification des fiches transporteurs
+- name: meta
+  description: Meta données de l'application
+paths:
+  /carriers/search/:
+    get:
+      tags:
+      - carriers
+      summary: Recherche de transporteurs
+      description: |
+        Filtre les transporteurs selon différents critères métiers et classe les résultats selon l'ordre :
+          1. aire de travail la plus restreinte (départemental, France ou internationale)
+          2. nombre de départements le plus faible
+          3. siège dans la zone de recherche
+          4. niveau de complétude de la fiche
+          5. ordre alphabétique du nom d'enseigne
+
+        Le but étant de fournir en priorité des entreprises locales et spécialisées.
+      operationId: searchCarriers
+      parameters:
+      - name: q
+        in: query
+        description: critère de recherche sur les attributs d'enseigne, code postal ou SIRET du transporteur. En séparant les critères par une virgule, il est possible d'en fournir plusieurs.
+        required: false
+        style: FORM
+        explode: true
+        schema:
+          type: string
+      - name: licence-types
+        in: query
+        description: filtre sur le type de license ('lc' pour License communautaire ou 'lti' pour License de transport intérieur)
+        required: false
+        style: FORM
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - lc
+            - lti
+      - name: departement-depart
+        in: query
+        description: le département d'enlèvement de la marchandise. Le paramètre doit être un département français valide (ex. "56")
+        required: false
+        style: FORM
+        explode: true
+        schema:
+          type: string
+      - name: departement-arrivee
+        in: query
+        description: le département de livraison de la marchandise. Le paramètre doit être un département français valide (ex. "2A")
+        required: false
+        style: FORM
+        explode: true
+        schema:
+          type: string
+      - name: specialities
+        in: query
+        description: filtre sur les transporteurs disposant de l'ensemble des spécialités demandées
+        required: false
+        style: FORM
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        200:
+          description: recherche valide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+              examples:
+                carriers:
+                  value:
+                    results:
+                    - lti_nombre: 3
+                      adresse: 49 RUE RENE DUMONT
+                      raison_sociale: TRANSPORTS CITY ONE
+                      completeness: 55
+                      working_area: DEPARTEMENT
+                      ville: COUERON
+                      code_postal: "44220"
+                      lc_nombre: 0
+                      enseigne: TRANSPORTS CITY ONE
+                      siret: "82882108200017"
+                    - lti_nombre: 4
+                      adresse: 1 AV DES JADES
+                      raison_sociale: NAONED TRANSPORT
+                      completeness: 40
+                      working_area: DEPARTEMENT
+                      ville: NANTES
+                      code_postal: "44300"
+                      lc_nombre: 0
+                      enseigne: NAONED TRANSPORT
+                      siret: "84195743400019"
+                    - lti_nombre: 2
+                      adresse: 2 RUE AMPERE
+                      raison_sociale: STONE EXPRESS
+                      completeness: 100
+                      working_area: FRANCE
+                      ville: TRESSES
+                      code_postal: "33370"
+                      lc_nombre: 0
+                      enseigne: STONE EXPRESS
+                      siret: "82363496900013"
+        400:
+          description: les critères de recherche ne sont pas valides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+  /carriers/{siret}:
+    get:
+      tags:
+      - carrier
+      summary: retourne les détails d'un transporteur
+      operationId: getCarrierDetail
+      parameters:
+      - name: siret
+        in: path
+        description: SIRET du transporteur
+        required: true
+        style: SIMPLE
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: requête réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        400:
+          description: Invalid status value
+    patch:
+      tags:
+      - carrier
+      summary: modification du transporteur
+      description: modifie certains attributs du transporteur qui sont spécifiques à A Dock
+      operationId: patchCarrier
+      parameters:
+      - name: siret
+        in: path
+        description: SIRET du transporteur
+        required: true
+        style: SIMPLE
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarrierPatch'
+      responses:
+        200:
+          description: requête réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        400:
+          description: requête non valide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+  /carriers/{siret}/confirm_email/{token}:
+    get:
+      tags:
+      - carrier
+      summary: confirme l'adresse électronique d'un transporteur
+      operationId: confirmCarrierEmail
+      parameters:
+      - name: siret
+        in: path
+        description: SIRET du transporteur
+        required: true
+        style: SIMPLE
+        explode: false
+        schema:
+          type: string
+      - name: token
+        in: path
+        description: le token envoyé par courriel
+        required: true
+        style: SIMPLE
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: requête réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_3'
+        400:
+          description: impossible de confirmer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400_1'
+  /carriers/send_code/:
+    get:
+      tags:
+      - carrier
+      summary: envoie un code de modification à une adresse électronique confirmée
+      operationId: sendCarrierCode
+      responses:
+        200:
+          description: le précédent code de modification envoyé est toujours valide.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarrierSendEditCodeResponse'
+        201:
+          description: un code de modification a été envoyé par courriel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarrierSendEditCodeResponse'
+        409:
+          description: impossible quand l'adresse électronique n'est pas confirmée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarrierSendEditCodeResponse'
+        503:
+          description: impossible d'envoyer le code de modification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarrierSendEditCodeResponse'
+  /meta/:
+    get:
+      tags:
+      - meta
+      description: meta données
+      operationId: getMeta
+      responses:
+        200:
+          description: succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_4'
+components:
+  schemas:
+    CarrierLight:
+      type: object
+      properties:
+        siret:
+          maxLength: 14
+          type: string
+        raison_sociale:
+          maxLength: 131
+          type: string
+        enseigne:
+          maxLength: 131
+          type: string
+        adresse:
+          maxLength: 126
+          type: string
+          description: numéro et nom de la rue
+        code_postal:
+          maxLength: 5
+          type: string
+        ville:
+          maxLength: 32
+          type: string
+        completeness:
+          type: integer
+          description: niveau de complétude en pourcentage des informations de la fiche transporteur
+          format: int32
+        lti_nombre:
+          type: integer
+          description: nombre de licenses de transport intérieur
+          format: int32
+        lc_nombre:
+          type: integer
+          description: nombre de licenses communautaire
+          format: int32
+        working_area:
+          type: string
+          enum:
+          - INTERNATIONAL
+          - FRANCE
+          - REGION
+          - DEPARTEMENT
+      xml:
+        name: CarrierLight
+    Carrier:
+      type: object
+      properties:
+        siret:
+          maxLength: 14
+          type: string
+        raison_sociale:
+          maxLength: 131
+          type: string
+        enseigne:
+          maxLength: 131
+          type: string
+        gestionnaire:
+          maxLength: 131
+          type: string
+        adresse:
+          maxLength: 126
+          type: string
+          description: numéro et nom de la rue
+        code_postal:
+          maxLength: 5
+          type: string
+        ville:
+          maxLength: 32
+          type: string
+        telephone:
+          type: string
+        email:
+          maxLength: 254
+          type: string
+        debut_activite:
+          type: string
+          format: date
+        code_ape:
+          maxLength: 5
+          type: string
+          description: apen700 from Sirene
+        libelle_ape:
+          maxLength: 65
+          type: string
+          description: libapen from Sirene
+        numero_tva:
+          maxLength: 13
+          type: string
+        completeness:
+          type: integer
+          description: niveau de complétude en pourcentage des informations de la fiche transporteur
+          format: int32
+        lti_numero:
+          maxLength: 16
+          type: string
+        lti_date_debut:
+          type: string
+          description: date de début de validité
+          format: date
+        lti_date_fin:
+          type: string
+          description: date de fin de validité
+          format: date
+        lti_nombre:
+          type: integer
+          description: nombre de licenses de transport intérieur
+          format: int32
+        lc_numero:
+          maxLength: 16
+          type: string
+        lc_date_debut:
+          type: string
+          description: date de début de validité
+          format: date
+        lc_date_fin:
+          type: string
+          description: date de fin de validité
+          format: date
+        lc_nombre:
+          type: integer
+          description: nombre de licenses communautaire
+          format: int32
+        working_area:
+          type: string
+          enum:
+          - INTERNATIONAL
+          - FRANCE
+          - REGION
+          - DEPARTEMENT
+        working_area_departements:
+          type: array
+          items:
+            maxLength: 3
+            type: string
+        specialities:
+          type: array
+          items:
+            type: string
+            enum:
+            - LOT
+            - PALETTE
+            - URBAIN
+            - VRAC_SOLIDE
+            - VRAC_LIQUIDE
+            - TEMPERATURE
+            - PLATEAU
+            - MULTIMODAL
+            - LOCATION
+            - ANIMAL
+            - VEHICULE
+            - AUTRE
+        website:
+          maxLength: 200
+          type: string
+        description:
+          type: string
+          description: champ libre de description de l'activité de transport
+        objectif_co2:
+          maxLength: 8
+          type: string
+          enum:
+          - ENLISTED
+          - LABELLED
+        objectif_co2_begin:
+          type: string
+          format: date
+        objectif_co2_end:
+          type: string
+          format: date
+        deleted_at:
+          type: boolean
+          description: date de la supression de l'établissement du registre des transports
+        sirene_deleted_at:
+          type: boolean
+          description: date de la suppression de l'établissement de la base Sirène
+        is_locked:
+          type: boolean
+          description: indique que la fiche est verrouillée
+        subsidiaries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subsidiary'
+      xml:
+        name: Carrier
+    CarrierPatch:
+      type: object
+      properties:
+        email:
+          maxLength: 254
+          type: string
+        telephone:
+          type: string
+        working_area:
+          type: string
+          enum:
+          - INTERNATIONAL
+          - FRANCE
+          - REGION
+          - DEPARTEMENT
+        working_area_departements:
+          type: array
+          items:
+            maxLength: 3
+            type: string
+        specialities:
+          type: array
+          items:
+            type: string
+            enum:
+            - LOT
+            - PALETTE
+            - URBAIN
+            - VRAC_SOLIDE
+            - VRAC_LIQUIDE
+            - TEMPERATURE
+            - PLATEAU
+            - MULTIMODAL
+            - LOCATION
+            - ANIMAL
+            - VEHICULE
+            - AUTRE
+        website:
+          maxLength: 200
+          type: string
+        description:
+          type: string
+          description: champ libre de description de l'activité de transport
+        editcode:
+          type: integer
+          description: le code de modification envoyé par courriel lorsque la fiche est verrouillée
+          format: int32
+      xml:
+        name: CarrierPatch
+    Subsidiary:
+      type: object
+      properties:
+        siret:
+          maxLength: 14
+          type: string
+        code_postal:
+          maxLength: 5
+          type: string
+        ville:
+          maxLength: 32
+          type: string
+        debut_activite:
+          type: string
+          format: date
+        is_siege:
+          type: boolean
+          description: indique si l'établissement est le siège social de l'entreprise
+        deleted_at:
+          type: string
+          description: date de la supression de l'établissement du registre des transports
+          format: date
+    CarrierSendEditCodeResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        email:
+          type: string
+        edit_code_at:
+          type: string
+          description: date de génération du code de modification
+          format: date-time
+        edit_code_timeout_at:
+          type: string
+          description: date d'expiration du code de modification
+          format: date-time
+    inline_response_200:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CarrierLight'
+        limit:
+          type: integer
+          description: the number of results if a limit has been applied
+          format: int32
+    inline_response_400:
+      type: object
+      properties:
+        message:
+          type: string
+    inline_response_200_1:
+      type: object
+      properties:
+        carrier:
+          $ref: '#/components/schemas/Carrier'
+        subsidiaries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subsidiary'
+    inline_response_200_2:
+      type: object
+      properties:
+        confirmation_email_sent:
+          type: boolean
+          description: indique si un courriel pour confirmer l'adresse électronique a été envoyé
+    inline_response_200_3:
+      type: object
+      properties:
+        message:
+          type: string
+          example: L'adresse électronique est confirmée.
+    inline_response_400_1:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Impossible de confirmer l'adresse électronique.
+    inline_response_200_4:
+      type: object
+      properties:
+        choices:
+          type: object
+        version:
+          type: string
+          description: version de l'application serveur
+        date:
+          type: string
+          description: date de dernière mise à jour de la base de données
+          format: date
+        count:
+          type: integer
+          description: nombre de transporteurs
+          format: int32
+  requestBodies:
+    Carrier:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CarrierPatch'
+  extensions: {}
