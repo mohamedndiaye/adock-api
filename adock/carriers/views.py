@@ -35,7 +35,7 @@ TRANSPORTEUR_DETAIL_FIELDS = (
     "code_postal",
     "ville",
     "telephone",
-    "email",
+    # "email" is added when the carrier is validated (not locked)
     "debut_activite",
     "code_ape",
     "libelle_ape",
@@ -316,7 +316,11 @@ def carrier_detail(request, carrier_siret):
 
         response_json["confirmation_email_sent"] = confirmation_email_to_send
 
-    carrier_json = get_carrier_as_json(carrier, TRANSPORTEUR_DETAIL_FIELDS)
+    transporteur_detail_fields = TRANSPORTEUR_DETAIL_FIELDS
+    if carrier.validated_at:
+        transporteur_detail_fields += ("email",)
+
+    carrier_json = get_carrier_as_json(carrier, transporteur_detail_fields)
     carrier_json["subsidiaries"] = get_carrier_subsidiaries_as_json(carrier)
     response_json["carrier"] = carrier_json
     return JsonResponse(response_json)

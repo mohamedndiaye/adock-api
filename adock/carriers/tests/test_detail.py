@@ -69,6 +69,18 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         data = response.json()
         self.assertEqual(data["carrier"]["telephone"], "")
 
+    def test_get_no_email(self):
+        response = self.client.get(self.detail_url)
+        data = response.json()
+        self.assertNotIn("email", data["carrier"])
+
+    def get_get_mail(self):
+        self.carrier.validated_at = timezone.now
+        self.carrier.save()
+        response = self.client.get(self.detail_url)
+        data = response.json()
+        self.assertIn("email", data["carrier"])
+
     def test_patch_log(self):
         old_phone = self.carrier.telephone
         carrier = self.patch_carrier({"telephone": PHONE}, 200)["carrier"]

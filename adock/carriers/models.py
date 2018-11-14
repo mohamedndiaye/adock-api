@@ -170,7 +170,7 @@ class Carrier(models.Model):
     sirene_deleted_at = models.DateTimeField(
         blank=True,
         null=True,
-        help_text="Date de la suppression de l'établissement de la base Sirène.",
+        help_text="Date de la suppression de l'établissement de la base Sirene.",
     )
     edit_code = models.IntegerField(blank=True, null=True)
     edit_code_at = models.DateTimeField(blank=True, null=True)
