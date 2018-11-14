@@ -4,9 +4,8 @@ import random
 import string
 
 import factory
-import unidecode
-from django.utils import timezone
 from factory import fuzzy
+import unidecode
 from faker import Faker
 
 from . import models, validators
