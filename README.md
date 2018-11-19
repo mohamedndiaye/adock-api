@@ -127,6 +127,10 @@ Il est aussi possible de lancer les tests via Docker avec :
 
 Le projet utilise le service d'intégration continu de [CircleCI](https://circleci.com/gh/MTES-MCT/adock-api).
 
+Les codes de modification sont envoyés par message électronique à l'utilisateur pour les recevoir en développement, vous pouvez lancer un serveur fictif avec :
+
+`python3 -m smtpd -n -c DebuggingServer localhost:1025`
+
 ## Versions
 
 Les numéros de version sont gérés par [bumpversion](https://github.com/peritus/bumpversion).
