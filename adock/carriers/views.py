@@ -61,6 +61,8 @@ TRANSPORTEUR_DETAIL_FIELDS = (
     "sirene_deleted_at",
     # Boolean for real email_confirmed_at field to avoid privacy issue
     "is_locked",
+    "longitude",
+    "latitude"
 )
 
 
