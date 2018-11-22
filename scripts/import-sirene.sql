@@ -175,7 +175,7 @@ create table sirene (
     geo_l5 text
 );
 
-\copy sirene from 'csv/geo-sirene.csv' with csv header delimiter ';' null '' encoding 'ISO-8859-1';
+\copy sirene from 'csv/geo-sirene.csv' with csv header delimiter ',' null '' encoding 'utf-8';
 
 -- Slow but I'm not able to speed up the process by defining them in 'create table'
 -- because I have issues to specify the columns to copy from the CSV file
