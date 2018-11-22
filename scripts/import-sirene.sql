@@ -169,7 +169,7 @@ create table sirene (
     geo_score float,
     geo_type varchar(32),
     geo_adresse text,
-    geo_id varchar(32),
+    geo_id varchar(64),
     geo_ligne text,
     geo_l4 text,
     geo_l5 text
