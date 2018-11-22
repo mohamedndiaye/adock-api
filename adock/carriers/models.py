@@ -180,6 +180,8 @@ class Carrier(models.Model):
     objectif_co2_begin = models.DateField(blank=True, null=True)
     # Usually begin plus 3 years
     objectif_co2_end = models.DateField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
 
     class Meta:
         db_table = "carrier"
