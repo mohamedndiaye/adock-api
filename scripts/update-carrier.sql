@@ -22,7 +22,9 @@ insert into carrier
      created_at,
      deleted_at,
      sirene_deleted_at,
-     objectif_co2)
+     objectif_co2,
+     longitude,
+     latitude)
     select r.siret,
            r.raison_sociale,
            coalesce(nullif(s.enseigne, ''), r.raison_sociale) as enseigne,
@@ -71,7 +73,9 @@ insert into carrier
            null as deleted_at,
            -- Deleted from Sirene
            case when s.apen700 is not null then null else now() end as sirene_deleted_at,
-           '' as objectif_co2
+           '' as objectif_co2,
+           s.longitude,
+           s.latitude
     from registre as r
     left join sirene as s
        on s.siret = r.siret
@@ -104,7 +108,9 @@ set
      then null
      -- Keep the existing date if any
      else coalesce(carrier.sirene_deleted_at, excluded.sirene_deleted_at)
-    end;
+    end,
+  longitude = excluded.longitude,
+  latitude = excluded.latitude;
 
 --- Delete by setting the deleted_at attribute with current date (if not alreay deleted).
 update carrier
