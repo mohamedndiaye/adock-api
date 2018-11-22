@@ -163,10 +163,19 @@ create table sirene (
     -- - JJ le jour,
     -- - T (time) séparateur de la date par rapport à l'heure,
     -- - HH l'heure, MM les minutes et SS les secondes.
-    datemaj varchar(19)
+    datemaj varchar(19),
+    longitude float,
+    latitude float,
+    geo_score float,
+    geo_type varchar(32),
+    geo_adresse text,
+    geo_id varchar(32),
+    geo_ligne text,
+    geo_l4 text,
+    geo_l5 text
 );
 
-\copy sirene from 'csv/sirene.csv' with csv header delimiter ';' null '' encoding 'ISO-8859-1';
+\copy sirene from 'csv/geo-sirene.csv' with csv header delimiter ';' null '' encoding 'ISO-8859-1';
 
 -- Slow but I'm not able to speed up the process by defining them in 'create table'
 -- because I have issues to specify the columns to copy from the CSV file
