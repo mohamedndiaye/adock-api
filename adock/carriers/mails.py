@@ -37,7 +37,13 @@ L'équipe A Dock
         token=token,
     )
     recipient_list = get_recipient_list_from_env(carrier)
-    send_mail(subject, message, settings.SERVER_EMAIL, recipient_list)
+    send_mail(
+        subject,
+        message,
+        settings.SERVER_EMAIL,
+        recipient_list,
+        fail_silently=settings.DEBUG,
+    )
 
 
 def mail_managers_changes(carrier, old_data_changed, scheme):
@@ -100,4 +106,10 @@ L'équipe A Dock
         ),
     )
     recipient_list = get_recipient_list_from_env(carrier)
-    send_mail(subject, message, settings.SERVER_EMAIL, recipient_list)
+    send_mail(
+        subject,
+        message,
+        settings.SERVER_EMAIL,
+        recipient_list,
+        fail_silently=settings.DEBUG,
+    )
