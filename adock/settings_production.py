@@ -15,6 +15,7 @@ ADMINS = ((u"Stéphane Raimbault", "stephane.raimbault@webstack.fr"),)
 MANAGERS = (
     ("Stéphane Raimbault", "stephane.raimbault@webstack.fr"),
     ("Alexandre Dupont", "alexandre.dupont@developpement-durable.gouv.fr"),
+    ("Clémence Gourragne", "clemence.gourragne@beta.gouv.fr"),
 )
 
 SERVER_NAME = "adock.beta.gouv.fr"
