@@ -90,7 +90,7 @@ Adresse électronique confirmée : {email}
 
 def mail_carrier_edit_code(carrier):
     subject = "A Dock - Code de modification"
-    max_edit_time = carrier.edit_code_at + settings.TRANSPORTEUR_EDIT_CODE_INTERVAL
+    max_edit_time = carrier.edit_code_at + settings.CARRIER_EDIT_CODE_INTERVAL
     message = """
 Votre code de modification est {edit_code}.
 

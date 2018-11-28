@@ -104,7 +104,7 @@ class CarrierSearchQueryTestCase(CarrierSearchTestCase):
             [t["siret"] for t in carriers], [t.siret for t in [t1, t2, t3, t4]]
         )
 
-    @override_settings(TRANSPORTEURS_LIMIT=2)
+    @override_settings(CARRIERS_LIMIT=2)
     def test_too_many_results(self):
         factories.CarrierFactory.create_batch(3, enseigne="FOO")
         response = self.client.get(self.search_url, {"q": "Foo"})

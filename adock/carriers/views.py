@@ -13,7 +13,7 @@ import sentry_sdk
 
 from . import forms, mails, models, tokens, validators
 
-TRANSPORTEUR_LIST_FIELDS = (
+CARRIER_LIST_FIELDS = (
     "siret",
     "raison_sociale",
     "enseigne",
@@ -26,7 +26,7 @@ TRANSPORTEUR_LIST_FIELDS = (
     "working_area",
 )
 
-TRANSPORTEUR_DETAIL_FIELDS = (
+CARRIER_DETAIL_FIELDS = (
     "siret",
     "raison_sociale",
     "enseigne",
@@ -200,13 +200,13 @@ def search(request):
 
     # By completeness and enseigne
     order_by_list.extend(("-completeness", "enseigne"))
-    carriers = carriers.order_by(*order_by_list).values(*TRANSPORTEUR_LIST_FIELDS)[
-        : settings.TRANSPORTEURS_LIMIT
+    carriers = carriers.order_by(*order_by_list).values(*CARRIER_LIST_FIELDS)[
+        : settings.CARRIERS_LIMIT
     ]
 
     payload = {"results": list(carriers)}
-    if len(payload["results"]) == settings.TRANSPORTEURS_LIMIT:
-        payload["limit"] = settings.TRANSPORTEURS_LIMIT
+    if len(payload["results"]) == settings.CARRIERS_LIMIT:
+        payload["limit"] = settings.CARRIERS_LIMIT
     return JsonResponse(payload)
 
 
@@ -318,7 +318,7 @@ def carrier_detail(request, carrier_siret):
 
         response_json["confirmation_email_sent"] = confirmation_email_to_send
 
-    transporteur_detail_fields = TRANSPORTEUR_DETAIL_FIELDS
+    transporteur_detail_fields = CARRIER_DETAIL_FIELDS
     if carrier.validated_at:
         transporteur_detail_fields += ("email",)
 

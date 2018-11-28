@@ -30,7 +30,7 @@ class CarrierEditCodeTestCase(test.CarrierTestCase):
 
     def test_expired_edit_code(self):
         self.carrier.set_edit_code()
-        self.carrier.edit_code_at -= settings.TRANSPORTEUR_EDIT_CODE_INTERVAL
+        self.carrier.edit_code_at -= settings.CARRIER_EDIT_CODE_INTERVAL
         self.carrier.save()
 
         self.assertTrue(self.carrier.is_locked())

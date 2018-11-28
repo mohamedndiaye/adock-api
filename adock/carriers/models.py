@@ -236,7 +236,7 @@ class Carrier(models.Model):
         if self.edit_code_at is None:
             return None
 
-        return self.edit_code_at + settings.TRANSPORTEUR_EDIT_CODE_INTERVAL
+        return self.edit_code_at + settings.CARRIER_EDIT_CODE_INTERVAL
 
     def edit_code_has_expired(self):
         if not self.edit_code:
