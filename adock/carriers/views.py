@@ -72,6 +72,7 @@ SUBSIDIARY_LIST_FIELDS = (
     "debut_activite",
     "is_siege",
     "deleted_at",
+    "sirene_deleted_at",
 )
 
 
