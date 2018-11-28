@@ -62,7 +62,16 @@ CARRIER_DETAIL_FIELDS = (
     # Boolean for real email_confirmed_at field to avoid privacy issue
     "is_locked",
     "longitude",
-    "latitude"
+    "latitude",
+)
+
+SUBSIDIARY_LIST_FIELDS = (
+    "siret",
+    "code_postal",
+    "ville",
+    "debut_activite",
+    "is_siege",
+    "deleted_at",
 )
 
 
@@ -89,9 +98,7 @@ def get_carrier_subsidiaries_as_json(carrier):
             siret__startswith=carrier.siret[: validators.SIREN_LENGTH]
         )
         .exclude(pk=carrier.pk)
-        .values(
-            "siret", "code_postal", "ville", "debut_activite", "is_siege", "deleted_at"
-        )
+        .values(*SUBSIDIARY_LIST_FIELDS)
     )
     return list(subsidiaries)
 
