@@ -66,13 +66,15 @@ CARRIER_DETAIL_FIELDS = (
 )
 
 SUBSIDIARY_LIST_FIELDS = (
-    "siret",
     "code_postal",
-    "ville",
+    "completeness",
     "debut_activite",
-    "is_siege",
     "deleted_at",
+    "enseigne",
+    "is_siege",
     "sirene_deleted_at",
+    "siret",
+    "ville",
 )
 
 
