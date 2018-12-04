@@ -65,7 +65,7 @@ CARRIER_DETAIL_FIELDS = (
     "latitude",
 )
 
-SUBSIDIARY_LIST_FIELDS = (
+OTHER_FACILITIES_LIST_FIELDS = (
     "code_postal",
     "completeness",
     "debut_activite",
@@ -95,15 +95,15 @@ def get_carrier_as_json(carrier, fields):
     return carrier_json
 
 
-def get_carrier_subsidiaries_as_json(carrier):
-    subsidiaries = (
+def get_other_facilities_as_json(carrier):
+    other_facilities = (
         models.Carrier.objects.filter(
             siret__startswith=carrier.siret[: validators.SIREN_LENGTH]
         )
         .exclude(pk=carrier.pk)
-        .values(*SUBSIDIARY_LIST_FIELDS)
+        .values(*OTHER_FACILITIES_LIST_FIELDS)
     )
-    return list(subsidiaries)
+    return list(other_facilities)
 
 
 def search(request):
@@ -333,7 +333,7 @@ def carrier_detail(request, carrier_siret):
         transporteur_detail_fields += ("email",)
 
     carrier_json = get_carrier_as_json(carrier, transporteur_detail_fields)
-    carrier_json["subsidiaries"] = get_carrier_subsidiaries_as_json(carrier)
+    carrier_json["other_facilities"] = get_other_facilities_as_json(carrier)
     response_json["carrier"] = carrier_json
     return JsonResponse(response_json)
 

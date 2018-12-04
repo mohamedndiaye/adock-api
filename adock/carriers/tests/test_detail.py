@@ -45,9 +45,9 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         self.assertEqual(carrier_data["debut_activite"], None)
         self.assertEqual(carrier_data["specialities"], None)
         self.assertEqual(carrier_data["is_locked"], False)
-        self.assertEqual(carrier_data["subsidiaries"], [])
+        self.assertEqual(carrier_data["other_facilities"], [])
 
-    def test_get_subsidiaries(self):
+    def test_get_other_facilities(self):
         for i in range(3):
             siret = "{siren}{i:05}".format(
                 siren=self.carrier.siret[  # pylint: disable=E1136
@@ -59,8 +59,8 @@ class CarrierDetailTestCase(test.CarrierTestCase):
 
         response = self.client.get(self.detail_url)
         carrier_data = response.json()["carrier"]
-        self.assertEqual(len(carrier_data["subsidiaries"]), 3)
-        self.assertIn("siret", carrier_data["subsidiaries"][0])
+        self.assertEqual(len(carrier_data["other_facilities"]), 3)
+        self.assertIn("siret", carrier_data["other_facilities"][0])
 
     def test_get_empty_phone(self):
         self.carrier.telephone = ""
