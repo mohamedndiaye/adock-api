@@ -306,20 +306,21 @@ def carrier_detail(request, carrier_siret):
             for field in updated_fields:
                 setattr(carrier, field, cleaned_payload[field])
 
-            with transaction.atomic(savepoint=False):
-                if "email" in updated_fields:
-                    # New email should invalidate email confirmation and edit code
-                    carrier.email_confirmed_at = None
-                    carrier.reset_edit_code()
-                    updated_fields.extend(
-                        ["email_confirmed_at", "edit_code", "edit_code_at"]
-                    )
-                    # If not empty
-                    if carrier.email:
-                        confirmation_email_to_send = True
+            if "email" in updated_fields:
+                # New email should invalidate email confirmation and edit code
+                carrier.email_confirmed_at = None
+                carrier.reset_edit_code()
+                updated_fields.extend(
+                    ["email_confirmed_at", "edit_code", "edit_code_at"]
+                )
+                # If not empty
+                if carrier.email:
+                    confirmation_email_to_send = True
 
-                carrier.validated_at = timezone.now()
-                updated_fields.append("validated_at")
+            carrier.validated_at = timezone.now()
+            updated_fields.append("validated_at")
+
+            with transaction.atomic(savepoint=False):
                 carrier.save(force_update=True, update_fields=updated_fields)
                 add_carrier_log(carrier, old_data_changed, cleaned_payload)
 
