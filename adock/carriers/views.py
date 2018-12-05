@@ -273,6 +273,11 @@ def carrier_detail(request, carrier_siret):
                 {"message": "Les données ne sont pas valides."}, status=400
             )
 
+        # Emails stored in DB aren't exposed before validation.
+        # If not provided on first validation, emails are deleted (and logged).
+        if not carrier.validated_at and not "email" in payload:
+            payload["email"] = ""
+
         # Form is not bound to the carrier instance but we need it to check edit code
         form = forms.DetailForm(payload, carrier=carrier)
         if not form.is_valid():
@@ -291,10 +296,6 @@ def carrier_detail(request, carrier_siret):
         confirmation_email_to_send = False
         scheme = "https" if request.is_secure() else "http"
 
-        # Special case when the user validates (first time) the already known email address
-        if carrier.validated_at is None and carrier.email:
-            confirmation_email_to_send = True
-
         # Only apply the submitted values if they are different in DB
         old_data_changed = get_carrier_changes(carrier, cleaned_payload)
         if old_data_changed:
@@ -306,9 +307,6 @@ def carrier_detail(request, carrier_siret):
                 setattr(carrier, field, cleaned_payload[field])
 
             with transaction.atomic(savepoint=False):
-                carrier.validated_at = timezone.now()
-                updated_fields.append("validated_at")
-
                 if "email" in updated_fields:
                     # New email should invalidate email confirmation and edit code
                     carrier.email_confirmed_at = None
@@ -316,8 +314,12 @@ def carrier_detail(request, carrier_siret):
                     updated_fields.extend(
                         ["email_confirmed_at", "edit_code", "edit_code_at"]
                     )
-                    confirmation_email_to_send = True
+                    # If not empty
+                    if carrier.email:
+                        confirmation_email_to_send = True
 
+                carrier.validated_at = timezone.now()
+                updated_fields.append("validated_at")
                 carrier.save(force_update=True, update_fields=updated_fields)
                 add_carrier_log(carrier, old_data_changed, cleaned_payload)
 
@@ -330,6 +332,7 @@ def carrier_detail(request, carrier_siret):
 
     transporteur_detail_fields = CARRIER_DETAIL_FIELDS
     if carrier.validated_at:
+        # Only emails of validated carriers are provided
         transporteur_detail_fields += ("email",)
 
     carrier_json = get_carrier_as_json(carrier, transporteur_detail_fields)

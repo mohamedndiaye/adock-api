@@ -82,6 +82,9 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         self.assertIn("email", data["carrier"])
 
     def test_patch_log(self):
+        self.carrier.email = ""
+        self.carrier.save()
+
         old_phone = self.carrier.telephone
         carrier = self.patch_carrier({"telephone": PHONE}, 200)["carrier"]
         # Initial and new entry
@@ -210,12 +213,12 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         WEBSITE = "http://www.example.com"
         data = self.patch_carrier({"website": "www.example.com"}, 200)
         self.assertEqual(data["carrier"]["website"], WEBSITE)
-        # Mail sent on first validation
-        self.assertTrue(data["confirmation_email_sent"])
+        # No mail provided by the user input (field in DB is ignored)
+        self.assertFalse(data["confirmation_email_sent"])
         self.carrier.refresh_from_db()
         self.assertEqual(self.carrier.website, WEBSITE)
 
-        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(len(mail.outbox), 1)
         message = "[adock] Modification du transporteur %s" % self.carrier.siret
         self.assertEqual(mail.outbox[0].subject, message)
 
