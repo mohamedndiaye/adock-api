@@ -1,9 +1,9 @@
-Django==2.1.3
-psycopg2-binary>=2.7.5
+Django==2.1.4
+psycopg2-binary==2.7.6.1
 jinja2
-django-cors-headers>=2.4
-django-phonenumber-field>=2.0.1
-sentry_sdk==0.4.0
-requests>=2.19.1
+django-cors-headers==2.4
+django-phonenumber-field==2.0.1
+sentry_sdk==0.6.2
+requests==2.20.1
 # To import labelled carriers of Objectif CO2
 openpyxl
