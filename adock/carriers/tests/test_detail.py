@@ -260,10 +260,9 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         data = self.patch_carrier(
             {"telephone": "11223344556", "email": self.carrier.email}, 400
         )
-
-        # Wrong French translation will be fixed in django-phonenumber-field > 2.0.1 (my patch)
-        # https://github.com/stefanfoulis/django-phonenumber-field/issues/233
-        self.assertEqual(data["telephone"][0], "Entrez un numéro de téléphone valide.")
+        self.assertEqual(
+            data["telephone"][0], "Saisissez un numéro de téléphone valide."
+        )
 
     def test_patch_unexisting_working_area_departements(self):
         data = self.patch_carrier({"working_area_departements": ["20"]}, 400)

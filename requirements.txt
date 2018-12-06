@@ -2,7 +2,8 @@ Django==2.1.4
 psycopg2-binary==2.7.6.1
 jinja2
 django-cors-headers==2.4
-django-phonenumber-field==2.0.1
+phonenumbers==8.10.1
+django-phonenumber-field==2.1.0
 sentry_sdk==0.6.2
 requests==2.20.1
 # To import labelled carriers of Objectif CO2
