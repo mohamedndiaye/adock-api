@@ -152,6 +152,19 @@ USE_SELFTEST = True
 
 SENTRY_DSN = ""
 
+FRANCE_CONNECT_URL_ROOT = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
+FRANCE_CONNECT_URLS = {
+    "authorize": FRANCE_CONNECT_URL_ROOT + "authorize",
+    "token": FRANCE_CONNECT_URL_ROOT + "token",
+    "userinfo": FRANCE_CONNECT_URL_ROOT + "userinfo",
+    "logout": FRANCE_CONNECT_URL_ROOT + "logout",
+}
+FRANCE_CONNECT_CLIENT_ID = ""
+FRANCE_CONNECT_CLIENT_SECRET = ""
+# Could be a reverse by it's more convenient to provide plain URL (ngrok like,
+# https:// preprend, etc)
+FRANCE_CONNECT_URL_CALLBACK = "https://adock.beta.gouv.fr/accounts/fc/callback/"
+
 try:
     from .settings_local import *  # pylint: disable=W0401
 except ImportError:  # pragma: no cover
