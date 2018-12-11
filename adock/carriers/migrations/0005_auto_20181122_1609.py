@@ -5,24 +5,26 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('carriers', '0004_index_enseigne_unaccent'),
-    ]
+    dependencies = [("carriers", "0004_index_enseigne_unaccent")]
 
     operations = [
         migrations.AddField(
-            model_name='carrier',
-            name='latitude',
+            model_name="carrier",
+            name="latitude",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='carrier',
-            name='longitude',
+            model_name="carrier",
+            name="longitude",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='carrier',
-            name='sirene_deleted_at',
-            field=models.DateTimeField(blank=True, help_text="Date de la suppression de l'établissement de la base Sirene.", null=True),
+            model_name="carrier",
+            name="sirene_deleted_at",
+            field=models.DateTimeField(
+                blank=True,
+                help_text="Date de la suppression de l'établissement de la base Sirene.",
+                null=True,
+            ),
         ),
     ]
