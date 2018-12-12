@@ -5,7 +5,8 @@ load-plugins=pylint_django
 #   C0111 = Missing docstring
 #   C0103 = Invalid name
 #   R0801 = Duplicate code
-disable=C0111,C0103,R0801
+#   W0613 = Unused argument
+disable=C0111,C0103,R0801,W0613
 
 [FORMAT]
 
