@@ -195,4 +195,4 @@ if USE_SENTRY:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
 
-    sentry_sdk.init(SENTRY_DSN, integrations=[DjangoIntegration()])
+    sentry_sdk.init(SENTRY_DSN, integrations=[DjangoIntegration()], release=VERSION)
