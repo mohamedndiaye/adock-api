@@ -15,3 +15,4 @@ class AccountsTestCase(TestCase):
         EMAIL = "foo@example.com"
         user = factories.UserFactory(email=EMAIL)
         self.assertEqual(user.email, EMAIL)
+        self.assertEqual(user.get_username(), EMAIL)

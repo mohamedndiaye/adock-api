@@ -1,8 +1,7 @@
-from django.contrib.auth import get_user_model
-
 import factory
 from faker import Faker
 
+from . import models
 
 faker = Faker("fr_FR")
 
@@ -14,4 +13,4 @@ class UserFactory(factory.django.DjangoModelFactory):
     password = factory.PostGenerationMethodCall('set_password', 'secret')
 
     class Meta:
-        model = get_user_model()
+        model = models.User
