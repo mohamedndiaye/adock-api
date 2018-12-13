@@ -8,3 +8,5 @@ sentry_sdk==0.6.2
 requests==2.20.1
 # To import labelled carriers of Objectif CO2
 openpyxl
+# For France Connect
+requests
