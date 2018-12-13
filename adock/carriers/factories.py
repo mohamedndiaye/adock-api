@@ -28,9 +28,6 @@ def compute_vat_number(siret):
 
 
 class CarrierFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.Carrier
-
     siret = fuzzy.FuzzyText(length=validators.SIRET_LENGTH, chars=string.digits)
     numero_tva = factory.LazyAttribute(lambda o: compute_vat_number(o.siret))
     raison_sociale = factory.LazyAttribute(lambda _: faker.company().upper())
@@ -56,3 +53,6 @@ class CarrierFactory(factory.django.DjangoModelFactory):
     working_area = models.WORKING_AREA_DEPARTEMENT
     working_area_departements = ["35", "44"]
     specialities = ["TEMPERATURE", "URBAIN"]
+
+    class Meta:
+        model = models.Carrier
