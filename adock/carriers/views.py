@@ -8,7 +8,6 @@ from django.db.models.expressions import OrderBy, RawSQL
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
 import sentry_sdk
 
 from . import forms, mails, models, tokens, validators
@@ -252,7 +251,6 @@ def add_carrier_log(carrier, old_data_changed, cleaned_payload):
 RE_MANY_COMMAS = re.compile(r",+")
 
 
-@csrf_exempt
 def carrier_detail(request, carrier_siret):
     response_json = {}
     # Access to deleted carriers is allowed.
