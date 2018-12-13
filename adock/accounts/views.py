@@ -1,15 +1,9 @@
 import requests
 
-import django
 from django.conf import settings
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.utils.http import urlencode
 from django.views.decorators.http import require_GET, require_POST
-
-
-def get_csrf_token(request):
-    token = django.middleware.csrf.get_token(request)
-    return JsonResponse({"csrf_token": token})
 
 
 @require_POST

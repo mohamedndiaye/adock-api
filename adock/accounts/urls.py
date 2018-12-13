@@ -12,5 +12,4 @@ urlpatterns = [
     path(
         "logout/", auth_views.LogoutView.as_view(next_page="/"), name="accounts_log_out"
     ),
-    path("csrftoken/", views.get_csrf_token, name="accounts_get_csrf_token"),
 ]
