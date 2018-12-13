@@ -1,8 +1,9 @@
-from django.core.mail import send_mail
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.postgres.fields import JSONField
+from django.core.mail import send_mail
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class CustomUserManager(BaseUserManager):
@@ -33,9 +34,14 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser):
+    PROVIDER_CHOICES = (("AD", "A Dock"), ("FC", "France Connect"))
     email = models.EmailField(_("email address"), max_length=255, unique=True)
     first_name = models.CharField(_("first name"), max_length=30, blank=True)
     last_name = models.CharField(_("last name"), max_length=150, blank=True)
+    provider = models.CharField(
+        _("provider"), max_length=2, choices=PROVIDER_CHOICES, default="AD"
+    )
+    provider_data = JSONField(blank=True, null=True)
 
     is_staff = models.BooleanField(
         _("staff status"),
