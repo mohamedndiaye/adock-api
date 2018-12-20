@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.postgres.fields import JSONField
 from django.core.mail import send_mail
 from django.db import models
@@ -33,7 +33,7 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class User(AbstractUser):
+class User(AbstractBaseUser):
     PROVIDER_CHOICES = (("AD", "A Dock"), ("FC", "France Connect"))
 
     email = models.EmailField(_("email address"), max_length=255, unique=True)
@@ -62,8 +62,11 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "email"
     EMAIL_FIELD = "email"
-
     REQUIRED_FIELDS = []
+
+    def clean(self):
+        super().clean()
+        self.email = self.__class__.objects.normalize_email(self.email)
 
     def has_perm(self, perm, obj=None):
         # Simplest possible answer: Yes, always
