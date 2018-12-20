@@ -1,11 +1,14 @@
 from django.urls import reverse
 
-from ..accounts.test import AuthTestCase
+from ..accounts.test import AuthTestCaseBase
 
 
-class SelftestTestCase(AuthTestCase):
+class SelftestTestCase(AuthTestCaseBase):
     def test_selftest(self):
-        # Inception!
         url = reverse("selftest")
-        response = self.client.get(url)
+        response = self.client.get(
+            url,
+            content_type="application/json",
+            HTTP_AUTHORIZATION=self.http_authorization,
+        )
         self.assertContains(response, "Selftest page")
