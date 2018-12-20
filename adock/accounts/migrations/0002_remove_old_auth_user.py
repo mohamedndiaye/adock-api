@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     dependencies = [("accounts", "0001_initial")]
 
     operations = [
-        migrations.RunSQL("DROP TABLE auth_user_groups"),
-        migrations.RunSQL("DROP TABLE auth_user_user_permissions"),
-        migrations.RunSQL("DROP TABLE auth_user"),
+        migrations.RunSQL("DROP TABLE IF EXISTS auth_user_groups"),
+        migrations.RunSQL("DROP TABLE IF EXISTS auth_user_user_permissions"),
+        migrations.RunSQL("DROP TABLE IF EXISTS auth_user"),
     ]
