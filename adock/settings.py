@@ -152,6 +152,8 @@ USE_SELFTEST = True
 
 SENTRY_DSN = ""
 
+JWT_PAYLOAD_HANDLER = "adock.accounts.views.jwt_payload_handler"
+
 FRANCE_CONNECT_URL_ROOT = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
 FRANCE_CONNECT_URLS = {
     "authorize": FRANCE_CONNECT_URL_ROOT + "authorize",
