@@ -9,5 +9,4 @@ requests==2.20.1
 # To import labelled carriers of Objectif CO2
 openpyxl
 # For France Connect
-requests
 webstack-django-jwt-auth==0.4.0
