@@ -16,3 +16,6 @@ FRANCE_CONNECT_CLIENT_ID = ""
 FRANCE_CONNECT_CLIENT_SECRET = ""
 # According to your ngrok like URL...
 FRANCE_CONNECT_URL_CALLBACK = "https://adock.beta.gouv.fr/accounts/fc/callback/"
+
+# Speed up tests
+PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
