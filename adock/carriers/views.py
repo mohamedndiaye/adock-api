@@ -10,6 +10,8 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 import sentry_sdk
 
+from ..accounts.decorators import user_is_staff
+
 from . import forms, mails, models, tokens, validators
 
 CARRIER_LIST_FIELDS = (
@@ -394,6 +396,7 @@ def carrier_send_edit_code(request, carrier_siret):
     )
 
 
+@user_is_staff()
 def get_stats(request):
     # Counters (total)
     validated_carriers = models.Carrier.objects.filter(

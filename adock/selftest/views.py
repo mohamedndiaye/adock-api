@@ -1,17 +1,18 @@
 import logging
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
 from django.core.mail import mail_managers
 from django.shortcuts import render
 from sentry_sdk import capture_message
 
+from ..accounts.decorators import user_is_staff
 from ..meta import models as meta_models
 
 logger = logging.getLogger(__name__)
 
 
-@login_required
+@user_is_staff()
 def selftest_index(request):
     """Render a page with various selftest actions and run each action on POST"""
     results = None

@@ -1,14 +1,33 @@
 import datetime
 import random
 
-from django.test import TestCase
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 
 from .. import factories
+from ...accounts.test import AuthTestCaseBase
 
 
-class CarrierStatsTestCase(TestCase):
+class CarrierStatsTestCase(AuthTestCaseBase):
+    def setUp(self):
+        super().setUp()
+        self.url = reverse("carriers_stats")
+
+    def test_staff_only(self):
+        User = get_user_model()
+        user = User(email="courriel@example.com", is_staff=False)
+        user.set_password("password")
+        user.save()
+
+        http_authorization = self.log_in(user.email, "password")
+        response = self.client.get(
+            self.url,
+            content_type="application/json",
+            HTTP_AUTHORIZATION=http_authorization,
+        )
+        self.assertEqual(response.status_code, 405)
+
     def test_stats(self):
         STATS_NB_MONTHS = 6
 
@@ -30,8 +49,12 @@ class CarrierStatsTestCase(TestCase):
         # 2 locked sheets
         factories.CarrierFactory.create_batch(3, email_confirmed_at=validated_date)
 
-        url = reverse("carriers_stats")
-        response = self.client.get(url)
+        http_authorization = self.log_in()
+        response = self.client.get(
+            self.url,
+            content_type="application/json",
+            HTTP_AUTHORIZATION=http_authorization,
+        )
         self.assertEqual(response.status_code, 200)
         stats = response.json()
 
