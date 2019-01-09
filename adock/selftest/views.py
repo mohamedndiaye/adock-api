@@ -1,10 +1,9 @@
 import logging
 
 from django.conf import settings
-from django.contrib.auth.decorators import user_passes_test
 from django.core.mail import mail_managers
 from django.shortcuts import render
-from sentry_sdk import capture_message
+import sentry_sdk
 
 from ..accounts.decorators import user_is_staff
 from ..meta import models as meta_models
@@ -39,7 +38,7 @@ def selftest_index(request):
         elif "raise_exception" in request.POST:
             raise Exception("Raised by selftest page (safe to ignore).")
         elif "capture_event" in request.POST:
-            event_id = capture_message("Event captured in selftest page.")
+            event_id = sentry_sdk.capture_message("Event captured in selftest page.")
             results = "Event captured #%s" % event_id
 
     return render(request, "selftest.html", {"results": results})
