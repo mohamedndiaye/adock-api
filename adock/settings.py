@@ -152,7 +152,8 @@ USE_SELFTEST = True
 
 SENTRY_DSN = ""
 
-JWT_PAYLOAD_HANDLER = "adock.accounts.views.jwt_payload_handler"
+JWT_EXPIRATION_DELTA = datetime.timedelta(seconds=3600)
+JWT_PAYLOAD_HANDLER = "adock.accounts.jwt.jwt_payload_handler"
 
 FRANCE_CONNECT_URL_ROOT = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
 FRANCE_CONNECT_URLS = {

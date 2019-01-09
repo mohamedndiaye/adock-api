@@ -1,23 +1,14 @@
 import requests
 
 from django.conf import settings
-from django.http import HttpResponseRedirect
-from django.utils import timezone
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.http import urlencode
 from django.views.decorators.http import require_GET, require_POST
-from jwt_auth import settings as jwt_auth_settings
+import sentry_sdk
 
+from . import models as accounts_models
 
-def jwt_payload_handler(user):
-    """Custom payload handler"""
-    return {
-        "user_id": user.pk,
-        "email": user.email,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "is_staff": user.is_staff,
-        "exp": timezone.now() + jwt_auth_settings.JWT_EXPIRATION_DELTA,
-    }
+logger = logging.getLogger(__name__)
 
 
 def france_connect_authorize(request):
