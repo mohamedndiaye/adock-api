@@ -29,9 +29,15 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class User(AbstractBaseUser):
-    PROVIDER_CHOICES = (("AD", "A Dock"), ("FC", "France Connect"))
+PROVIDER_A_DOCK = "AD"
+PROVIDER_FRANCE_CONNECT = "FC"
+PROVIDER_CHOICES = (
+    (PROVIDER_A_DOCK, "A Dock"),
+    (PROVIDER_FRANCE_CONNECT, "France Connect"),
+)
 
+
+class User(AbstractBaseUser):
     email = models.EmailField(_("email address"), max_length=255, unique=True)
     first_name = models.CharField(_("first name"), max_length=30, blank=True)
     last_name = models.CharField(_("last name"), max_length=150, blank=True)
