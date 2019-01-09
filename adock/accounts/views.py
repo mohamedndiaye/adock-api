@@ -20,7 +20,6 @@ def jwt_payload_handler(user):
     }
 
 
-@require_POST
 def france_connect_authorize(request):
     # Possible to set acr_values=eidas1 (eidas2 or eidas3) to filter on provider
     # of identities on a security level.
