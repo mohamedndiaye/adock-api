@@ -164,9 +164,7 @@ FRANCE_CONNECT_URLS = {
 }
 FRANCE_CONNECT_CLIENT_ID = ""
 FRANCE_CONNECT_CLIENT_SECRET = ""
-# Could be a reverse by it's more convenient to provide plain URL (ngrok like,
-# https:// preprend, etc)
-FRANCE_CONNECT_URL_CALLBACK = "https://adock.beta.gouv.fr/api/accounts/fc/callback/"
+FRANCE_CONNECT_URL_CALLBACK = "https://adock.beta.gouv.fr/fc/callback/"
 
 try:
     from .settings_local import *  # pylint: disable=W0401

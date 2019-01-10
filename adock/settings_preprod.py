@@ -30,4 +30,4 @@ SENTRY_DSN = "https://URL-TO-PASTE-FROM-SENTRY-IO"
 
 FRANCE_CONNECT_CLIENT_ID = ""
 FRANCE_CONNECT_CLIENT_SECRET = ""
-FRANCE_CONNECT_URL_CALLBACK = "https://adock.webstack.fr/accounts/fc/callback/"
+FRANCE_CONNECT_URL_CALLBACK = "https://adock.webstack.fr/fc/callback/"
