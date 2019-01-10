@@ -10,3 +10,5 @@ requests==2.20.1
 openpyxl
 # For France Connect
 webstack-django-jwt-auth==0.5.0
+# To parse Sirene page
+beautifulsoup4
