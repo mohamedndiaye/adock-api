@@ -9,6 +9,7 @@ from django.utils.crypto import get_random_string
 from django.utils.http import urlencode
 from django.views.decorators.http import require_GET, require_POST
 import sentry_sdk
+from jwt_auth import forms as jwt_auth_forms
 
 from . import models as accounts_models
 
@@ -91,6 +92,7 @@ def france_connect_callback(request):
         "grant_type": "authorization_code",
         "redirect_uri": settings.FRANCE_CONNECT_URL_CALLBACK,
     }
+    logger.debug(settings.FRANCE_CONNECT_URLS["token"])
     response = requests.post(settings.FRANCE_CONNECT_URLS["token"], data=data)
     if response.status_code != 200:
         message = "Unable to get the token from France Connect."
@@ -104,6 +106,7 @@ def france_connect_callback(request):
     token_data = response.json()
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
+    logger.debug(settings.FRANCE_CONNECT_URLS["userinfo"])
     response = requests.get(
         settings.FRANCE_CONNECT_URLS["userinfo"],
         params={"schema": "openid"},
@@ -119,7 +122,17 @@ def france_connect_callback(request):
     user, created = create_or_update_user(user_infos)
     if created:
         logger.info("New user created '%s'.", user.email)
-    return JsonResponse({"message": "OK"})
+
+    # Return JWT with id_token to allow logout from FC
+    if user is None:
+        return JsonResponse({"message": "No user"})
+
+    return JsonResponse(
+        {
+            "token": jwt_auth_forms.json_web_token_encode_payload(user),
+            "expiresIn": settings.JWT_EXPIRATION_DELTA.total_seconds(),
+        }
+    )
 
 
 @require_POST

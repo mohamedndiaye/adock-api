@@ -146,4 +146,4 @@ class FranceConnectCallbackTestCase(TestCase):
             response = self.client.get(self.url, {"code": "007"})
         self.assertEqual(response.status_code, 200)
         payload = response.json()
-        self.assertEqual(payload["message"], "OK")
+        self.assertIn("token", payload)
