@@ -7,7 +7,7 @@ from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.crypto import get_random_string
 from django.utils.http import urlencode
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_POST
 import sentry_sdk
 from jwt_auth import forms as jwt_auth_forms
 
