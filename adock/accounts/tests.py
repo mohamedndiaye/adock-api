@@ -93,6 +93,14 @@ class FranceConnectCallbackTestCase(TestCase):
     def setUp(self):
         self.url = reverse("france_connect_callback")
 
+    def test_no_code(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 400)
+        payload = response.json()
+        self.assertEqual(
+            payload["message"], "The query doesn't provide the 'code' parameter."
+        )
+
     def test_unable_to_get_token(self):
         with requests_mock.mock() as m:
             m.post(settings.FRANCE_CONNECT_URLS["token"], status_code=404)

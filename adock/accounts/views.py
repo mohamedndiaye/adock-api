@@ -76,10 +76,13 @@ def create_or_update_user(user_infos):
     return user, created
 
 
-@require_GET
 def france_connect_callback(request):
     # state is also available and should be checked (#1)
-    code = request.GET["code"]
+    code = request.GET.get("code")
+    if code is None:
+        return JsonResponse(
+            {"message": "The query doesn't provide the 'code' parameter."}, status=400
+        )
 
     data = {
         "client_id": settings.FRANCE_CONNECT_CLIENT_ID,
