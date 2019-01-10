@@ -89,35 +89,34 @@ def france_connect_callback(request):
         "redirect_uri": settings.FRANCE_CONNECT_URL_CALLBACK,
     }
     response = requests.post(settings.FRANCE_CONNECT_URLS["token"], data=data)
-
-    if response.status_code == 200:
-        # Contains access_token, token_type, expires_in, id_token
-        # id_token contains a field 'nonce' to check (#2)
-        token_data = response.json()
-        # A token has been provided so it's time to fetch associated user infos
-        # because the token is only valid for 5 seconds.
-        response = requests.get(
-            settings.FRANCE_CONNECT_URLS["userinfo"],
-            params={"schema": "openid"},
-            headers={"Authorization": "Bearer " + token_data["access_token"]},
-        )
-        if response.status_code == 200:
-            user_infos = json.loads(response.content.decode("utf-8"))
-            user, created = create_or_update_user(user_infos)
-            if created:
-                logger.info("New user created '%s'.", user.email)
-            return JsonResponse({"message": "OK"})
-        else:
-            message = "Unable to get the user infos from France Connect."
-            logger.error(message)
-            sentry_sdk.capture_message(message)
-            return JsonResponse({"message": message}, status=response.status_code)
-    else:
+    if response.status_code != 200:
         message = "Unable to get the token from France Connect."
         logger.error(message)
         sentry_sdk.capture_message("%s\n%s" % (message, response.content))
         # The response is certainly ignored by FC but it's convenient for our tests
         return JsonResponse({"message": message}, status=response.status_code)
+
+    # Contains access_token, token_type, expires_in, id_token
+    # id_token contains a field 'nonce' to check (#2)
+    token_data = response.json()
+    # A token has been provided so it's time to fetch associated user infos
+    # because the token is only valid for 5 seconds.
+    response = requests.get(
+        settings.FRANCE_CONNECT_URLS["userinfo"],
+        params={"schema": "openid"},
+        headers={"Authorization": "Bearer " + token_data["access_token"]},
+    )
+    if response.status_code != 200:
+        message = "Unable to get the user infos from France Connect."
+        logger.error(message)
+        sentry_sdk.capture_message(message)
+        return JsonResponse({"message": message}, status=response.status_code)
+
+    user_infos = json.loads(response.content.decode("utf-8"))
+    user, created = create_or_update_user(user_infos)
+    if created:
+        logger.info("New user created '%s'.", user.email)
+    return JsonResponse({"message": "OK"})
 
 
 @require_POST
