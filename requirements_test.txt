@@ -3,3 +3,4 @@ coverage
 factory_boy
 faker
 unidecode
+requests-mock
