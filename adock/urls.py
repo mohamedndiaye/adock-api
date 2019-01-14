@@ -13,7 +13,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf import settings
 from django.urls import include, path
 
 from adock.meta import views as meta_views
@@ -24,8 +23,6 @@ urlpatterns = [
     path("accounts/", include("adock.accounts.urls")),
     path("carriers/", include("adock.carriers.urls")),
     path("meta/", meta_views.meta_index, name="meta"),
+    path("selftest", selftest_views.selftest_index, name="selftest"),
     path("stats/", stats_views.stats, name="stats"),
 ]
-
-if settings.USE_SELFTEST:
-    urlpatterns.append(path("selftest", selftest_views.selftest_index, name="selftest"))
