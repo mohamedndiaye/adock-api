@@ -1,6 +1,8 @@
+from unittest import skipIf
 import datetime
 import random
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
@@ -14,6 +16,7 @@ class CarrierStatsTestCase(AuthTestCaseBase):
         super().setUp()
         self.url = reverse("carriers_stats")
 
+    @skipIf(settings.AUTHENTICATION_DISABLED, "Authentication is disabled")
     def test_staff_only(self):
         User = get_user_model()
         user = User(email="courriel@example.com", is_staff=False)
