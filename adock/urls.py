@@ -17,12 +17,14 @@ from django.conf import settings
 from django.urls import include, path
 
 from adock.meta import views as meta_views
+from adock.stats import views as stats_views
 from adock.selftest import views as selftest_views
 
 urlpatterns = [
     path("accounts/", include("adock.accounts.urls")),
     path("carriers/", include("adock.carriers.urls")),
     path("meta/", meta_views.meta_index, name="meta"),
+    path("stats/", stats_views.stats, name="stats"),
 ]
 
 if settings.USE_SELFTEST:

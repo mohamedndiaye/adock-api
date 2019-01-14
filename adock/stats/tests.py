@@ -7,14 +7,14 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 
-from .. import factories
-from ...accounts.test import AuthTestCaseBase
+from adock.carriers import factories as carriers_factories
+from adock.accounts.test import AuthTestCaseBase
 
 
-class CarrierStatsTestCase(AuthTestCaseBase):
+class StatsTestCase(AuthTestCaseBase):
     def setUp(self):
         super().setUp()
-        self.url = reverse("carriers_stats")
+        self.url = reverse("stats")
 
     @skipIf(settings.AUTHENTICATION_DISABLED, "Authentication is disabled")
     def test_staff_only(self):
@@ -35,22 +35,24 @@ class CarrierStatsTestCase(AuthTestCaseBase):
         STATS_NB_MONTHS = 6
 
         # One carrier not validated
-        factories.CarrierFactory(validated_at=None)
+        carriers_factories.CarrierFactory(validated_at=None)
 
         # First day in one of 10 previous months
         validated_date = (
             timezone.now()
             - datetime.timedelta(days=random.randint(1, STATS_NB_MONTHS - 1) * 31)
         ).replace(day=1)
-        factories.CarrierFactory(validated_at=validated_date)
+        carriers_factories.CarrierFactory(validated_at=validated_date)
 
         # One carrier validated outside of the range of stats
-        factories.CarrierFactory(
+        carriers_factories.CarrierFactory(
             validated_at=timezone.now() - datetime.timedelta(days=STATS_NB_MONTHS * 31)
         )
 
         # 2 locked sheets
-        factories.CarrierFactory.create_batch(3, email_confirmed_at=validated_date)
+        carriers_factories.CarrierFactory.create_batch(
+            3, email_confirmed_at=validated_date
+        )
 
         http_authorization = self.log_in()
         response = self.client.get(

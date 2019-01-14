@@ -41,9 +41,10 @@ INSTALLED_APPS = [
     "corsheaders",
     "phonenumber_field",
     "adock.accounts.apps.AccountsConfig",
+    "adock.carriers.apps.CarriersConfig",
     "adock.meta.apps.MetaConfig",
     "adock.selftest.apps.SelftestConfig",
-    "adock.carriers.apps.CarriersConfig",
+    "adock.stats.apps.StatsConfig",
 ]
 
 MIDDLEWARE = [
