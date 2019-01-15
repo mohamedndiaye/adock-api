@@ -4,7 +4,7 @@ jinja2
 django-cors-headers==2.4
 phonenumbers==8.10.1
 django-phonenumber-field==2.1.0
-sentry_sdk==0.6.2
+sentry_sdk==0.6.6
 requests==2.20.1
 # To import labelled carriers of Objectif CO2
 openpyxl
