@@ -4,10 +4,11 @@ _build/
 /.coverage
 /.pytest_cache/
 /.vscode/
+/datafiles/
 /htmlcov/
 /media/
+/node_modules/
 /static/
-/datafiles/
 *.csv
 # conf specific to the instance
 adock/settings_local.py

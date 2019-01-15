@@ -311,3 +311,27 @@ class CarrierFeed(models.Model):
 
     class Meta:
         db_table = "carrier_feed"
+
+
+CERTIFICATE_NO_FOREIGNERS = "no-foreigners"
+CERTIFICATE_FOREIGNERS = "foreigners"
+CERTIFICATE_CHOICES = (
+    (CERTIFICATE_NO_FOREIGNERS, "Attestation de non emploi de travailleurs étrangers"),
+    (CERTIFICATE_FOREIGNERS, "Attestation d'emploi de travailleurs étrangers"),
+)
+CERTIFICATE_DICT = dict(CERTIFICATE_CHOICES)
+
+
+class CarrierCertificate(models.Model):
+    carrier = models.ForeignKey(
+        Carrier, on_delete=models.CASCADE, related_name="certificates"
+    )
+    kind = models.CharField(max_length=32, choices=CERTIFICATE_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+    data = JSONField()
+
+    def __str__(self):
+        return "%s: %s" % (self.carrier.siret, self.get_kind_display())
+
+    class Meta:
+        db_table = "carrier_certificate"

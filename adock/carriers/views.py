@@ -6,10 +6,12 @@ from django.db import transaction
 from django.db.models import Q
 from django.db.models.expressions import OrderBy, RawSQL
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
+from django.utils.formats import date_format
 import sentry_sdk
 
+from adock.core import pdf as core_pdf
 from . import forms, mails, models, tokens, validators
 
 CARRIER_LIST_FIELDS = (
@@ -392,3 +394,61 @@ def carrier_send_edit_code(request, carrier_siret):
         },
         status=status,
     )
+
+
+#
+# FIXME Check POST is done by carrier owner
+# FIXME Dry to handle 'foreigners' too
+def carrier_certificate(request, carrier_siret, as_pdf=True):
+    kind = models.CERTIFICATE_NO_FOREIGNERS
+    carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
+
+    if request.method == "POST":
+        try:
+            payload = json.loads(request.body.decode("utf-8"))
+        except json.decoder.JSONDecodeError:
+            return JsonResponse(
+                {"message": "Les données ne sont pas valides."}, status=400
+            )
+
+        REQUIRED_FIELDS = ("last_name", "first_name", "position", "location")
+        if not all(required_field in payload for required_field in REQUIRED_FIELDS):
+            return JsonResponse(
+                {"message": "Les données ne contiennent pas tous les champs requis"},
+                status=400,
+            )
+
+        models.CarrierCertificate.objects.create(
+            carrier=carrier, kind=kind, data=payload
+        )
+        return JsonResponse(
+            {"carrier": get_carrier_as_json(carrier, CARRIER_DETAIL_FIELDS)}
+        )
+
+    # Get latest certificate
+    certificate = carrier.certificates.filter(kind=kind).latest("created_at")
+
+    if not certificate:
+        return JsonResponse(
+            {
+                "message": "Aucun certificat du type « %s »."
+                % models.CERTIFICATE_DICT[kind]
+            }
+        )
+
+    response = render(
+        request,
+        "certificate_no_foreigners.html",
+        {
+            "carrier": carrier,
+            "certificate": certificate,
+            "formated_date": date_format(certificate.created_at),
+        },
+    )
+
+    if as_pdf:
+        return core_pdf.pdf_response(
+            response, "adock-%s-attestation-%s.pdf" % (carrier.pk, certificate.pk)
+        )
+
+    return response

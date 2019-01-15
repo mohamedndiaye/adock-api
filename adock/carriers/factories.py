@@ -56,3 +56,17 @@ class CarrierFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = models.Carrier
+
+
+class CarrierCertificateFactory(factory.DjangoModelFactory):
+    carrier = factory.SubFactory(CarrierFactory)
+    kind = models.CERTIFICATE_NO_FOREIGNERS
+    data = {
+        "first_name": "Régis",
+        "last_name": "Dujardin",
+        "position": "Gérant",
+        "location": "Saint André des Eaux",
+    }
+
+    class Meta:
+        model = models.CarrierCertificate

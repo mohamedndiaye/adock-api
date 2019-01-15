@@ -15,4 +15,15 @@ urlpatterns = [
         views.carrier_send_edit_code,
         name="carriers_send_code",
     ),
+    path(
+        "<str:carrier_siret>/certificate/no-foreigners/",
+        views.carrier_certificate_no_foreigners,
+        name="carriers_certificate_no_foreigners",
+    ),
+    path(
+        "<str:carrier_siret>/certificate/no-foreigners/html/",
+        views.carrier_certificate_no_foreigners,
+        name="carriers_certificate_no_foreigners_html",
+        kwargs={"as_pdf": False},
+    ),
 ]

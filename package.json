@@ -1,0 +1,7 @@
+{
+  "name": "adock-api",
+  "private": true,
+  "dependencies": {
+    "puppeteer": "^1.8.0"
+  }
+}
