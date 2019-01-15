@@ -9,6 +9,8 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.utils.formats import date_format
+from django.views.decorators.http import require_POST
+
 import sentry_sdk
 
 from adock.core import pdf as core_pdf
@@ -396,49 +398,57 @@ def carrier_send_edit_code(request, carrier_siret):
     )
 
 
-#
 # FIXME Check POST is done by carrier owner
-# FIXME Dry to handle 'foreigners' too
-def carrier_certificate(request, carrier_siret, as_pdf=True):
-    kind = models.CERTIFICATE_NO_FOREIGNERS
+def _carrier_sign_certificate(
+    request, carrier_siret, kind=models.CERTIFICATE_FOREIGNERS
+):
     carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
 
-    if request.method == "POST":
-        try:
-            payload = json.loads(request.body.decode("utf-8"))
-        except json.decoder.JSONDecodeError:
-            return JsonResponse(
-                {"message": "Les données ne sont pas valides."}, status=400
-            )
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except json.decoder.JSONDecodeError:
+        return JsonResponse({"message": "Les données ne sont pas valides."}, status=400)
 
-        REQUIRED_FIELDS = ("last_name", "first_name", "position", "location")
-        if not all(required_field in payload for required_field in REQUIRED_FIELDS):
-            return JsonResponse(
-                {"message": "Les données ne contiennent pas tous les champs requis"},
-                status=400,
-            )
+    REQUIRED_FIELDS = ["last_name", "first_name", "position", "location"]
+    if kind == models.CERTIFICATE_FOREIGNERS:
+        REQUIRED_FIELDS.append("workers")
 
-        models.CarrierCertificate.objects.create(
-            carrier=carrier, kind=kind, data=payload
-        )
+    if not all(required_field in payload for required_field in REQUIRED_FIELDS):
         return JsonResponse(
-            {"carrier": get_carrier_as_json(carrier, CARRIER_DETAIL_FIELDS)}
+            {"message": "Les données ne contiennent pas tous les champs requis."},
+            status=400,
         )
 
-    # Get latest certificate
+    models.CarrierCertificate.objects.create(carrier=carrier, kind=kind, data=payload)
+    return JsonResponse(
+        {"carrier": get_carrier_as_json(carrier, CARRIER_DETAIL_FIELDS)}
+    )
+
+
+def _carrier_get_certificate(
+    request, carrier_siret, kind=models.CERTIFICATE_FOREIGNERS, as_pdf=True
+):
+    carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
+
+    # Get latest certificate of the required kind
     certificate = carrier.certificates.filter(kind=kind).latest("created_at")
 
     if not certificate:
         return JsonResponse(
             {
-                "message": "Aucun certificat du type « %s »."
-                % models.CERTIFICATE_DICT[kind]
+                "message": "Aucun certificat du type « %s » pour le transporteur %s"
+                % (models.CERTIFICATE_DICT[kind], carrier.enseigne)
             }
         )
 
+    template_name = (
+        "certificate_foreigners.html"
+        if kind == models.CERTIFICATE_FOREIGNERS
+        else "certificate_no_foreigners.html"
+    )
     response = render(
         request,
-        "certificate_no_foreigners.html",
+        template_name,
         {
             "carrier": carrier,
             "certificate": certificate,
@@ -452,3 +462,10 @@ def carrier_certificate(request, carrier_siret, as_pdf=True):
         )
 
     return response
+
+
+def carrier_certificate(request, *args, **kwargs):
+    if request.method == "POST":
+        return _carrier_sign_certificate(request, *args, **kwargs)
+
+    return _carrier_get_certificate(request, *args, **kwargs)

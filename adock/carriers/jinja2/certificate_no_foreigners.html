@@ -12,8 +12,11 @@
     }
 
     .title {
+      padding-top: 6em;
       grid-area: t;
       justify-self: center;
+      align-self: center;
+      text-align: center
     }
 
     .content {
@@ -30,7 +33,7 @@
   <div class="wrapper">
     <div class="title">
       <h3>Attestation de non-emploi de travailleurs étrangers</h3>
-      (au regard des articles D8254-2 et L5221-2 du code du travail)
+      <p>Au regard des articles D8254-2 et L5221-2 du code du travail</p>
     </div>
     <div class="content">
       <p>Je, soussigné Mr / Mme {{ certificate.data.first_name }} {{ certificate.data.last_name}}, agissant en
@@ -56,12 +59,12 @@
 
       <p>Indépendamment des cas prévus au présent chapitre, est puni d’un an
       d’emprisonnement et de 15 000 euros d’amende le fait :
-      <ul>
+      <ol>
         <li>D’établir une attestation ou un certificat faisant état de faits matériellement inexacts ;</li>
         <li>De falsifier une attestation ou un certificat originairement sincère ;</li>
         <li>De faire usage d’une attestation ou d’un certificat inexact ou
         falsifié.</li>
-      </ul>
+      </ol>
       </p>
 
       <p>Les peines sont portées à trois ans d’emprisonnement et à 45 000 € d’amende

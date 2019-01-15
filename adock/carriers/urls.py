@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import models, views
 
 urlpatterns = [
     path("search/", views.search, name="carriers_search"),
@@ -16,14 +16,27 @@ urlpatterns = [
         name="carriers_send_code",
     ),
     path(
+        "<str:carrier_siret>/certificate/foreigners/",
+        views.carrier_certificate,
+        name="carriers_certificate_foreigners",
+        kwargs={"kind": models.CERTIFICATE_FOREIGNERS},
+    ),
+    path(
+        "<str:carrier_siret>/certificate/foreigners/html/",
+        views.carrier_certificate,
+        name="carriers_certificate_foreigners_html",
+        kwargs={"kind": models.CERTIFICATE_FOREIGNERS, "as_pdf": False},
+    ),
+    path(
         "<str:carrier_siret>/certificate/no-foreigners/",
-        views.carrier_certificate_no_foreigners,
+        views.carrier_certificate,
         name="carriers_certificate_no_foreigners",
+        kwargs={"kind": models.CERTIFICATE_NO_FOREIGNERS},
     ),
     path(
         "<str:carrier_siret>/certificate/no-foreigners/html/",
-        views.carrier_certificate_no_foreigners,
+        views.carrier_certificate,
         name="carriers_certificate_no_foreigners_html",
-        kwargs={"as_pdf": False},
+        kwargs={"kind": models.CERTIFICATE_NO_FOREIGNERS, "as_pdf": False},
     ),
 ]

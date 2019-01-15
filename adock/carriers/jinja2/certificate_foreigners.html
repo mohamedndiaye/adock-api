@@ -1,0 +1,101 @@
+<html>
+<head>
+    <style>
+    .wrapper {
+      display: grid;
+      grid-gap: 3em;
+      grid-auto-rows: minmax(100px, auto);
+      grid-template-areas:
+        ". t t t ."
+        ". c c c ."
+        ". . s s .";
+    }
+
+    .title {
+      padding-top: 6em;
+      grid-area: t;
+      justify-self: center;
+      align-self: center;
+      text-align: center;
+    }
+
+    .content {
+      grid-area: c;
+    }
+
+    .signature {
+      grid-area: s;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table, .table th, .table td {
+      border: 1px solid black;
+      padding: 1em;
+    }
+
+    .table th {
+      font-weight: bold;
+    }
+    </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="title">
+      <h2>Liste nominative des salariés étrangers soumis à autorisation de travail</h2>
+      <p>Application de l’article d8254-2 du code du travail</p>
+    </div>
+    <div class="content">
+       <p>Je, soussigné Mr / Mme {{ certificate.data.first_name }} {{ certificate.data.last_name}}, agissant en
+      qualité de {{ certificate.data.position }}, de la société {{ carrier.enseigne }}
+      immatriculée sous le {{ carrier.siret }}, dont le siège social est {{
+      carrier.adresse }} {{ carrier.code_postal }} {{ carrier.ville }},</p>
+
+      <strong>Déclare ci-dessous les salariés étrangers soumis à l'autorisation de
+      travail mentionnée à l'article L5221-2 du code du travail</strong>
+
+      <p>Ne sont pas soumis à autorisation de travail :</p>
+      <ul>
+        <li>Les ressortissants des états membres de l’Union Européenne :
+        Allemagne, Autriche, Belgique, Danemark, Espagne, Grèce, Finlande,
+        Irlande, Italie, Luxembourg, Pays Bas, Portugal, Royaume-Uni, Suède,
+        Chypre, Malte, République Tchèque, Estonie, Lettonie, Lituanie, Hongrie,
+        Pologne, Slovénie et Slovaquie ;
+        </li>
+        <li>
+        Les ressortissants des autres états parties à l’accord sur l’Espace
+        économique européen : Islande, Liechtenstein et Norvège ;</li>
+        <li>Les ressortissants de la Confédération Helvétique.</li>
+      </ul>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nom salarié</th>
+            <th>Date embauche</th>
+            <th>Nationalité</th>
+            <th>Type / N°ordre titre valant autorisation de travail</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for worker in certificate.data.workers %}
+          <tr>
+            <td>{{ worker["name"] }}</td>
+            <td>{{ worker["date"] }}</td>
+            <td>{{ worker["nationality"] }}</td>
+            <td>{{ worker["work_permit"] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="signature">
+      <p>Fait à {{ certificate.data.location }}, le {{ formated_date }}</p>
+      <p>Signature du dirigeant + cachet de l’entreprise</p>
+    </div>
+  </div>
+</body>
+</html>
