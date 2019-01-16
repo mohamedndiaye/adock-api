@@ -1,6 +1,7 @@
 DEBUG = True
 USE_DEBUG_CONSOLE = True
 USE_SENTRY = False
+USE_CIRCLECI = True
 
 DATABASES = {
     "default": {

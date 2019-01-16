@@ -1,6 +1,8 @@
+from unittest import skipIf
 import copy
 import json
 
+from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 
@@ -75,6 +77,7 @@ class CarrierCertificateTestCase(TestCase):
         self.assertEqual(certificate.data["location"], data["location"])
         self.assertIsNotNone(certificate.created_at)
 
+    @skipIf(settings.USE_CIRCLECI, "Image not ready for CircleCI")
     def test_get_certificate_foreigners(self):
         certificate = factories.CarrierCertificateFactory(
             kind=models.CERTIFICATE_FOREIGNERS
@@ -87,6 +90,7 @@ class CarrierCertificateTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
 
+    @skipIf(settings.USE_CIRCLECI, "Image not ready for CircleCI")
     def test_get_certificate_no_foreigners(self):
         data = copy.copy(CERTIFICATE_DATA)
         data["workers"] = CERTIFICATE_DATA_WORKERS
