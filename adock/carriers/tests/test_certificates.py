@@ -77,6 +77,22 @@ class CarrierCertificateTestCase(TestCase):
         self.assertEqual(certificate.data["location"], data["location"])
         self.assertIsNotNone(certificate.created_at)
 
+    def test_sign_invalid_certificate_no_foreigners(self):
+        carrier = factories.CarrierFactory()
+        url = reverse(
+            "carriers_certificate_no_foreigners",
+            kwargs={"carrier_siret": carrier.siret},
+        )
+        data = copy.copy(CERTIFICATE_DATA)
+        # Empty field
+        data["last_name"] = ""
+        response = self.client.post(
+            url, json.dumps(data), content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.content)
+        self.assertIn("last_name", data)
+
     @skipIf(settings.USE_CIRCLECI, "Image not ready for CircleCI")
     def test_get_certificate_foreigners(self):
         certificate = factories.CarrierCertificateFactory(

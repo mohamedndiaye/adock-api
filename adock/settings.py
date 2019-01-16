@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.postgres",
     "corsheaders",
+    "rest_framework",
     "phonenumber_field",
     "adock.accounts.apps.AccountsConfig",
     "adock.carriers.apps.CarriersConfig",

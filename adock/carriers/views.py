@@ -10,11 +10,12 @@ from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.utils.formats import date_format
 from django.views.decorators.http import require_POST
-
+from rest_framework import serializers
 import sentry_sdk
 
 from adock.core import pdf as core_pdf
 from . import forms, mails, models, tokens, validators
+from . import serializers as carriers_serializers
 
 CARRIER_LIST_FIELDS = (
     "siret",
@@ -404,22 +405,27 @@ def _carrier_sign_certificate(
 ):
     carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
 
+    # FIXME DRY
+
     try:
         payload = json.loads(request.body.decode("utf-8"))
     except json.decoder.JSONDecodeError:
         return JsonResponse({"message": "Les données ne sont pas valides."}, status=400)
 
-    REQUIRED_FIELDS = ["last_name", "first_name", "position", "location"]
     if kind == models.CERTIFICATE_FOREIGNERS:
-        REQUIRED_FIELDS.append("workers")
+        Serializer = carriers_serializers.CertificateWithWorkersSerializer
+    else:
+        Serializer = carriers_serializers.CertificateSerializer
 
-    if not all(required_field in payload for required_field in REQUIRED_FIELDS):
-        return JsonResponse(
-            {"message": "Les données ne contiennent pas tous les champs requis."},
-            status=400,
-        )
+    serializer = Serializer(data=payload)
+    try:
+        serializer.is_valid(raise_exception=True)
+    except serializers.ValidationError:
+        return JsonResponse(serializer.errors, status=400)
 
-    models.CarrierCertificate.objects.create(carrier=carrier, kind=kind, data=payload)
+    models.CarrierCertificate.objects.create(
+        carrier=carrier, kind=kind, data=serializer.validated_data
+    )
     return JsonResponse(
         {"carrier": get_carrier_as_json(carrier, CARRIER_DETAIL_FIELDS)}
     )
