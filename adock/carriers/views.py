@@ -269,12 +269,9 @@ def carrier_detail(request, carrier_siret):
                 status=400,
             )
 
-        try:
-            payload = json.loads(request.body.decode("utf-8"))
-        except json.decoder.JSONDecodeError:
-            return JsonResponse(
-                {"message": "Les données ne sont pas valides."}, status=400
-            )
+        payload, response = core_views.request_load(request)
+        if response:
+            return response
 
         # Emails stored in DB aren't exposed before validation.
         # If not provided on first validation, emails are deleted (and logged).

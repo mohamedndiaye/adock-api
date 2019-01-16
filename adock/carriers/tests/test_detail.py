@@ -234,7 +234,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         response = self.client.patch(self.detail_url, "foo", "application/json")
         self.assertEqual(response.status_code, 400)
         data = response.json()
-        self.assertEqual(data["message"], "Les données ne sont pas valides.")
+        self.assertEqual(data["message"], "Le format des données n'est pas valide.")
 
     def test_patch_unknow_payload(self):
         data = self.patch_carrier({"foo": "42"}, 200)

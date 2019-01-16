@@ -119,7 +119,13 @@ def france_connect_callback(request):
         sentry_sdk.capture_message(message)
         return JsonResponse({"message": message}, status=response.status_code)
 
-    user_infos = json.loads(response.content.decode("utf-8"))
+    try:
+        user_infos = json.loads(response.content.decode("utf-8"))
+    except json.decoder.JSONDecodeError:
+        return JsonResponse(
+            {"message": "Unable to decode user infos from response."}, status=400
+        )
+
     user, created = create_or_update_user(user_infos)
     if created:
         logger.info("New user created '%s'.", user.email)

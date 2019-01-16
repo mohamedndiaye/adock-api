@@ -10,7 +10,9 @@ def request_load(request):
     except json.decoder.JSONDecodeError:
         return (
             None,
-            JsonResponse({"message": "Les données ne sont pas valides."}, status=400),
+            JsonResponse(
+                {"message": "Le format des données n'est pas valide."}, status=400
+            ),
         )
 
     return payload, None
