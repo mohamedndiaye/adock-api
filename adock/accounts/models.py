@@ -70,11 +70,11 @@ class User(AbstractBaseUser):
         super().clean()
         self.email = self.__class__.objects.normalize_email(self.email)
 
-    def has_perm(self, perm, obj=None):
+    def has_perm(self, perm, obj=None):  # pylint: disable=no-self-use
         # Simplest possible answer: Yes, always
         return True
 
-    def has_module_perms(self, app_label):
+    def has_module_perms(self, app_label):  # pylint: disable=no-self-use
         # Simplest possible answer: Yes, always
         return True
 
