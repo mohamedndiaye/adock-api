@@ -3,6 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.5.3
+      - image: circleci/node:latest-browsers
       - image: circleci/postgres:9.6
         environment:
           POSTGRES_DB: circleci_test
@@ -16,12 +17,16 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "requirements_test.txt" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - pip-dependencies-{{ checksum "requirements_test.txt" }}
+            - pip-dependencies-
+
+      - restore_cache:
+          keys:
+            - npm-dependencies-{{ checksum "package.txt" }}
+            - npm-dependencies-
 
       - run:
-          name: install dependencies
+          name: install Python dependencies
           command: |
             python -m venv venv
             . venv/bin/activate
@@ -29,8 +34,17 @@ jobs:
 
       - save_cache:
           paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements_test.txt" }}
+            - venv
+          key: pip-dependencies-{{ checksum "requirements_test.txt" }}
+
+      - run:
+          name: install npm packages
+          command: npm install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: npm-dependencies-{{ checksum "package.json" }}
 
       - run:
           name: install test settings
