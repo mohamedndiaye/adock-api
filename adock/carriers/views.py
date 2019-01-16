@@ -9,11 +9,11 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.utils.formats import date_format
-from django.views.decorators.http import require_POST
-from rest_framework import serializers
 import sentry_sdk
 
 from adock.core import pdf as core_pdf
+from adock.core import views as core_views
+
 from . import forms, mails, models, tokens, validators
 from . import serializers as carriers_serializers
 
@@ -405,23 +405,14 @@ def _carrier_sign_certificate(
 ):
     carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
 
-    # FIXME DRY
-
-    try:
-        payload = json.loads(request.body.decode("utf-8"))
-    except json.decoder.JSONDecodeError:
-        return JsonResponse({"message": "Les données ne sont pas valides."}, status=400)
-
     if kind == models.CERTIFICATE_FOREIGNERS:
         Serializer = carriers_serializers.CertificateWithWorkersSerializer
     else:
         Serializer = carriers_serializers.CertificateSerializer
 
-    serializer = Serializer(data=payload)
-    try:
-        serializer.is_valid(raise_exception=True)
-    except serializers.ValidationError:
-        return JsonResponse(serializer.errors, status=400)
+    serializer, response = core_views.request_validate(request, Serializer)
+    if response:
+        return response
 
     models.CarrierCertificate.objects.create(
         carrier=carrier, kind=kind, data=serializer.validated_data
