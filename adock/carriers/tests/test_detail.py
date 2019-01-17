@@ -46,6 +46,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         self.assertEqual(carrier_data["specialities"], None)
         self.assertEqual(carrier_data["is_locked"], False)
         self.assertEqual(carrier_data["other_facilities"], [])
+        self.assertEqual(carrier_data["latest_certificate"], None)
 
     def test_get_other_facilities(self):
         for i in range(3):
@@ -61,6 +62,15 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         carrier_data = response.json()["carrier"]
         self.assertEqual(len(carrier_data["other_facilities"]), 3)
         self.assertIn("siret", carrier_data["other_facilities"][0])
+
+    def test_latest_certificate(self):
+        certificate = factories.CarrierCertificateFactory(carrier=self.carrier)
+        response = self.client.get(self.detail_url)
+        carrier_data = response.json()["carrier"]
+        self.assertEqual(
+            carrier_data["latest_certificate"]["kind_display"],
+            certificate.get_kind_display(),
+        )
 
     def test_get_empty_phone(self):
         self.carrier.telephone = ""

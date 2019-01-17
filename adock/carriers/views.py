@@ -109,6 +109,17 @@ def get_other_facilities_as_json(carrier):
     return list(other_facilities)
 
 
+def get_latest_certificate_as_json(carrier):
+    certificate = carrier.get_latest_certificate()
+    if not certificate:
+        return None
+
+    return {
+        "kind_display": certificate.get_kind_display(),
+        "created_at": certificate.created_at,
+    }
+
+
 def search(request):
     """The search allows to filter on:
        - partial enseigne or SIRET
@@ -337,6 +348,7 @@ def carrier_detail(request, carrier_siret):
 
     carrier_json = get_carrier_as_json(carrier, transporteur_detail_fields)
     carrier_json["other_facilities"] = get_other_facilities_as_json(carrier)
+    carrier_json["latest_certificate"] = get_latest_certificate_as_json(carrier)
     response_json["carrier"] = carrier_json
     return JsonResponse(response_json)
 
