@@ -93,14 +93,22 @@ class SignCarrierCertificateTestCase(TestCase):
 
 @skipIf(settings.USE_CIRCLECI, "Image not ready for CircleCI")
 class GetCarrierCertificateTestCase(TestCase):
+    def setUp(self):
+        self.carrier = factories.CarrierFactory()
+        self.url = reverse(
+            "carriers_certificate", kwargs={"carrier_siret": self.carrier.siret}
+        )
+
+        def test_get_no_certificate(self):
+            response = self.client.get(self.url)
+            self.assertEqual(response.status_code, 404)
+
     def test_get_certificate_workers(self):
         certificate = factories.CarrierCertificateFactory(
-            kind=models.CERTIFICATE_WORKERS
+            carrier=self.carrier, kind=models.CERTIFICATE_WORKERS
         )
-        url = reverse(
-            "carriers_certificate", kwargs={"carrier_siret": certificate.carrier.siret}
-        )
-        response = self.client.get(url)
+
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
 
@@ -108,11 +116,8 @@ class GetCarrierCertificateTestCase(TestCase):
         data = copy.copy(CERTIFICATE_DATA)
         data["workers"] = CERTIFICATE_DATA_WORKERS
         certificate = factories.CarrierCertificateFactory(
-            kind=models.CERTIFICATE_NO_WORKERS, data=data
+            carrier=self.carrier, kind=models.CERTIFICATE_NO_WORKERS, data=data
         )
-        url = reverse(
-            "carriers_certificate", kwargs={"carrier_siret": certificate.carrier.siret}
-        )
-        response = self.client.get(url)
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
