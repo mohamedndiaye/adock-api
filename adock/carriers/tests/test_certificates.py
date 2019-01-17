@@ -60,7 +60,7 @@ class SignCarrierCertificateTestCase(TestCase):
         self.assertNotIn("kind", certificate.data)
         self.assertIsNotNone(certificate.created_at)
 
-    def test_sign_certificate_no_WORKERS(self):
+    def test_sign_certificate_no_workers(self):
         data = copy.copy(CERTIFICATE_DATA)
         data["kind"] = models.CERTIFICATE_NO_WORKERS
         response = self.client.post(
@@ -78,7 +78,7 @@ class SignCarrierCertificateTestCase(TestCase):
         self.assertNotIn("workers", certificate.data)
         self.assertIsNotNone(certificate.created_at)
 
-    def test_sign_invalid_certificate_no_WORKERS(self):
+    def test_sign_invalid_certificate_no_workers(self):
         data = copy.copy(CERTIFICATE_DATA)
         # Empty field
         data["kind"] = models.CERTIFICATE_NO_WORKERS
@@ -87,7 +87,7 @@ class SignCarrierCertificateTestCase(TestCase):
             self.url, json.dumps(data), content_type="application/json"
         )
         self.assertEqual(response.status_code, 400)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode("utf-8"))
         self.assertIn("last_name", data)
 
 
@@ -115,7 +115,7 @@ class GetCarrierCertificateTestCase(TestCase):
     def test_get_certificate_no_workers(self):
         data = copy.copy(CERTIFICATE_DATA)
         data["workers"] = CERTIFICATE_DATA_WORKERS
-        certificate = factories.CarrierCertificateFactory(
+        factories.CarrierCertificateFactory(
             carrier=self.carrier, kind=models.CERTIFICATE_NO_WORKERS, data=data
         )
         response = self.client.get(self.url)

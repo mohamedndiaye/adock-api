@@ -14,7 +14,7 @@ def pdf_response(response, pdf_filename):
         prefix=pdf_filename.replace(".pdf", ""), suffix=".html"
     )
     with open(html_filename, "w+") as f:
-        content = response.content.decode()
+        content = response.content.decode("utf-8")
         f.write(content)
 
     ps = subprocess.Popen(
