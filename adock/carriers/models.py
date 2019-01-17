@@ -313,11 +313,11 @@ class CarrierFeed(models.Model):
         db_table = "carrier_feed"
 
 
-CERTIFICATE_NO_FOREIGNERS = "no-foreigners"
-CERTIFICATE_FOREIGNERS = "foreigners"
+CERTIFICATE_NO_WORKERS = "no-workers"
+CERTIFICATE_WORKERS = "workers"
 CERTIFICATE_CHOICES = (
-    (CERTIFICATE_NO_FOREIGNERS, "Attestation de non emploi de travailleurs étrangers"),
-    (CERTIFICATE_FOREIGNERS, "Attestation d'emploi de travailleurs étrangers"),
+    (CERTIFICATE_NO_WORKERS, "Attestation de non emploi de travailleurs étrangers"),
+    (CERTIFICATE_WORKERS, "Attestation d'emploi de travailleurs étrangers"),
 )
 CERTIFICATE_DICT = dict(CERTIFICATE_CHOICES)
 

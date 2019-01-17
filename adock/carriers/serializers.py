@@ -23,5 +23,5 @@ class CertificateSerializer(serializers.Serializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.initial_data["kind"] == carriers_models.CERTIFICATE_FOREIGNERS:
+        if self.initial_data["kind"] == carriers_models.CERTIFICATE_WORKERS:
             self.fields["workers"].required = True

@@ -60,7 +60,7 @@ class CarrierFactory(factory.django.DjangoModelFactory):
 
 class CarrierCertificateFactory(factory.DjangoModelFactory):
     carrier = factory.SubFactory(CarrierFactory)
-    kind = models.CERTIFICATE_NO_FOREIGNERS
+    kind = models.CERTIFICATE_NO_WORKERS
     data = {
         "first_name": "Régis",
         "last_name": "Dujardin",

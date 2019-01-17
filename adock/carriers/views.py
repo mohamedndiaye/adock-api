@@ -426,9 +426,9 @@ def _carrier_get_certificate(request, carrier_siret, as_pdf=True):
         )
 
     template_name = (
-        "certificate_foreigners.html"
-        if certificate.kind == models.CERTIFICATE_FOREIGNERS
-        else "certificate_no_foreigners.html"
+        "certificate_workers.html"
+        if certificate.kind == models.CERTIFICATE_WORKERS
+        else "certificate_no_workers.html"
     )
     response = render(
         request,

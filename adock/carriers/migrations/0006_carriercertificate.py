@@ -7,22 +7,48 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('carriers', '0005_auto_20181122_1609'),
-    ]
+    dependencies = [("carriers", "0005_auto_20181122_1609")]
 
     operations = [
         migrations.CreateModel(
-            name='CarrierCertificate',
+            name="CarrierCertificate",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('kind', models.CharField(choices=[('no-foreigners', 'Attestation de non emploi de travailleurs étrangers'), ('foreigners', "Attestation d'emploi de travailleurs étrangers")], max_length=32)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('data', django.contrib.postgres.fields.jsonb.JSONField()),
-                ('carrier', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='certificates', to='carriers.Carrier')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "kind",
+                    models.CharField(
+                        choices=[
+                            (
+                                "no-workers",
+                                "Attestation de non emploi de travailleurs étrangers",
+                            ),
+                            (
+                                "workers",
+                                "Attestation d'emploi de travailleurs étrangers",
+                            ),
+                        ],
+                        max_length=32,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("data", django.contrib.postgres.fields.jsonb.JSONField()),
+                (
+                    "carrier",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="certificates",
+                        to="carriers.Carrier",
+                    ),
+                ),
             ],
-            options={
-                'db_table': 'carrier_certificate',
-            },
-        ),
+            options={"db_table": "carrier_certificate"},
+        )
     ]
