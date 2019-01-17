@@ -15,28 +15,17 @@ urlpatterns = [
         views.carrier_send_edit_code,
         name="carriers_send_code",
     ),
+    # POST to create SQL entry and GET to generate PDF
     path(
-        "<str:carrier_siret>/certificate/foreigners/",
+        "<str:carrier_siret>/certificate/",
         views.carrier_certificate,
-        name="carriers_certificate_foreigners",
-        kwargs={"kind": models.CERTIFICATE_FOREIGNERS},
+        name="carriers_certificate",
     ),
+    # GET to generate HTML
     path(
-        "<str:carrier_siret>/certificate/foreigners/html/",
+        "<str:carrier_siret>/certificate/html/",
         views.carrier_certificate,
-        name="carriers_certificate_foreigners_html",
-        kwargs={"kind": models.CERTIFICATE_FOREIGNERS, "as_pdf": False},
-    ),
-    path(
-        "<str:carrier_siret>/certificate/no-foreigners/",
-        views.carrier_certificate,
-        name="carriers_certificate_no_foreigners",
-        kwargs={"kind": models.CERTIFICATE_NO_FOREIGNERS},
-    ),
-    path(
-        "<str:carrier_siret>/certificate/no-foreigners/html/",
-        views.carrier_certificate,
-        name="carriers_certificate_no_foreigners_html",
-        kwargs={"kind": models.CERTIFICATE_NO_FOREIGNERS, "as_pdf": False},
+        name="carriers_certificate_html",
+        kwargs={"as_pdf": False},
     ),
 ]

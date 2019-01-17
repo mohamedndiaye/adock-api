@@ -32,81 +32,78 @@ CERTIFICATE_DATA_WORKERS = [
 ]
 
 
-class CarrierCertificateTestCase(TestCase):
-    def test_sign_certificate_foreigners(self):
-        carrier = factories.CarrierFactory()
-        url = reverse(
-            "carriers_certificate_foreigners", kwargs={"carrier_siret": carrier.siret}
+class SignCarrierCertificateTestCase(TestCase):
+    def setUp(self):
+        self.carrier = factories.CarrierFactory()
+        self.url = reverse(
+            "carriers_certificate", kwargs={"carrier_siret": self.carrier.siret}
         )
 
+    def test_sign_certificate_foreigners(self):
         data = copy.copy(CERTIFICATE_DATA)
+        data["kind"] = models.CERTIFICATE_FOREIGNERS
         data["workers"] = CERTIFICATE_DATA_WORKERS
         response = self.client.post(
-            url, json.dumps(data), content_type="application/json"
+            self.url, json.dumps(data), content_type="application/json"
         )
         self.assertEqual(response.status_code, 200)
 
-        carrier.refresh_from_db()
-        certificate = carrier.certificates.get()
+        self.carrier.refresh_from_db()
+        certificate = self.carrier.certificates.get()
         self.assertEqual(certificate.kind, models.CERTIFICATE_FOREIGNERS)
         self.assertEqual(certificate.data["first_name"], data["first_name"])
         self.assertEqual(certificate.data["last_name"], data["last_name"])
         self.assertEqual(certificate.data["position"], data["position"])
         self.assertEqual(certificate.data["location"], data["location"])
+        self.assertIn("workers", certificate.data)
+        self.assertEqual(len(certificate.data["workers"]), 2)
+        self.assertNotIn("kind", certificate.data)
         self.assertIsNotNone(certificate.created_at)
 
     def test_sign_certificate_no_foreigners(self):
-        carrier = factories.CarrierFactory()
-        url = reverse(
-            "carriers_certificate_no_foreigners",
-            kwargs={"carrier_siret": carrier.siret},
-        )
-
-        data = CERTIFICATE_DATA
+        data = copy.copy(CERTIFICATE_DATA)
+        data["kind"] = models.CERTIFICATE_NO_FOREIGNERS
         response = self.client.post(
-            url, json.dumps(data), content_type="application/json"
+            self.url, json.dumps(data), content_type="application/json"
         )
         self.assertEqual(response.status_code, 200)
 
-        carrier.refresh_from_db()
-        certificate = carrier.certificates.get()
+        self.carrier.refresh_from_db()
+        certificate = self.carrier.certificates.get()
         self.assertEqual(certificate.kind, models.CERTIFICATE_NO_FOREIGNERS)
         self.assertEqual(certificate.data["first_name"], data["first_name"])
         self.assertEqual(certificate.data["last_name"], data["last_name"])
         self.assertEqual(certificate.data["position"], data["position"])
         self.assertEqual(certificate.data["location"], data["location"])
+        self.assertNotIn("workers", certificate.data)
         self.assertIsNotNone(certificate.created_at)
 
     def test_sign_invalid_certificate_no_foreigners(self):
-        carrier = factories.CarrierFactory()
-        url = reverse(
-            "carriers_certificate_no_foreigners",
-            kwargs={"carrier_siret": carrier.siret},
-        )
         data = copy.copy(CERTIFICATE_DATA)
         # Empty field
+        data["kind"] = models.CERTIFICATE_NO_FOREIGNERS
         data["last_name"] = ""
         response = self.client.post(
-            url, json.dumps(data), content_type="application/json"
+            self.url, json.dumps(data), content_type="application/json"
         )
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.content)
         self.assertIn("last_name", data)
 
-    @skipIf(settings.USE_CIRCLECI, "Image not ready for CircleCI")
+
+@skipIf(settings.USE_CIRCLECI, "Image not ready for CircleCI")
+class GetCarrierCertificateTestCase(TestCase):
     def test_get_certificate_foreigners(self):
         certificate = factories.CarrierCertificateFactory(
             kind=models.CERTIFICATE_FOREIGNERS
         )
         url = reverse(
-            "carriers_certificate_foreigners",
-            kwargs={"carrier_siret": certificate.carrier.siret},
+            "carriers_certificate", kwargs={"carrier_siret": certificate.carrier.siret}
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
 
-    @skipIf(settings.USE_CIRCLECI, "Image not ready for CircleCI")
     def test_get_certificate_no_foreigners(self):
         data = copy.copy(CERTIFICATE_DATA)
         data["workers"] = CERTIFICATE_DATA_WORKERS
@@ -114,8 +111,7 @@ class CarrierCertificateTestCase(TestCase):
             kind=models.CERTIFICATE_NO_FOREIGNERS, data=data
         )
         url = reverse(
-            "carriers_certificate_no_foreigners",
-            kwargs={"carrier_siret": certificate.carrier.siret},
+            "carriers_certificate", kwargs={"carrier_siret": certificate.carrier.siret}
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

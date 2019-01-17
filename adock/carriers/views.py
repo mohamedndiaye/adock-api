@@ -396,20 +396,16 @@ def carrier_send_edit_code(request, carrier_siret):
 
 
 # FIXME Check POST is done by carrier owner
-def _carrier_sign_certificate(
-    request, carrier_siret, kind=models.CERTIFICATE_FOREIGNERS
-):
+def _carrier_sign_certificate(request, carrier_siret):
     carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
 
-    if kind == models.CERTIFICATE_FOREIGNERS:
-        Serializer = carriers_serializers.CertificateWithWorkersSerializer
-    else:
-        Serializer = carriers_serializers.CertificateSerializer
-
-    serializer, response = core_views.request_validate(request, Serializer)
+    serializer, response = core_views.request_validate(
+        request, carriers_serializers.CertificateSerializer
+    )
     if response:
         return response
 
+    kind = serializer.validated_data.pop("kind")
     models.CarrierCertificate.objects.create(
         carrier=carrier, kind=kind, data=serializer.validated_data
     )
@@ -418,25 +414,20 @@ def _carrier_sign_certificate(
     )
 
 
-def _carrier_get_certificate(
-    request, carrier_siret, kind=models.CERTIFICATE_FOREIGNERS, as_pdf=True
-):
+def _carrier_get_certificate(request, carrier_siret, as_pdf=True):
     carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
 
-    # Get latest certificate of the required kind
-    certificate = carrier.certificates.filter(kind=kind).latest("created_at")
+    # Get latest certificate of any kinds
+    certificate = carrier.certificates.latest("created_at")
 
     if not certificate:
         return JsonResponse(
-            {
-                "message": "Aucun certificat du type « %s » pour le transporteur %s"
-                % (models.CERTIFICATE_DICT[kind], carrier.enseigne)
-            }
+            {"message": "Aucun certificat pour le transporteur %s" % carrier.enseigne}
         )
 
     template_name = (
         "certificate_foreigners.html"
-        if kind == models.CERTIFICATE_FOREIGNERS
+        if certificate.kind == models.CERTIFICATE_FOREIGNERS
         else "certificate_no_foreigners.html"
     )
     response = render(
@@ -451,7 +442,7 @@ def _carrier_get_certificate(
 
     if as_pdf:
         return core_pdf.pdf_response(
-            response, "adock-%s-attestation-%s.pdf" % (carrier.pk, certificate.pk)
+            response, "adock-%s-attestation-%s.pdf" % (carrier.siret, certificate.pk)
         )
 
     return response
