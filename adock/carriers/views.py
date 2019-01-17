@@ -418,12 +418,8 @@ def _carrier_get_certificate(request, carrier_siret, as_pdf=True):
     carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
 
     # Get latest certificate of any kinds
-    try:
-        certificate = carrier.certificates.latest("created_at")
-    except models.CarrierCertificate.DoesNotExist:
-        return JsonResponse({"message": "Aucune attestation disponible"}, status=404)
-
-    if not certificate:
+    certificate = carrier.get_latest_certificate()
+    if certificate is None:
         return JsonResponse(
             {"message": "Aucun certificat pour le transporteur %s" % carrier.enseigne}
         )

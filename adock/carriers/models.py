@@ -280,6 +280,12 @@ class Carrier(models.Model):
         self.edit_code = None
         self.edit_code_at = None
 
+    def get_latest_certificate(self):
+        try:
+            return self.certificates.latest("created_at")
+        except CarrierCertificate.DoesNotExist:
+            return None
+
     def save(self, *args, **kwargs):  # pylint: disable=W0221
         self.completeness = self.compute_completeness()
         if "update_fields" in kwargs:
