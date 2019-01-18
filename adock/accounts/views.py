@@ -149,7 +149,7 @@ def france_connect_logout(request):
     data = {
         "id_token_hint": id_token,
         "state": "test",
-        "post_logout_redirect_uri": settings.FULL_WEBSITE,
+        "post_logout_redirect_uri": settings.HTTPS_WEBSITE,
     }
     return HttpResponseRedirect(
         settings.FRANCE_CONNECT_URLS["logout"] + "?" + urlencode(data)

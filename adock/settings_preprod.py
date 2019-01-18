@@ -16,7 +16,7 @@ ADMINS = (("Stéphane Raimbault", "stephane.raimbault@webstack.fr"),)
 MANAGERS = ADMINS
 
 WEBSITE = "adock.webstack.fr"
-FULL_WEBSITE = "https://" + WEBSITE
+HTTPS_WEBSITE = "https://" + WEBSITE
 SERVER_EMAIL = "no-reply@" + WEBSITE
 EMAIL_SUBJECT_PREFIX = "[adock-preprod]"
 
@@ -29,4 +29,4 @@ SENTRY_DSN = "https://URL-TO-PASTE-FROM-SENTRY-IO"
 
 FRANCE_CONNECT_CLIENT_ID = ""
 FRANCE_CONNECT_CLIENT_SECRET = ""
-FRANCE_CONNECT_URL_CALLBACK = FULL_WEBSITE + "/fc/callback/"
+FRANCE_CONNECT_URL_CALLBACK = HTTPS_WEBSITE + "/fc/callback/"

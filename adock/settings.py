@@ -123,6 +123,7 @@ LOGIN_URL = "accounts_log_in"
 DATAFILES_ROOT = os.path.join(BASE_DIR, "datafiles")
 
 WEBSITE = "adock.beta.gouv.fr"
+HTTPS_WEBSITE = "https://" + WEBSITE
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = False
