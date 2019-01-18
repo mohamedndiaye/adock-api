@@ -441,7 +441,9 @@ def _carrier_get_certificate(request, carrier_siret, as_pdf=True):
         if certificate.kind == models.CERTIFICATE_WORKERS
         else "certificate_no_workers.html"
     )
-    qr_code = core_pdf.get_qr_code(settings.HTTPS_WEBSITE + carrier.get_absolute_url())
+    qr_code = core_pdf.get_qr_code(
+        settings.HTTPS_WEBSITE + "/transporteur/" + carrier.siret
+    )
     response = render(
         request,
         template_name,
