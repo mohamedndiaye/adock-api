@@ -8,7 +8,7 @@
       grid-template-areas:
         ". t t t ."
         ". c c c ."
-        ". . s s .";
+        ". q s s .";
     }
 
     .title {
@@ -25,6 +25,11 @@
 
     .signature {
       grid-area: s;
+    }
+
+    .qr-code {
+      grid-area: q;
+      text-align: right;
     }
 
     .table {
@@ -91,6 +96,9 @@
           {% endfor %}
         </tbody>
       </table>
+    </div>
+    <div class="qr-code">
+      {{ qr_code | safe }}
     </div>
     <div class="signature">
       <p>Fait à {{ certificate.data.location }}, le {{ formated_date }}</p>

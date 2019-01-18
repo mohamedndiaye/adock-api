@@ -1,12 +1,27 @@
+import io
+import logging
 import os
 import subprocess
 import tempfile
-import logging
 
 from django.conf import settings
 from django.http import HttpResponse
+import qrcode
+import qrcode.image.svg
 
 logger = logging.getLogger(__name__)
+
+
+def get_qr_code(data=None, border=2, box_size=7):
+    qr = qrcode.QRCode(
+        image_factory=qrcode.image.svg.SvgImage, border=border, box_size=box_size
+    )
+    qr.add_data(data)
+    svg = qr.make_image()
+    svg_content = io.BytesIO()
+    svg.save(svg_content)
+    content = svg_content.getvalue().decode("utf-8")
+    return content
 
 
 def pdf_response(response, pdf_filename):

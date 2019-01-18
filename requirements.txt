@@ -14,3 +14,4 @@ openpyxl
 webstack-django-jwt-auth==0.5.1
 # To parse Sirene page
 beautifulsoup4
+qrcode[pil]==6.1

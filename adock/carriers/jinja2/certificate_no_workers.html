@@ -8,7 +8,7 @@
       grid-template-areas:
         ". t t t ."
         ". c c c ."
-        ". . s s ."
+        ". q s s ."
     }
 
     .title {
@@ -25,7 +25,11 @@
 
     .signature {
       grid-area: s;
+    }
 
+    .qr-code {
+      grid-area: q;
+      text-align: right;
     }
     </style>
 </head>
@@ -69,6 +73,9 @@
       <p>Les peines sont portées à trois ans d’emprisonnement et à 45 000 € d’amende
       lorsque l’infraction est commise en vue de porter préjudice au trésor public ou
       au patrimoine d’autrui.</p>
+    </div>
+    <div class="qr-code">
+      {{ qr_code | safe }}
     </div>
     <div class="signature">
       <p>Fait à {{ certificate.data.location }}, le {{ formated_date }}</p>
