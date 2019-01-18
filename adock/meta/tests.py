@@ -19,9 +19,7 @@ class MetaTestCase(TestCase):
         self.assertEqual(
             data["choices"]["OBJECTIF_CO2_CHOICES"]["LABELLED"], "Labellisé"
         )
-        self.assertEqual(
-            data["choices"]["SPECIALITY_CHOICES"]["LOT"], "Transport de lots"
-        )
+        self.assertEqual(data["choices"]["SPECIALITY_CHOICES"]["LOT"], "Lots")
         self.assertEqual(data["choices"]["WORKING_AREA_CHOICES"]["FRANCE"], "France")
         self.assertEqual(data["version"], settings.VERSION)
         self.assertEqual(data["carrier"]["count"], 42)
