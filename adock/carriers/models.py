@@ -49,19 +49,22 @@ WORKING_AREA_CHOICES = (
 )
 
 SPECIALITY_CHOICES = (
-    ("LOT", "Transport de lots"),
-    ("PALETTE", "Palettes / Messagerie palettisée"),
-    ("URBAIN", "Urbain / Dernier kilomètre"),
-    ("VRAC_SOLIDE", "Vrac solide"),
-    ("VRAC_LIQUIDE", "Vrac liquide"),
-    ("TEMPERATURE", "Température dirigée"),
-    ("PLATEAU", "Plateau bachés et spécifiques"),
+    ("ANIMAL", "Animaux vivants"),
+    ("AUTRE", "Autre"),
+    ("BOIS", "Bois"),
+    ("DECHETS", "Déchets"),
+    ("DEMENAGEMENT", "Déménagement"),
+    ("LOCATION", "Location"),
+    ("LOT", "Lots"),
     ("MESSAGERIE", "Messagerie express"),
     ("MULTIMODAL", "Multimodal"),
-    ("LOCATION", "Location"),
-    ("ANIMAL", "Animaux vivants"),
-    ("VEHICULE", "Transport de véhicules"),
-    ("AUTRE", "Autre"),
+    ("PALETTE", "Palettes / Messagerie palettisée"),
+    ("PLATEAU", "Plateau bachés et spécifiques"),
+    ("TEMPERATURE", "Température dirigée"),
+    ("URBAIN", "Urbain / Dernier kilomètre"),
+    ("VEHICULE", "Véhicules"),
+    ("VRAC_LIQUIDE", "Vrac liquide"),
+    ("VRAC_SOLIDE", "Vrac solide"),
 )
 
 OBJECTIF_CO2_ENLISTED = "ENLISTED"
