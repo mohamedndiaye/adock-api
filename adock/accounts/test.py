@@ -13,9 +13,10 @@ class AuthTestCaseBase(TestCase):
         self.user.save()
 
     def log_in(self, email=None, password=None):
+        """Log in with email as username"""
         url = reverse("accounts_log_in")
         data = {
-            "email": email if email is not None else self.user.email,
+            "username": email if email is not None else self.user.username,
             "password": password if password is not None else "password",
         }
         response = self.client.post(

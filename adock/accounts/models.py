@@ -7,26 +7,28 @@ from django.utils.translation import gettext_lazy as _
 
 
 class UserManager(BaseUserManager):
-    def _create_user(self, email, password, **extra_fields):
-        if not email:
-            raise ValueError("The email address must be set")
+    def _create_user(self, username, password, **extra_fields):
+        if not username:
+            raise ValueError(
+                "The username must be set to create A Dock account (not France Connect)"
+            )
 
-        user = self.model(email=self.normalize_email(email), **extra_fields)
+        user = self.model(username=username, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, username, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", False)
-        return self._create_user(email, password, **extra_fields)
+        return self._create_user(username, password, **extra_fields)
 
-    def create_superuser(self, email, password, **extra_fields):
+    def create_superuser(self, username, password, **extra_fields):
         extra_fields.setdefault("is_staff", True)
 
         if extra_fields.get("is_staff") is not True:
             raise ValueError("Superuser must have is_staff=True.")
 
-        return self._create_user(email, password, **extra_fields)
+        return self._create_user(username, password, **extra_fields)
 
 
 PROVIDER_A_DOCK = "AD"
@@ -38,9 +40,18 @@ PROVIDER_CHOICES = (
 
 
 class User(AbstractBaseUser):
-    email = models.EmailField(_("email address"), max_length=255, unique=True)
-    first_name = models.CharField(_("first name"), max_length=30, blank=True)
-    last_name = models.CharField(_("last name"), max_length=150, blank=True)
+    username = models.CharField(
+        _("username"), max_length=255, editable=False, unique=True
+    )
+    email = models.EmailField(
+        _("email address"), max_length=255, null=False, blank=True, default=""
+    )
+    first_name = models.CharField(
+        _("first name"), max_length=30, null=False, blank=True, default=""
+    )
+    last_name = models.CharField(
+        _("last name"), max_length=150, null=False, blank=True, default=""
+    )
     is_staff = models.BooleanField(
         _("staff status"),
         default=False,
@@ -58,17 +69,24 @@ class User(AbstractBaseUser):
     provider = models.CharField(
         _("provider"), max_length=2, choices=PROVIDER_CHOICES, default="AD"
     )
+
     provider_data = JSONField(blank=True, null=True)
 
     objects = UserManager()
 
-    USERNAME_FIELD = "email"
+    USERNAME_FIELD = "username"
     EMAIL_FIELD = "email"
     REQUIRED_FIELDS = []
 
+    def save(self, *args, **kwargs):
+        if not self.username and self.email:
+            self.username = self.email
+        super().save(*args, **kwargs)
+
     def clean(self):
         super().clean()
-        self.email = self.__class__.objects.normalize_email(self.email)
+        if self.email:
+            self.email = self.__class__.objects.normalize_email(self.email)
 
     def has_perm(self, perm, obj=None):  # pylint: disable=no-self-use
         # Simplest possible answer: Yes, always
