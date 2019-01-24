@@ -5,7 +5,10 @@ USE_SENTRY = False
 
 WEBSITE = "localhost:8080"
 HTTPS_WEBSITE = "http://" + WEBSITE
-CORS_ORIGIN_WHITELIST = (WEBSITE,)
+# According to your ngrok or serveo URL...
+# ssh -R 80:localhost:8000 serveo.net
+PUBLIC_HOSTNAME = "foo.serveo.net"
+CORS_ORIGIN_WHITELIST = (WEBSITE, PUBLIC_HOSTNAME)
 
 EMAIL_PORT = 1025
 
@@ -21,7 +24,4 @@ AUTHENTICATION_DISABLED = False
 FRANCE_CONNECT_CLIENT_ID = ""
 FRANCE_CONNECT_CLIENT_SECRET = ""
 
-# According to your ngrok or serveo URL...
-# ssh -R 80:localhost:8000 serveo.net
-PUBLIC_HOST_NAME = ""
-FRANCE_CONNECT_URL_CALLBACK = "https://" + PUBLIC_HOST_NAME + "/accounts/fc/callback/"
+FRANCE_CONNECT_URL_CALLBACK = "https://" + PUBLIC_HOSTNAME + "/accounts/fc/callback/"
