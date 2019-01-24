@@ -23,13 +23,6 @@ class AccountsTestCase(TestCase):
         jwt_payload = accounts_jwt.jwt_payload_handler(user)
         self.assertEqual(jwt_payload["user_id"], user.pk)
 
-    def test_france_connect_authorize(self):
-        response = self.client.get(reverse("france_connect_authorize"))
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(
-            response.url.startswith(settings.FRANCE_CONNECT_URLS["authorize"])
-        )
-
 
 class TestCreateOrUpdateUserTestCase(TestCase):
     def test_create_user(self):
@@ -89,9 +82,16 @@ class TestCreateOrUpdateUserTestCase(TestCase):
         self.assertEqual(user.email, user_infos["email"])
 
 
-class FranceConnectCallbackTestCase(TestCase):
+class FranceConnectTestCase(TestCase):
     def setUp(self):
         self.url = reverse("france_connect_callback")
+
+    def test_authorize(self):
+        response = self.client.get(reverse("france_connect_authorize"))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            response.url.startswith(settings.FRANCE_CONNECT_URLS["authorize"])
+        )
 
     def test_no_code(self):
         response = self.client.get(self.url)

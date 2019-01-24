@@ -10,6 +10,7 @@ from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 import sentry_sdk
 from jwt_auth import forms as jwt_auth_forms
+from jwt_auth import mixins as jwt_auth_mixins
 
 from . import models as accounts_models
 
@@ -26,7 +27,7 @@ def france_connect_authorize(request):
         "redirect_uri": settings.FRANCE_CONNECT_URL_CALLBACK,
         "response_type": "code",
         "scope": "openid identite_pivot address phone",
-        # FIXME state should be random or CSRF? and checcked (cf #1)
+        # FIXME state should be random or CSRF? and checked (cf #1)
         "state": "test",
     }
     return HttpResponseRedirect(
