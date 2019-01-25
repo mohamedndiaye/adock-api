@@ -41,10 +41,10 @@ sequenceDiagram
 Les paramètres de développement de `adock-api` utilisent les URL France
 Connect de la plateforme d'intégration.
 
-La plateforme d'intégration doit être en mesure d'accéder à l'application UI
-de développement locale pour appeller le callback en HTTPS. Le port doit
-être exporté via ngrok ou serveo, etc (par ex. `ssh -R 80:localhost:8000 serveo.net`). Le nom de domaine fournit devra ensuite être utilisé dans le
-settings :
+La plateforme d'intégration doit être en mesure d'accéder à l'application UI de
+développement locale pour appeller le callback en HTTPS. Le port de l'UI doit
+être exporté via ngrok ou serveo, etc (par ex. `ssh -R 80:localhost:8080 serveo.net`).
+Le nom de domaine fournit devra ensuite être utilisé dans le settings :
 
 ```
 yarn serve --public https://illis.serveo.net
@@ -76,8 +76,7 @@ puisse accéder _localement_ au serveur (il n'est pas nécessaire d'écouter les
 publiques).
 
 L'adresse de callback `https://illi.serveo.net/fc/callback/` doit être connue de
-France Connect et renseignée dans
-https://partenaires.franceconnect.gouv.fr/monprojet/edition/<votreprojet>/
+France Connect et renseignée dans https://partenaires.franceconnect.gouv.fr/monprojet/decouverte
 
 ```mermaid
 sequenceDiagram
