@@ -26,7 +26,7 @@ def france_connect_authorize(request):
         "nonce": "test",
         "redirect_uri": settings.FRANCE_CONNECT_URL_CALLBACK,
         "response_type": "code",
-        "scope": "openid identite_pivot address phone",
+        "scope": "openid identite_pivot email address phone",
         # FIXME state should be random or CSRF? and checked (cf #1)
         "state": "test",
     }
@@ -36,11 +36,6 @@ def france_connect_authorize(request):
 
 
 def create_or_update_user(user_infos):
-    # FIXME email field is not provided by integration platform!
-    if "email" not in user_infos:
-        logger.error("No email field")
-        user_infos["email"] = get_random_string(length=32) + "@example.com"
-
     if "address" in user_infos and "formatted" in user_infos["address"]:
         user_infos["address"] = user_infos["address"]["formatted"]
 
@@ -94,7 +89,6 @@ def france_connect_callback(request):
         "redirect_uri": settings.FRANCE_CONNECT_URL_CALLBACK,
     }
     logger.info(settings.FRANCE_CONNECT_URLS["token"])
-    logger.info(data)
     response = requests.post(settings.FRANCE_CONNECT_URLS["token"], data=data)
     if response.status_code != 200:
         message = "Unable to get the token from France Connect."
