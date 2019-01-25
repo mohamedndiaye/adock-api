@@ -131,7 +131,12 @@ class FranceConnectTestCase(TestCase):
             m.post(
                 settings.FRANCE_CONNECT_URLS["token"],
                 status_code=200,
-                json={"access_token": "123456789"},
+                json={
+                    "access_token": "123456789",
+                    "token_type": "Bearer",
+                    "expires_in": 60,
+                    "id_token": "VeryLongToken",
+                },
             )
             m.get(
                 settings.FRANCE_CONNECT_URLS["userinfo"],
