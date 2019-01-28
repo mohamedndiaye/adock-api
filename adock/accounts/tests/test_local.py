@@ -34,7 +34,6 @@ class CreateUserTestCase(TestCase):
             },
             content_type="application/json",
         )
-        print(response.content)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json()["message"], "Compte utilisateur créé pour Claude Martin."
