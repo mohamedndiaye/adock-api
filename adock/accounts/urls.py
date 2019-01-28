@@ -4,6 +4,7 @@ from jwt_auth import views as jwt_auth_views
 from . import views
 
 urlpatterns = [
+    path("create/", views.account_create, name="accounts_create"),
     path("login/", jwt_auth_views.jwt_token, name="accounts_log_in"),
     path(
         "fc/authorize/", views.france_connect_authorize, name="france_connect_authorize"

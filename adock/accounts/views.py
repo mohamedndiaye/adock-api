@@ -5,14 +5,42 @@ import requests
 from django.conf import settings
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
-from django.utils.crypto import get_random_string
+from django.views.decorators.http import require_POST
+
+# from django.utils.crypto import get_random_string
 from django.utils.http import urlencode
 import sentry_sdk
 from jwt_auth import forms as jwt_auth_forms
 
+from adock.core import views as core_views
+
 from . import models as accounts_models
+from . import serializers as accounts_serializers
 
 logger = logging.getLogger(__name__)
+
+
+@require_POST
+def account_create(request):
+    """Create a local user account"""
+    serializer, response = core_views.request_validate(
+        request, accounts_serializers.AccountSerializer
+    )
+    if response:
+        return response
+
+    user = accounts_models.User.objects.create_user(
+        email=serializer.validated_data["email"],
+        password=serializer.validated_data["password"],
+        first_name=serializer.validated_data["first_name"],
+        last_name=serializer.validated_data["last_name"],
+        is_active=False,
+    )
+
+    return JsonResponse(
+        {"message": "Compte utilisateur créé pour %s" % user.get_full_name()}
+    )
+    # FIXME mail to validate
 
 
 def france_connect_authorize(request):
