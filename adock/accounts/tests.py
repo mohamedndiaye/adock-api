@@ -41,32 +41,33 @@ class TestCreateOrUpdateUserTestCase(TestCase):
 
     def test_update_user(self):
         accounts_factories.UserFactory(
+            username="12345",
             email="foo@example.com",
             provider=accounts_models.PROVIDER_FRANCE_CONNECT,
             provider_data={"sub": "12345"},
         )
         # Update an existing user
-        user_infos = {"email": "bar@example.com", "first_name": "Roger", "sub": "12345"}
+        user_infos = {"sub": "12345", "email": "bar@example.com", "first_name": "Roger"}
         user, created = accounts_views.create_or_update_user(user_infos)
         self.assertFalse(created)
         self.assertEqual(user.email, user_infos["email"])
 
-    def test_creating_conflicting_user(self):
+    def test_create_with_used_email(self):
+        """Try to use an existing email with a different username"""
         accounts_factories.UserFactory(email="other@example.com")
-
-        # Try to use an existing email
         user_infos = {
             "email": "other@example.com",
             "first_name": "Roger",
             "sub": "12345",
         }
         user, created = accounts_views.create_or_update_user(user_infos)
-        self.assertIsNone(user)
-        self.assertFalse(created)
+        self.assertTrue(created)
+        self.assertEqual(user.email, user_infos["email"])
 
     def test_updating_conflicting_user(self):
         accounts_factories.UserFactory(email="someone@example.com")
         accounts_factories.UserFactory(
+            username="12345",
             email="joe@example.com",
             provider=accounts_models.PROVIDER_FRANCE_CONNECT,
             provider_data={"sub": "12345"},

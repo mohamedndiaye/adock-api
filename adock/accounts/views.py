@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 @require_POST
 def account_create(request):
-    """Create a local user account"""
+    """Create an A Dock user account (email as username)"""
     serializer, response = core_views.request_validate(
         request, accounts_serializers.AccountSerializer
     )
@@ -30,7 +30,7 @@ def account_create(request):
         return response
 
     user = accounts_models.User.objects.create_user(
-        email=serializer.validated_data["email"],
+        username=serializer.validated_data["username"],
         password=serializer.validated_data["password"],
         first_name=serializer.validated_data["first_name"],
         last_name=serializer.validated_data["last_name"],
@@ -65,28 +65,23 @@ def create_or_update_user(user_infos):
     if "address" in user_infos and "formatted" in user_infos["address"]:
         user_infos["address"] = user_infos["address"]["formatted"]
 
-    try:
-        user, created = accounts_models.User.objects.get_or_create(
-            provider=accounts_models.PROVIDER_FRANCE_CONNECT,
-            provider_data__sub=user_infos["sub"],
-            defaults={
-                "email": user_infos["email"],
-                "first_name": user_infos.get("given_name", ""),
-                "last_name": user_infos.get("family_name", ""),
-                "provider": accounts_models.PROVIDER_FRANCE_CONNECT,
-                "provider_data": user_infos,
-            },
-        )
-    except IntegrityError as e:
-        logger.error("Unable to create the user: %s", e.__cause__)
-        sentry_sdk.capture_exception(e)
-        return None, False
+    user, created = accounts_models.User.objects.get_or_create(
+        username=user_infos["sub"],
+        defaults={
+            "email": user_infos["email"],
+            "first_name": user_infos.get("given_name", ""),
+            "last_name": user_infos.get("family_name", ""),
+            "provider": accounts_models.PROVIDER_FRANCE_CONNECT,
+            "provider_data": user_infos,
+        },
+    )
 
     if not created:
         # Forced update (may be it will possible to set a different email later)
         user.email = user_infos.get("email", "")
         user.first_name = user_infos.get("given_name", "")
         user.family_name = user_infos.get("family_name", "")
+        user.provider = accounts_models.PROVIDER_FRANCE_CONNECT
         user.provider_data = user_infos
         try:
             user.save()
@@ -146,6 +141,11 @@ def france_connect_callback(request):
     except json.decoder.JSONDecodeError:
         return JsonResponse(
             {"message": "Unable to decode user infos from response."}, status=400
+        )
+
+    if "sub" not in user_infos:
+        return JsonResponse(
+            {"message": "The 'sub' wasn't provided by France Connect."}, status=400
         )
 
     user, created = create_or_update_user(user_infos)

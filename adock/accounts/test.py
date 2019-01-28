@@ -4,11 +4,14 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+from adock.accounts import factories as accounts_factories
+
 
 class AuthTestCaseBase(TestCase):
     def setUp(self):
-        User = get_user_model()
-        self.user = User(email="courriel@fai.fr", is_staff=True)
+        self.user = accounts_factories.UserFactory(
+            email="courriel@fai.fr", is_staff=True
+        )
         self.user.set_password("password")
         self.user.save()
 

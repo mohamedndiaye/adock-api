@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from adock.carriers import factories as carriers_factories
 from adock.accounts.test import AuthTestCaseBase
+from adock.accounts import factories as accounts_factories
 
 
 class StatsTestCase(AuthTestCaseBase):
@@ -19,7 +20,9 @@ class StatsTestCase(AuthTestCaseBase):
     @skipIf(settings.AUTHENTICATION_DISABLED, "Authentication is disabled")
     def test_staff_only(self):
         User = get_user_model()
-        user = User(email="courriel@example.com", is_staff=False)
+        user = accounts_factories.UserFactory(
+            email="courriel@example.com", is_staff=False
+        )
         user.set_password("password")
         user.save()
 

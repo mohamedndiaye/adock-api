@@ -7,6 +7,7 @@ faker = Faker("fr_FR")
 
 
 class UserFactory(factory.django.DjangoModelFactory):
+    username = factory.LazyAttribute(lambda o: o.email)
     email = factory.Faker("email")
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
