@@ -132,7 +132,7 @@ def france_connect_callback(request):
     return JsonResponse(
         {
             "token": jwt_auth_forms.json_web_token_encode_payload(user),
-            "expiresIn": settings.JWT_EXPIRATION_DELTA.total_seconds(),
+            "expires_in": settings.JWT_EXPIRATION_DELTA.total_seconds(),
         }
     )
 
