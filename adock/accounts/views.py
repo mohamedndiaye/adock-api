@@ -24,13 +24,14 @@ logger = logging.getLogger(__name__)
 def account_create(request):
     """Create an A Dock user account (email as username)"""
     serializer, response = core_views.request_validate(
-        request, accounts_serializers.AccountSerializer
+        request, accounts_serializers.CreateAccountSerializer
     )
     if response:
         return response
 
     user = accounts_models.User.objects.create_user(
-        username=serializer.validated_data["username"],
+        username=serializer.validated_data["email"],
+        email=serializer.validated_data["email"],
         password=serializer.validated_data["password"],
         first_name=serializer.validated_data["first_name"],
         last_name=serializer.validated_data["last_name"],
@@ -38,7 +39,7 @@ def account_create(request):
     )
 
     return JsonResponse(
-        {"message": "Compte utilisateur créé pour %s" % user.get_full_name()}
+        {"message": "Compte utilisateur créé pour %s." % user.get_full_name()}
     )
     # FIXME mail to validate
 
