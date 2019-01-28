@@ -85,7 +85,7 @@ class FranceConnectLoginTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         payload = response.json()
         self.assertEqual(
-            payload["message"], "The query doesn't provide the 'code' parameter."
+            payload["message"], "La requête ne contient pas le paramètre « code »."
         )
 
     def test_unable_to_get_token(self):
@@ -95,7 +95,7 @@ class FranceConnectLoginTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
         payload = response.json()
         self.assertEqual(
-            payload["message"], "Unable to get the token from France Connect."
+            payload["message"], "Impossible d'obtenir le jeton de France Connect."
         )
 
     def test_unable_to_get_user_infos(self):
@@ -110,7 +110,8 @@ class FranceConnectLoginTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
         payload = response.json()
         self.assertEqual(
-            payload["message"], "Unable to get the user infos from France Connect."
+            payload["message"],
+            "Impossible d'obtenir les informations utilisateur de France Connect.",
         )
 
     def test_create_user(self):

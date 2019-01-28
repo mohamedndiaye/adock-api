@@ -100,7 +100,7 @@ def france_connect_callback(request):
     code = request.GET.get("code")
     if code is None:
         return JsonResponse(
-            {"message": "The query doesn't provide the 'code' parameter."}, status=400
+            {"message": "La requête ne contient pas le paramètre « code »."}, status=400
         )
 
     data = {
@@ -113,7 +113,7 @@ def france_connect_callback(request):
     logger.info(settings.FRANCE_CONNECT_URLS["token"])
     response = requests.post(settings.FRANCE_CONNECT_URLS["token"], data=data)
     if response.status_code != 200:
-        message = "Unable to get the token from France Connect."
+        message = "Impossible d'obtenir le jeton de France Connect."
         logger.error(message)
         sentry_sdk.capture_message("%s\n%s" % (message, response.content))
         # The response is certainly ignored by FC but it's convenient for our tests
@@ -132,7 +132,7 @@ def france_connect_callback(request):
         headers={"Authorization": "Bearer " + token_data["access_token"]},
     )
     if response.status_code != 200:
-        message = "Unable to get the user infos from France Connect."
+        message = "Impossible d'obtenir les informations utilisateur de France Connect."
         logger.error(message)
         sentry_sdk.capture_message(message)
         return JsonResponse({"message": message}, status=response.status_code)
@@ -141,21 +141,25 @@ def france_connect_callback(request):
         user_infos = json.loads(response.content.decode("utf-8"))
     except json.decoder.JSONDecodeError:
         return JsonResponse(
-            {"message": "Unable to decode user infos from response."}, status=400
+            {"message": "Impossible de décoder les informations utilisateur."},
+            status=400,
         )
 
     if "sub" not in user_infos:
         return JsonResponse(
-            {"message": "The 'sub' wasn't provided by France Connect."}, status=400
+            {
+                "message": "Le paramètre « sub » n'a pas été retourné par France Connect."
+            },
+            status=400,
         )
 
     user, created = create_or_update_user(user_infos)
     if created:
-        logger.info("New user created '%s'.", user.email)
+        logger.info("Nouvel utilisateur créé « %s ».", user.email)
 
     # Return JWT with id_token to allow logout from FC
     if user is None:
-        return JsonResponse({"message": "No user"})
+        return JsonResponse({"message": "Aucun utilisateur."})
 
     return JsonResponse(
         {
