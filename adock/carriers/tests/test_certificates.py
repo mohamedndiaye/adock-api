@@ -43,9 +43,7 @@ class SignCarrierCertificateTestCase(TestCase):
         data = copy.copy(CERTIFICATE_DATA)
         data["kind"] = models.CERTIFICATE_WORKERS
         data["workers"] = CERTIFICATE_DATA_WORKERS
-        response = self.client.post(
-            self.url, json.dumps(data), content_type="application/json"
-        )
+        response = self.client.post(self.url, data, content_type="application/json")
         self.assertEqual(response.status_code, 200)
 
         self.carrier.refresh_from_db()
@@ -63,9 +61,7 @@ class SignCarrierCertificateTestCase(TestCase):
     def test_sign_certificate_no_workers(self):
         data = copy.copy(CERTIFICATE_DATA)
         data["kind"] = models.CERTIFICATE_NO_WORKERS
-        response = self.client.post(
-            self.url, json.dumps(data), content_type="application/json"
-        )
+        response = self.client.post(self.url, data, content_type="application/json")
         self.assertEqual(response.status_code, 200)
 
         self.carrier.refresh_from_db()
@@ -83,9 +79,7 @@ class SignCarrierCertificateTestCase(TestCase):
         # Empty field
         data["kind"] = models.CERTIFICATE_NO_WORKERS
         data["last_name"] = ""
-        response = self.client.post(
-            self.url, json.dumps(data), content_type="application/json"
-        )
+        response = self.client.post(self.url, data, content_type="application/json")
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.content.decode("utf-8"))
         self.assertIn("last_name", data)
