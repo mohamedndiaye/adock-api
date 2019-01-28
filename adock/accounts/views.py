@@ -7,10 +7,8 @@ from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.crypto import get_random_string
 from django.utils.http import urlencode
-from django.views.decorators.http import require_POST
 import sentry_sdk
 from jwt_auth import forms as jwt_auth_forms
-from jwt_auth import mixins as jwt_auth_mixins
 
 from . import models as accounts_models
 
@@ -102,6 +100,7 @@ def france_connect_callback(request):
     token_data = response.json()
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
+    logger.info(token_data)
     logger.info(settings.FRANCE_CONNECT_URLS["userinfo"])
     response = requests.get(
         settings.FRANCE_CONNECT_URLS["userinfo"],
@@ -131,21 +130,31 @@ def france_connect_callback(request):
 
     return JsonResponse(
         {
+            "token_type": token_data.get("token_type", ""),
             "token": jwt_auth_forms.json_web_token_encode_payload(user),
+            # FIXME To check
             "expires_in": settings.JWT_EXPIRATION_DELTA.total_seconds(),
+            "id_token": token_data.get("id_token", ""),
         }
     )
 
 
-@require_POST
 def france_connect_logout(request):
-    # FIXME To extract from JWT
-    id_token = None
-    data = {
-        "id_token_hint": id_token,
-        "state": "test",
-        "post_logout_redirect_uri": settings.HTTPS_WEBSITE,
-    }
-    return HttpResponseRedirect(
-        settings.FRANCE_CONNECT_URLS["logout"] + "?" + urlencode(data)
-    )
+    if request.user.is_anonymous:
+        return JsonResponse({"message": "L'utilisateur n'est pas authentifié."})
+
+    id_token = request.GET.get("id_token")
+    if id_token:
+        data = {
+            "id_token_hint": id_token,
+            "state": "test",
+            "post_logout_redirect_uri": settings.HTTPS_WEBSITE,
+        }
+        response = requests.get(settings.FRANCE_CONNECT_URLS["logout"], params=data)
+        if response.status_code != 302:
+            message = "Impossible de se déconnecter de France Connect."
+            logger.error(message)
+            sentry_sdk.capture_message(message)
+            return JsonResponse({"message": message}, status=response.status_code)
+
+    return JsonResponse({"message": "L'utilisateur est déconnecté."})

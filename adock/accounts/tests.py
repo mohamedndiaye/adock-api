@@ -3,6 +3,7 @@ import requests_mock
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
+from jwt_auth import forms as jwt_auth_forms
 
 from . import factories as accounts_factories
 from . import jwt as accounts_jwt
@@ -82,7 +83,7 @@ class TestCreateOrUpdateUserTestCase(TestCase):
         self.assertEqual(user.email, user_infos["email"])
 
 
-class FranceConnectTestCase(TestCase):
+class FranceConnectLoginTestCase(TestCase):
     def setUp(self):
         self.url = reverse("france_connect_callback")
 
@@ -151,4 +152,61 @@ class FranceConnectTestCase(TestCase):
             response = self.client.get(self.url, {"code": "007"})
         self.assertEqual(response.status_code, 200)
         payload = response.json()
+        self.assertEqual(payload["token_type"], "Bearer")
         self.assertIn("token", payload)
+        self.assertIn("expires_in", payload)
+        self.assertIn("id_token", payload)
+
+
+class FranceConnectLogoutTestCase(TestCase):
+    def setUp(self):
+        self.user = accounts_factories.UserFactory()
+        self.url = reverse("france_connect_logout")
+
+    def test_no_user(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json()["message"], "L'utilisateur n'est pas authentifié."
+        )
+
+    def test_not_id_token(self):
+        token = jwt_auth_forms.json_web_token_encode_payload(self.user)
+        response = self.client.get(
+            self.url, **{"HTTP_AUTHORIZATION": "Bearer %s" % token}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["message"], "L'utilisateur est déconnecté.")
+
+    def test_logout_error(self):
+        token = jwt_auth_forms.json_web_token_encode_payload(self.user)
+        id_token = "54321"
+        with requests_mock.mock() as m:
+            m.get(
+                settings.FRANCE_CONNECT_URLS["logout"] + "?" + id_token, status_code=400
+            )
+            response = self.client.get(
+                self.url,
+                {"id_token": id_token},
+                **{"HTTP_AUTHORIZATION": "Bearer %s" % token}
+            )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json()["message"],
+            "Impossible de se déconnecter de France Connect.",
+        )
+
+    def test_logout_success(self):
+        token = jwt_auth_forms.json_web_token_encode_payload(self.user)
+        id_token = "54321"
+        with requests_mock.mock() as m:
+            m.get(
+                settings.FRANCE_CONNECT_URLS["logout"] + "?" + id_token, status_code=302
+            )
+            response = self.client.get(
+                self.url,
+                {"id_token": id_token},
+                **{"HTTP_AUTHORIZATION": "Bearer %s" % token}
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["message"], "L'utilisateur est déconnecté.")
