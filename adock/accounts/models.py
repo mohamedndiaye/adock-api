@@ -7,20 +7,23 @@ from django.utils.translation import gettext_lazy as _
 
 
 class UserManager(BaseUserManager):
-    def _create_user(self, username, password, **extra_fields):
+    def _create_user(self, email, password, username=None, **extra_fields):
         if not username:
-            raise ValueError(
-                "The username must be set to create A Dock account (not France Connect)"
-            )
+            username = email
 
-        user = self.model(username=username, **extra_fields)
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_user(self, username, password=None, **extra_fields):
+    def create_user(self, email, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", False)
-        return self._create_user(username, password, **extra_fields)
+        return self._create_user(email=email, password=password, **extra_fields)
+
+    def create_france_connect_user(self, username, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", False)
+        return self._create_user(username=username, password=password, **extra_fields)
 
     def create_superuser(self, username, password, **extra_fields):
         extra_fields.setdefault("is_staff", True)
@@ -28,7 +31,9 @@ class UserManager(BaseUserManager):
         if extra_fields.get("is_staff") is not True:
             raise ValueError("Superuser must have is_staff=True.")
 
-        return self._create_user(username, password, **extra_fields)
+        return self._create_user(
+            username=username, email=username, password=password, **extra_fields
+        )
 
 
 PROVIDER_A_DOCK = "AD"
