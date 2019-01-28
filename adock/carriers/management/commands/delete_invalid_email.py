@@ -26,7 +26,7 @@ class Command(BaseCommand):
                             if mail_match:
                                 extracted_mails.append(mail_match.group(1))
                     except UnicodeDecodeError as e:
-                        print(entry.path)
+                        self.stdout.write(self.style.ERROR("Path: %s" % entry.path))
                         raise e
 
         self.stdout.write("Number of mails found: %d" % len(extracted_mails))
