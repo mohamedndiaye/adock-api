@@ -155,7 +155,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         self.assertEqual(len(mail.outbox), 2)
 
         # Mail manager about applied changes
-        message = "[adock] Modification du transporteur %s" % self.carrier.siret
+        message = "[A Dock] Modification du transporteur %s" % self.carrier.siret
         self.assertEqual(mail.outbox[0].subject, message)
         self.assertIn("telephone", mail.outbox[0].body)
         self.assertIn("email", mail.outbox[0].body)
@@ -164,7 +164,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         # Mail user to confirm email
         self.assertEqual(
             mail.outbox[1].subject,
-            "A Dock - Confirmation de votre adresse électronique",
+            "[A Dock] Confirmation de l'adresse électronique du transporteur",
         )
 
         # Apply same changes so field comparison detects there is no changes
@@ -229,7 +229,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         self.assertEqual(self.carrier.website, WEBSITE)
 
         self.assertEqual(len(mail.outbox), 1)
-        message = "[adock] Modification du transporteur %s" % self.carrier.siret
+        message = "[A Dock] Modification du transporteur %s" % self.carrier.siret
         self.assertEqual(mail.outbox[0].subject, message)
 
     def test_patch_invalid_request(self):

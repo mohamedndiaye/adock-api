@@ -17,13 +17,16 @@ def mail_carrier_to_confirm_email(carrier, scheme):
         return
 
     token = tokens.email_confirmation_token.make_token(carrier)
-    subject = "A Dock - Confirmation de votre adresse électronique"
+    subject = (
+        "%sConfirmation de l'adresse électronique du transporteur"
+        % settings.EMAIL_SUBJECT_PREFIX
+    )
     message = """
 Merci d'avoir renseigné votre fiche sur A Dock, l'application
 qui facilite la relation chargeur et transporteur.
 
 Cliquez sur le lien pour confirmer votre adresse électronique « {email} »
-et ainsi sécuriser votre fiche transporteur :
+et ainsi sécuriser la fiche transporteur :
 
 {scheme}://{website}/transporteur/{siret}/confirm/{token}/
 
@@ -49,7 +52,7 @@ L'équipe A Dock
 def mail_managers_changes(carrier, old_data_changed, scheme):
     # Send a mail to managers to track changes
     # The URL is detail view of the front application
-    subject = "Modification du transporteur {0}".format(carrier.siret)
+    subject = "Modification du transporteur %s" % carrier.siret
     message = """
 Modification du transporteur : {enseigne}
 SIRET : {siret}
@@ -71,7 +74,7 @@ Valeurs modifiées :
 
 
 def mail_managers_lock(carrier, scheme):
-    subject = "Verrouillage du transporteur {0}".format(carrier.siret)
+    subject = "Verrouillage du transporteur %s" % carrier.siret
     message = """
 Verrouillage du transporteur : {enseigne}
 SIRET : {siret}
@@ -89,7 +92,7 @@ Adresse électronique confirmée : {email}
 
 
 def mail_carrier_edit_code(carrier):
-    subject = "A Dock - Code de modification"
+    subject = "%sCode de modification" % settings.EMAIL_SUBJECT_PREFIX
     max_edit_time = carrier.edit_code_at + settings.CARRIER_EDIT_CODE_INTERVAL
     message = """
 Votre code de modification est {edit_code}.

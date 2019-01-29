@@ -52,7 +52,7 @@ class CarrierEmailConfirmationTestCase(test.CarrierTestCase):
         self.assertTrue(self.carrier.is_locked())
 
         self.assertEqual(len(mail.outbox), 1)
-        subject = "[adock] Verrouillage du transporteur %s" % self.carrier.siret
+        subject = "[A Dock] Verrouillage du transporteur %s" % self.carrier.siret
         self.assertEqual(mail.outbox[0].subject, subject)
 
     def test_altered_token(self):
@@ -72,7 +72,7 @@ class CarrierEmailConfirmationTestCase(test.CarrierTestCase):
         data = self.patch_carrier({"telephone": "0102030405"}, 200)
         self.assertFalse(data["confirmation_email_sent"])
         self.assertEqual(len(mail.outbox), 1)
-        message = "[adock] Modification du transporteur %s" % self.carrier.siret
+        message = "[A Dock] Modification du transporteur %s" % self.carrier.siret
         self.assertEqual(mail.outbox[0].subject, message)
         self.carrier.refresh_from_db()
         self.assertIsNotNone(self.carrier.validated_at)
@@ -85,7 +85,7 @@ class CarrierEmailConfirmationTestCase(test.CarrierTestCase):
         self.assertEqual(data["carrier"]["email"], "")
         self.assertFalse(data["confirmation_email_sent"])
         self.assertEqual(len(mail.outbox), 1)
-        message = "[adock] Modification du transporteur %s" % self.carrier.siret
+        message = "[A Dock] Modification du transporteur %s" % self.carrier.siret
         self.assertEqual(mail.outbox[0].subject, message)
         self.carrier.refresh_from_db()
         self.assertIsNotNone(self.carrier.validated_at)
