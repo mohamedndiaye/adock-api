@@ -41,13 +41,14 @@ def account_create(request):
     )
     token = accounts_tokens.account_activation_token.make_token(user)
 
-    # The link triggers the backend that redirects the UI for user feedback
+    # The link triggers the UI that requests the backend to provide feedback to
+    # the user.
     subject = "%sConfirmation de votre adresse électronique"
     message = """
 Vous venez de créer un compte utilisateur sur A Dock, il suffit maintenant de cliquer sur ce lien
 pour l'activer :
 
-{http_server_url}/accounts/{user_id}/activer/{token}/
+{http_server_url}/utilisateur/{user_id}/activer/{token}/
 
 Cordialement,
 L'équipe A Dock
