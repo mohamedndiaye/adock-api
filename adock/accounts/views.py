@@ -5,13 +5,12 @@ import requests
 from django.conf import settings
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 
 # from django.utils.crypto import get_random_string
 from django.utils.http import urlencode
 import sentry_sdk
-from jwt_auth import forms as jwt_auth_forms
+from jwt_auth import views as jwt_auth_views
 
 from adock.core import views as core_views
 
@@ -203,7 +202,7 @@ def france_connect_callback(request):
     return JsonResponse(
         {
             "token_type": token_data.get("token_type", ""),
-            "token": jwt_auth_forms.json_web_token_encode_payload(user),
+            "token": jwt_auth_views.jwt_encode_token(user),
             # FIXME To check
             "expires_in": settings.JWT_EXPIRATION_DELTA.total_seconds(),
             "id_token": token_data.get("id_token", ""),

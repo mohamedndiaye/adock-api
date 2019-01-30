@@ -3,7 +3,7 @@ import requests_mock
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
-from jwt_auth import forms as jwt_auth_forms
+from jwt_auth import views as jwt_auth_views
 
 from .. import factories as accounts_factories
 from .. import models as accounts_models
@@ -158,7 +158,7 @@ class FranceConnectLogoutTestCase(TestCase):
         )
 
     def test_not_id_token(self):
-        token = jwt_auth_forms.json_web_token_encode_payload(self.user)
+        token = jwt_auth_views.jwt_encode_token(self.user)
         response = self.client.get(
             self.url, **{"HTTP_AUTHORIZATION": "Bearer %s" % token}
         )
@@ -166,7 +166,7 @@ class FranceConnectLogoutTestCase(TestCase):
         self.assertEqual(response.json()["message"], "L'utilisateur est déconnecté.")
 
     def test_logout_error(self):
-        token = jwt_auth_forms.json_web_token_encode_payload(self.user)
+        token = jwt_auth_views.jwt_encode_token(self.user)
         id_token = "54321"
         with requests_mock.mock() as m:
             m.get(
@@ -184,7 +184,7 @@ class FranceConnectLogoutTestCase(TestCase):
         )
 
     def test_logout_success(self):
-        token = jwt_auth_forms.json_web_token_encode_payload(self.user)
+        token = jwt_auth_views.jwt_encode_token(self.user)
         id_token = "54321"
         with requests_mock.mock() as m:
             m.get(
