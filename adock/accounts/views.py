@@ -152,7 +152,6 @@ def france_connect_callback(request):
         "grant_type": "authorization_code",
         "redirect_uri": settings.FRANCE_CONNECT_URL_CALLBACK,
     }
-    logger.info(settings.FRANCE_CONNECT_URLS["token"])
     response = requests.post(settings.FRANCE_CONNECT_URLS["token"], data=data)
     if response.status_code != 200:
         message = "Impossible d'obtenir le jeton de France Connect."
@@ -166,8 +165,6 @@ def france_connect_callback(request):
     token_data = response.json()
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
-    logger.info(token_data)
-    logger.info(settings.FRANCE_CONNECT_URLS["userinfo"])
     response = requests.get(
         settings.FRANCE_CONNECT_URLS["userinfo"],
         params={"schema": "openid"},
