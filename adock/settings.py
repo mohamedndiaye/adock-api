@@ -122,14 +122,14 @@ LOGIN_URL = "accounts_log_in"
 
 DATAFILES_ROOT = os.path.join(BASE_DIR, "datafiles")
 
-WEBSITE = "adock.beta.gouv.fr"
-HTTPS_WEBSITE = "https://" + WEBSITE
-HTTP_CLIENT_URL = "https://" + WEBSITE + "/"
-HTTP_SERVER_URL = "https://" + WEBSITE + "/api/"
+HOSTNAME = "adock.beta.gouv.fr"
+HTTP_CLIENT_URL = "https://" + HOSTNAME + "/"
+HTTP_SERVER_URL = "https://" + HOSTNAME + "/api/"
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = False
-CORS_ORIGIN_WHITELIST = (WEBSITE,)
+CORS_ORIGIN_WHITELIST = None
+ALLOWED_HOSTS = None
 
 PHONENUMBER_DB_FORMAT = "NATIONAL"
 PHONENUMBER_DEFAULT_REGION = "FR"
@@ -177,6 +177,14 @@ try:
     from .settings_local import *  # pylint: disable=W0401
 except ImportError:  # pragma: no cover
     pass
+
+if not CORS_ORIGIN_WHITELIST:
+    CORS_ORIGIN_WHITELIST = (HOSTNAME,)
+
+if not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = [HOSTNAME]
+
+SERVER_EMAIL = "no-reply@" + HOSTNAME
 
 LOGGING = {
     "version": 1,

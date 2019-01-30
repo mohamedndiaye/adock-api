@@ -203,7 +203,7 @@ def france_connect_logout(request):
         data = {
             "id_token_hint": id_token,
             "state": "test",
-            "post_logout_redirect_uri": settings.HTTPS_WEBSITE,
+            "post_logout_redirect_uri": settings.HTTP_CLIENT_URL,
         }
         response = requests.get(settings.FRANCE_CONNECT_URLS["logout"], params=data)
         if response.status_code != 302:

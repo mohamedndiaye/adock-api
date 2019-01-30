@@ -12,7 +12,7 @@ def get_recipient_list_from_env(carrier):
     return (carrier.email,)
 
 
-def mail_carrier_to_confirm_email(carrier, scheme):
+def mail_carrier_to_confirm_email(carrier):
     if not carrier.email:
         return
 
@@ -28,13 +28,12 @@ qui facilite la relation chargeur et transporteur.
 Cliquez sur le lien pour confirmer votre adresse électronique « {email} »
 et ainsi sécuriser la fiche transporteur :
 
-{scheme}://{website}/transporteur/{siret}/confirm/{token}/
+{http_client_url}transporteur/{siret}/confirm/{token}/
 
 Cordialement,
 L'équipe A Dock
     """.format(
-        scheme=scheme,
-        website=settings.WEBSITE,
+        http_client_url=settings.HTTP_CLIENT_URL,
         siret=carrier.siret,
         email=carrier.email,
         token=token,
@@ -49,21 +48,20 @@ L'équipe A Dock
     )
 
 
-def mail_managers_changes(carrier, old_data_changed, scheme):
+def mail_managers_changes(carrier, old_data_changed):
     # Send a mail to managers to track changes
     # The URL is detail view of the front application
     subject = "Modification du transporteur %s" % carrier.siret
     message = """
 Modification du transporteur : {enseigne}
 SIRET : {siret}
-{scheme}://{website}/transporteur/{siret}
+{http_client_url}transporteur/{siret}
 
 Valeurs modifiées :
     """.format(
-        scheme=scheme,
         enseigne=carrier.enseigne,
         siret=carrier.siret,
-        website=settings.WEBSITE,
+        http_client_url=settings.HTTP_CLIENT_URL,
     )
 
     for field, old_value in old_data_changed.items():
@@ -73,19 +71,18 @@ Valeurs modifiées :
     mail_managers(subject, message, fail_silently=True)
 
 
-def mail_managers_lock(carrier, scheme):
+def mail_managers_lock(carrier):
     subject = "Verrouillage du transporteur %s" % carrier.siret
     message = """
 Verrouillage du transporteur : {enseigne}
 SIRET : {siret}
-{scheme}://{website}/transporteur/{siret}
+{http_client_url}transporteur/{siret}
 
 Adresse électronique confirmée : {email}
     """.format(
-        scheme=scheme,
         enseigne=carrier.enseigne,
         siret=carrier.siret,
-        website=settings.WEBSITE,
+        http_client_url=settings.HTTP_CLIENT_URL,
         email=carrier.email,
     )
     mail_managers(subject, message, fail_silently=True)

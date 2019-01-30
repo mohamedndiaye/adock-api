@@ -23,7 +23,7 @@ def selftest_index(request):
         elif "mail_managers" in request.POST:
             subject = "Selftest mail"
             message = "Message sent by selftest page of {website}.".format(
-                website=settings.WEBSITE
+                website=settings.HTTP_SERVER_URL
             )
             mail_managers(subject, message, fail_silently=False)
             results = "Mail sent to %s." % ", ".join(

@@ -304,7 +304,6 @@ def carrier_detail(request, carrier_siret):
 
         # Only set in PATCH request
         confirmation_email_to_send = False
-        scheme = "https" if request.is_secure() else "http"
 
         # Only apply the submitted values if they are different in DB
         old_data_changed = get_carrier_changes(carrier, cleaned_payload)
@@ -334,10 +333,10 @@ def carrier_detail(request, carrier_siret):
                 carrier.save(force_update=True, update_fields=updated_fields)
                 add_carrier_log(carrier, old_data_changed, cleaned_payload)
 
-            mails.mail_managers_changes(carrier, old_data_changed, scheme)
+            mails.mail_managers_changes(carrier, old_data_changed)
 
         if confirmation_email_to_send:
-            mails.mail_carrier_to_confirm_email(carrier, scheme)
+            mails.mail_carrier_to_confirm_email(carrier)
 
         response_json["confirmation_email_sent"] = confirmation_email_to_send
 
@@ -362,8 +361,7 @@ def carrier_confirm_email(request, carrier_siret, token):
     if carrier and tokens.email_confirmation_token.check_token(carrier, token):
         carrier.lock()
         carrier.save()
-        scheme = "https" if request.is_secure() else "http"
-        mails.mail_managers_lock(carrier, scheme)
+        mails.mail_managers_lock(carrier)
         return JsonResponse({"message": "L'adresse électronique est confirmée."})
 
     return JsonResponse(
@@ -442,7 +440,7 @@ def _carrier_get_certificate(request, carrier_siret, as_pdf=True):
         else "certificate_no_workers.html"
     )
     qr_code = core_pdf.get_qr_code(
-        settings.HTTPS_WEBSITE + "/transporteur/" + carrier.siret
+        settings.HTTP_CLIENT_URL + "transporteur/" + carrier.siret
     )
     response = render(
         request,

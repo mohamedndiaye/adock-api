@@ -18,11 +18,6 @@ MANAGERS = (
     ("Clémence Gourragne", "clemence.gourragne@beta.gouv.fr"),
 )
 
-WEBSITE = "adock.beta.gouv.fr"
-SERVER_EMAIL = "no-reply@" + WEBSITE
-
-CORS_ORIGIN_WHITELIST = (WEBSITE,)
-ALLOWED_HOSTS = [WEBSITE]
 # Web tool or ./manage.py generate_secret_key with Django extensions
 SECRET_KEY = ""
 
