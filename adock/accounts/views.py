@@ -82,7 +82,11 @@ def account_activate(request, user_id, token):
 
     user.is_active = True
     user.save()
-    return JsonResponse({"message": "Le compte utilisateur est activé."})
+
+    token = jwt_auth_views.jwt_encode_token(user)
+    json_data = jwt_auth_views.jwt_get_json_with_token(token)
+    json_data["message"] = "Le compte utilisateur est activé."
+    return JsonResponse(json_data)
 
 
 def france_connect_authorize(request):
