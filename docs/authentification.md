@@ -6,16 +6,16 @@ Cette documentation décrit les différents workflows de l'application autour de
 l'authentification :
 
 - création de compte (interne à A Dock)
-- identification via France Connect
+- identification via FranceConnect
 - récupération de mot de passe
 - association d'un utilisateur comme titulaire d'une fiche transporteur
 
 L'application A Dock offre deux méthodes d'identification soit via les comptes
-utilisateurs internes à l'application ou via France Connect. Une fois que
-l'utilisateur est identifié via France Connect, un compte utilisateur interne
+utilisateurs internes à l'application ou via FranceConnect. Une fois que
+l'utilisateur est identifié via FranceConnect, un compte utilisateur interne
 sans mot de passe est créé dans l'application A Dock. Le modèle de données
 des utilisateurs permet de distinguer la source du compte (A Dock ou France
-Connect) et de stocker des informations propres à France Connect dans un champ
+Connect) et de stocker des informations propres à FranceConnect dans un champ
 JSONB en base de données.
 
 ## Création de compte
@@ -36,7 +36,7 @@ sequenceDiagram
   Mail ->> Backend: activation du compte
 ```
 
-## Authenfication via France Connect
+## Authenfication via FranceConnect
 
 Les paramètres de développement de `adock-api` utilisent les URL France
 Connect de la plateforme d'intégration.
@@ -63,7 +63,7 @@ module.exports = {
 ```
 
 L'utilisateur `123-4567` avec le mot de passe `dupont` peut être utilisé sinon
-La plateforme d'intégration de France Connect permet de créer des jeu de données
+La plateforme d'intégration de FranceConnect permet de créer des jeu de données
 utilisateur via le formulaire
 https://fip1.integ01.dev-franceconnect.fr/user/create.
 L'identifiant et le mot de passe pourront ensuite être utilisés avec les
@@ -76,7 +76,7 @@ puisse accéder _localement_ au serveur (il n'est pas nécessaire d'écouter les
 publiques).
 
 L'adresse de callback `https://illi.serveo.net/fc/callback/` doit être connue de
-France Connect et renseignée dans https://partenaires.franceconnect.gouv.fr/monprojet/decouverte
+FranceConnect et renseignée dans https://partenaires.franceconnect.gouv.fr/monprojet/decouverte
 
 ```mermaid
 sequenceDiagram

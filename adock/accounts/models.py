@@ -36,13 +36,13 @@ PROVIDER_A_DOCK = "AD"
 PROVIDER_FRANCE_CONNECT = "FC"
 PROVIDER_CHOICES = (
     (PROVIDER_A_DOCK, "A Dock"),
-    (PROVIDER_FRANCE_CONNECT, "France Connect"),
+    (PROVIDER_FRANCE_CONNECT, "FranceConnect"),
 )
 
 
 class User(AbstractBaseUser):
     # A Dock accounts store same value for username and email.
-    # France Connect accounts store the sub as username.
+    # FranceConnect accounts store the sub as username.
     username = models.CharField(
         _("username"), max_length=255, editable=False, unique=True
     )

@@ -95,7 +95,7 @@ class FranceConnectLoginTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
         payload = response.json()
         self.assertEqual(
-            payload["message"], "Impossible d'obtenir le jeton de France Connect."
+            payload["message"], "Impossible d'obtenir le jeton de FranceConnect."
         )
 
     def test_unable_to_get_user_infos(self):
@@ -111,7 +111,7 @@ class FranceConnectLoginTestCase(TestCase):
         payload = response.json()
         self.assertEqual(
             payload["message"],
-            "Impossible d'obtenir les informations utilisateur de France Connect.",
+            "Impossible d'obtenir les informations utilisateur de FranceConnect.",
         )
 
     def test_create_user(self):
@@ -179,8 +179,7 @@ class FranceConnectLogoutTestCase(TestCase):
             )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            response.json()["message"],
-            "Impossible de se déconnecter de France Connect.",
+            response.json()["message"], "Impossible de se déconnecter de FranceConnect."
         )
 
     def test_logout_success(self):

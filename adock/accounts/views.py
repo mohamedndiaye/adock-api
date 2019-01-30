@@ -137,7 +137,7 @@ def france_connect_callback(request):
     }
     response = requests.post(settings.FRANCE_CONNECT_URLS["token"], data=data)
     if response.status_code != 200:
-        message = "Impossible d'obtenir le jeton de France Connect."
+        message = "Impossible d'obtenir le jeton de FranceConnect."
         logger.error(message)
         sentry_sdk.capture_message("%s\n%s" % (message, response.content))
         # The response is certainly ignored by FC but it's convenient for our tests
@@ -154,7 +154,7 @@ def france_connect_callback(request):
         headers={"Authorization": "Bearer " + token_data["access_token"]},
     )
     if response.status_code != 200:
-        message = "Impossible d'obtenir les informations utilisateur de France Connect."
+        message = "Impossible d'obtenir les informations utilisateur de FranceConnect."
         logger.error(message)
         sentry_sdk.capture_message(message)
         return JsonResponse({"message": message}, status=response.status_code)
@@ -170,7 +170,7 @@ def france_connect_callback(request):
     if "sub" not in user_infos:
         return JsonResponse(
             {
-                "message": "Le paramètre « sub » n'a pas été retourné par France Connect."
+                "message": "Le paramètre « sub » n'a pas été retourné par FranceConnect."
             },
             status=400,
         )
@@ -207,7 +207,7 @@ def france_connect_logout(request):
         }
         response = requests.get(settings.FRANCE_CONNECT_URLS["logout"], params=data)
         if response.status_code != 302:
-            message = "Impossible de se déconnecter de France Connect."
+            message = "Impossible de se déconnecter de FranceConnect."
             logger.error(message)
             sentry_sdk.capture_message(message)
             return JsonResponse({"message": message}, status=response.status_code)
