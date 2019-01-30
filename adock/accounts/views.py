@@ -16,6 +16,7 @@ from adock.core import views as core_views
 
 from . import models as accounts_models
 from . import serializers as accounts_serializers
+from . import tokens as accounts_tokens
 
 logger = logging.getLogger(__name__)
 
@@ -37,11 +38,31 @@ def account_create(request):
         last_name=serializer.validated_data["last_name"],
         is_active=False,
     )
+    token = accounts_tokens.account_activation_token.make_token(user)
 
-    return JsonResponse(
-        {"message": "Compte utilisateur créé pour %s." % user.get_full_name()}
+    # The link triggers the backend that redirects the UI for user feedback
+    subject = "%sConfirmation de votre adresse électronique"
+    message = """
+Vous venez de créer un compte utilisateur sur A Dock, il suffit maintenant de cliquer sur ce lien
+pour l'activer :
+
+{http_server_url}/accounts/{user_id}/activer/{token}/
+
+Cordialement,
+L'équipe A Dock
+    """.format(
+        http_server_url=settings.HTTP_SERVER_URL, user_id=user.pk, token=token
     )
-    # FIXME mail to validate
+
+    user.email_user(
+        subject=subject,
+        message=message,
+        from_email=settings.SERVER_EMAIL,
+        fail_silently=settings.DEBUG,
+    )
+    return JsonResponse(
+        {"message": "Un email vous a été envoyé à « %s »." % user.email}
+    )
 
 
 def france_connect_authorize(request):

@@ -17,6 +17,9 @@ MANAGERS = ADMINS
 
 WEBSITE = "adock.webstack.fr"
 HTTPS_WEBSITE = "https://" + WEBSITE
+HTTP_CLIENT_URL = "https://" + WEBSITE + "/"
+HTTP_SERVER_URL = "https://" + WEBSITE + "/api/"
+
 SERVER_EMAIL = "no-reply@" + WEBSITE
 EMAIL_SUBJECT_PREFIX = "[adock-preprod]"
 

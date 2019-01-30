@@ -5,6 +5,9 @@ USE_SENTRY = False
 
 WEBSITE = "localhost:8080"
 HTTPS_WEBSITE = "http://" + WEBSITE
+HTTP_SERVER_URL = "http://localhost:8000/"
+HTTP_CLIENT_URL = "http://localhost:8080/"
+
 # According to your ngrok or serveo URL...
 # ssh -R 80:localhost:8000 serveo.net
 PUBLIC_HOSTNAME = "foo.serveo.net"

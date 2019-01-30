@@ -24,10 +24,11 @@ class CreateUserTestCase(TestCase):
         self.url = reverse("accounts_create")
 
     def test_success(self):
+        EMAIL = "foo@example.com"
         response = self.client.post(
             self.url,
             {
-                "email": "foo@example.com",
+                "email": EMAIL,
                 "first_name": "Claude",
                 "last_name": "Martin",
                 "password": "secret1234",
@@ -36,7 +37,7 @@ class CreateUserTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            response.json()["message"], "Compte utilisateur créé pour Claude Martin."
+            response.json()["message"], "Un email vous a été envoyé à « %s »." % EMAIL
         )
 
     def test_failure(self):
