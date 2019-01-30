@@ -5,6 +5,11 @@ from . import views
 
 urlpatterns = [
     path("create/", views.account_create, name="accounts_create"),
+    path(
+        "<int:user_id>/activate/<str:token>/",
+        views.account_activate,
+        name="accounts_activate",
+    ),
     path("login/", jwt_auth_views.jwt_token, name="accounts_log_in"),
     path(
         "fc/authorize/", views.france_connect_authorize, name="france_connect_authorize"

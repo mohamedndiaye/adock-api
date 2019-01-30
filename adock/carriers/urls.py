@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import models, views
+from . import views
 
 urlpatterns = [
     path("search/", views.search, name="carriers_search"),

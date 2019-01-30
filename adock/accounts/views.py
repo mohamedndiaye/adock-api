@@ -5,6 +5,7 @@ import requests
 from django.conf import settings
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 
 # from django.utils.crypto import get_random_string
@@ -63,6 +64,25 @@ L'équipe A Dock
     return JsonResponse(
         {"message": "Un email vous a été envoyé à « %s »." % user.email}
     )
+
+
+def account_activate(request, user_id, token):
+    try:
+        user = accounts_models.User.objects.get(pk=user_id)
+    except accounts_models.User.DoesNotExist:
+        return JsonResponse({"message": "L'utilisateur n'existe pas."}, status=400)
+
+    if user.is_active:
+        return JsonResponse({"message": "Le compte utilisateur est déjà actif."})
+
+    if not accounts_tokens.account_activation_token.check_token(user, token):
+        return JsonResponse(
+            {"message": "Le jeton d'activation n'est pas valide."}, status=400
+        )
+
+    user.is_active = True
+    user.save()
+    return JsonResponse({"message": "Le compte utilisateur est activé."})
 
 
 def france_connect_authorize(request):
