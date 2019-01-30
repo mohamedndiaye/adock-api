@@ -15,3 +15,4 @@ class CreateAccountSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 "Un compte utilisateur existe déjà avec cette adresse."
             )
+        return value
