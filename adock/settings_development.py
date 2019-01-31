@@ -7,6 +7,8 @@ HOSTNAME = "localhost"
 HTTP_SERVER_URL = "http://" + HOSTNAME + ":8000/"
 HTTP_CLIENT_URL = "http://" + HOSTNAME + ":8080/"
 
+CORS_ORIGIN_WHITELIST = (HOSTNAME + ":8080/",)
+
 # According to your ngrok or serveo URL...
 # ssh -R 80:localhost:8000 serveo.net
 PUBLIC_HOSTNAME = "foo.serveo.net"
