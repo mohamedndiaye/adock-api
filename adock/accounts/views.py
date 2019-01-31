@@ -169,9 +169,7 @@ def france_connect_callback(request):
 
     if "sub" not in user_infos:
         return JsonResponse(
-            {
-                "message": "Le paramètre « sub » n'a pas été retourné par FranceConnect."
-            },
+            {"message": "Le paramètre « sub » n'a pas été retourné par FranceConnect."},
             status=400,
         )
 
@@ -210,6 +208,6 @@ def france_connect_logout(request):
             message = "Impossible de déconnecter l'utilisateur de FranceConnect."
             logger.error(message)
             sentry_sdk.capture_message(message)
-            return JsonResponse({"message": message}, status=response.status_code)
+            return JsonResponse({"message": message}, status=400)
 
     return JsonResponse({"message": "L'utilisateur est déconnecté."})
