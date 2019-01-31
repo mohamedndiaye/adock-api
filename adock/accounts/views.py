@@ -207,7 +207,7 @@ def france_connect_logout(request):
         }
         response = requests.get(settings.FRANCE_CONNECT_URLS["logout"], params=data)
         if response.status_code != 302:
-            message = "Impossible de se déconnecter de FranceConnect."
+            message = "Impossible de déconnecter l'utilisateur de FranceConnect."
             logger.error(message)
             sentry_sdk.capture_message(message)
             return JsonResponse({"message": message}, status=response.status_code)

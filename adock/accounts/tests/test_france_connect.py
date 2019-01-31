@@ -179,7 +179,8 @@ class FranceConnectLogoutTestCase(TestCase):
             )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            response.json()["message"], "Impossible de se déconnecter de FranceConnect."
+            response.json()["message"],
+            "Impossible de déconnecter l'utilisateur de FranceConnect.",
         )
 
     def test_logout_success(self):
