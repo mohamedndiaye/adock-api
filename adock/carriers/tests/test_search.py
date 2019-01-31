@@ -15,7 +15,7 @@ class CarrierSearchTestCase(TestCase):
         """Helper"""
         response = self.client.get(self.search_url, params)
         self.assertEqual(response.status_code, 200)
-        return response.json()["results"]
+        return response.json()["carriers"]
 
 
 class CarrierSearchQueryTestCase(CarrierSearchTestCase):
@@ -110,7 +110,7 @@ class CarrierSearchQueryTestCase(CarrierSearchTestCase):
         response = self.client.get(self.search_url, {"q": "Foo"})
         data = response.json()
         self.assertEqual(data["limit"], 2)
-        self.assertEqual(len(data["results"]), 2)
+        self.assertEqual(len(data["carriers"]), 2)
 
     def test_deleted(self):
         factories.CarrierFactory(raison_sociale="ACTIVE")

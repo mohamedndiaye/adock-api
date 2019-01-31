@@ -228,8 +228,8 @@ def search(request):
         : settings.CARRIERS_LIMIT
     ]
 
-    payload = {"results": list(carriers)}
-    if len(payload["results"]) == settings.CARRIERS_LIMIT:
+    payload = {"carriers": list(carriers)}
+    if len(payload["carriers"]) == settings.CARRIERS_LIMIT:
         payload["limit"] = settings.CARRIERS_LIMIT
     return JsonResponse(payload)
 
@@ -291,7 +291,7 @@ def carrier_detail(request, carrier_siret):
         # Form is not bound to the carrier instance but we need it to check edit code
         form = forms.DetailForm(payload, carrier=carrier)
         if not form.is_valid():
-            return JsonResponse(form.errors, status=400)
+            return JsonResponse({"errors": form.errors}, status=400)
 
         # Exclude edit code from changes if not up to you to define it!
         form.cleaned_data.pop("edit_code")
@@ -431,7 +431,8 @@ def _carrier_get_certificate(request, carrier_siret, as_pdf=True):
     certificate = carrier.get_latest_certificate()
     if certificate is None:
         return JsonResponse(
-            {"message": "Aucun certificat pour le transporteur %s" % carrier.enseigne}
+            {"message": "Aucun certificat pour le transporteur %s" % carrier.enseigne},
+            status=404,
         )
 
     template_name = (

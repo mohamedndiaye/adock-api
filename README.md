@@ -141,3 +141,33 @@ Le développement s'effectue sur la branche `master` et seule la branche `prod` 
 L'API est décrite au format OpenAPI v3, la documentation est publiée sur
 [swaggerHub](https://app.swaggerhub.com/apis/stephaner/adock/1.0.0-oas3) et le
 fichier YAML correspondant est enregistré dans le fichier `docs/openapi.yaml`.
+
+## Format JSON
+
+Les réponses JSON contiennent les valeurs demandées à la racine de la réponse
+dans un champ nommé en fonction de la ressource :
+
+```json
+{
+  "carrier": {
+    "enseigne": "foo"
+  }
+}
+```
+
+Les validations de formulaires retournent les erreurs dans un champ `errors` qui
+contient les différents champs concernés et une liste d'erreurs pour chacun
+d'eux. Quand les erreurs sont globales, elles sont ajoutées à la liste du champ
+spécial `__all__`, par exemple :
+
+```json
+{
+  "errors": {
+    "__all__": ["L'identifiant et le mot de passe sont incorrects."],
+    "email": ["Ce champ est requis."]
+  }
+}
+```
+
+Le champ `message` est souvent retourné pour expliciter en français la raison de
+la réponse en cas de succès ou erreur.

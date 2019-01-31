@@ -94,7 +94,7 @@ paths:
               examples:
                 carriers:
                   value:
-                    results:
+                    carriers:
                       - lti_nombre: 3
                         adresse: 49 RUE RENE DUMONT
                         raison_sociale: TRANSPORTS CITY ONE

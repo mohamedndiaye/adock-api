@@ -91,7 +91,7 @@ class CarrierEditCodeTestCase(test.CarrierTestCase):
             {"telephone": "0102030405", "working_area_departements": "44"}, 400
         )
         self.assertEqual(
-            data["edit_code"][0], "Le code de modification n'est pas valide."
+            data["errors"]["edit_code"][0], "Le code de modification n'est pas valide."
         )
 
         self.patch_carrier(

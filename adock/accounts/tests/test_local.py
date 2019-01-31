@@ -48,12 +48,12 @@ class CreateUserTestCase(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 400)
-        data = response.json()
-        self.assertEqual(data["email"], ["Saisissez une adresse email valable."])
-        self.assertEqual(data["first_name"], ["Ce champ ne peut être vide."])
-        self.assertEqual(data["last_name"], ["Ce champ est obligatoire."])
+        errors = response.json()["errors"]
+        self.assertEqual(errors["email"], ["Saisissez une adresse email valable."])
+        self.assertEqual(errors["first_name"], ["Ce champ ne peut être vide."])
+        self.assertEqual(errors["last_name"], ["Ce champ est obligatoire."])
         self.assertEqual(
-            data["password"],
+            errors["password"],
             ["Assurez-vous que ce champ comporte au moins 8 caractères."],
         )
 

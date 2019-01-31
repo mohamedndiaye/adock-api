@@ -82,7 +82,7 @@ class SignCarrierCertificateTestCase(TestCase):
         response = self.client.post(self.url, data, content_type="application/json")
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.content.decode("utf-8"))
-        self.assertIn("last_name", data)
+        self.assertIn("last_name", data["errors"])
 
 
 @skipIf(settings.USE_CIRCLECI, "Image not ready for CircleCI")
@@ -93,12 +93,12 @@ class GetCarrierCertificateTestCase(TestCase):
             "carriers_certificate", kwargs={"carrier_siret": self.carrier.siret}
         )
 
-        def test_get_no_certificate(self):
-            response = self.client.get(self.url)
-            self.assertEqual(response.status_code, 404)
+    def test_get_no_certificate(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
 
     def test_get_certificate_workers(self):
-        certificate = factories.CarrierCertificateFactory(
+        factories.CarrierCertificateFactory(
             carrier=self.carrier, kind=models.CERTIFICATE_WORKERS
         )
 

@@ -27,6 +27,6 @@ def request_validate(request, Serializer):
     try:
         serializer.is_valid(raise_exception=True)
     except serializers.ValidationError:
-        return None, JsonResponse(serializer.errors, status=400)
+        return None, JsonResponse({"errors": serializer.errors}, status=400)
 
     return serializer, None

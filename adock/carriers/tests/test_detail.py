@@ -260,7 +260,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
 
         # Only possible to PATCH w/o phone when the carrier already contains a phone
         data = self.patch_carrier({"email": self.carrier.email}, 400)
-        self.assertEqual(data["telephone"][0], "Ce champ est obligatoire.")
+        self.assertEqual(data["errors"]["telephone"][0], "Ce champ est obligatoire.")
 
         data = self.patch_carrier(
             {"telephone": PHONE, "email": self.carrier.email}, 200
@@ -271,20 +271,20 @@ class CarrierDetailTestCase(test.CarrierTestCase):
             {"telephone": "11223344556", "email": self.carrier.email}, 400
         )
         self.assertEqual(
-            data["telephone"][0], "Saisissez un numéro de téléphone valide."
+            data["errors"]["telephone"][0], "Saisissez un numéro de téléphone valide."
         )
 
     def test_patch_unexisting_working_area_departements(self):
         data = self.patch_carrier({"working_area_departements": ["20"]}, 400)
         self.assertEqual(
-            data["working_area_departements"][0],
+            data["errors"]["working_area_departements"][0],
             "« 20 » n'est pas un département français valide.",
         )
 
     def test_patch_invalid_working_area_departements(self):
         data = self.patch_carrier({"working_area_departements": ["2034;454"]}, 400)
         self.assertEqual(
-            data["working_area_departements"][0],
+            data["errors"]["working_area_departements"][0],
             "L'élément n°1 du tableau n'est pas valide : "
             "Assurez-vous que cette valeur comporte au plus 3 caractères (actuellement 8).",
         )
@@ -298,7 +298,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
             400,
         )
         self.assertEqual(
-            data["working_area_departements"][0],
+            data["errors"]["working_area_departements"][0],
             "Des départements doivent être renseignés quand l'aire de travail est départementale.",
         )
 
