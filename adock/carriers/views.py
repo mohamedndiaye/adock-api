@@ -120,7 +120,7 @@ def get_latest_certificate_as_json(carrier):
     }
 
 
-def search(request):
+def carrier_search(request):
     """The search allows to filter on:
        - partial enseigne or SIRET
        - type of the license (LC heavy or LTI light)

@@ -3,7 +3,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("search/", views.search, name="carriers_search"),
+    path("search/", views.carrier_search, name="carriers_search"),
     path("<str:carrier_siret>/", views.carrier_detail, name="carriers_detail"),
     path(
         "<str:carrier_siret>/confirm_email/<token>/",
