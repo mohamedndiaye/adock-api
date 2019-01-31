@@ -240,6 +240,9 @@ class Carrier(models.Model):
         # The email has been confirmed
         return bool(self.email_confirmed_at)
 
+    def has_owner(self):
+        return self.owners.exists()
+
     def get_edit_code_timeout_at(self):
         if self.edit_code_at is None:
             return None

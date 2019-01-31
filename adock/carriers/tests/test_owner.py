@@ -10,8 +10,9 @@ class CarrierOnwerTestCase(TestCase):
     def test_model(self):
         carrier = factories.CarrierFactory()
         user = accounts_factories.UserFactory()
-        self.assertEqual(carrier.owners.count(), 0)
+        self.assertFalse(carrier.has_owner())
 
         owner = models.CarrierUser.objects.create(carrier=carrier, user=user)
-        self.assertEqual(carrier.owners.count(), 1)
         self.assertIsNotNone(owner.created_at)
+
+        self.assertTrue(carrier.has_owner())
