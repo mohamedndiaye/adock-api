@@ -243,6 +243,13 @@ class Carrier(models.Model):
     def has_owner(self):
         return self.owners.exists()
 
+    def add_owner(self, user):
+        try:
+            owner = self.owners.get(carrieruser__user=user)
+        except accounts_models.User.DoesNotExist:
+            owner = CarrierUser.objects.create(carrier=self, user=user)
+        return owner
+
     def get_edit_code_timeout_at(self):
         if self.edit_code_at is None:
             return None
