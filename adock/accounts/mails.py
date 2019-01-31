@@ -9,12 +9,12 @@ def mail_user_to_activate(user, token):
 Vous venez de créer un compte utilisateur sur A Dock, il suffit maintenant de cliquer sur ce lien
 pour l'activer :
 
-{http_server_url}/utilisateur/{user_id}/activer/{token}/
+{http_client_url}utilisateur/{user_id}/activer/{token}/
 
 Cordialement,
 L'équipe A Dock
     """.format(
-        http_server_url=settings.HTTP_SERVER_URL, user_id=user.pk, token=token
+        http_client_url=settings.HTTP_CLIENT_URL, user_id=user.pk, token=token
     )
 
     user.email_user(
