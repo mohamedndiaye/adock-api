@@ -9,6 +9,8 @@ from django.urls import reverse
 from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 
+from adock.accounts import models as accounts_models
+
 from . import validators as carriers_validators
 
 
@@ -185,6 +187,9 @@ class Carrier(models.Model):
     objectif_co2_end = models.DateField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
     latitude = models.FloatField(blank=True, null=True)
+    owners = models.ManyToManyField(
+        accounts_models.User, through="CarrierUser", related_name="carriers"
+    )
 
     class Meta:
         db_table = "carrier"
@@ -344,3 +349,13 @@ class CarrierCertificate(models.Model):
 
     class Meta:
         db_table = "carrier_certificate"
+
+
+class CarrierUser(models.Model):
+    carrier = models.ForeignKey(Carrier, on_delete=models.CASCADE)
+    user = models.ForeignKey(accounts_models.User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "carrier_user"
+        unique_together = ("carrier", "user")
