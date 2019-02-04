@@ -19,3 +19,5 @@ class CarrierOnwerTestCase(TestCase):
         # Didn't add twice
         owner = carrier.add_owner(user)
         self.assertEqual(models.CarrierUser.objects.count(), 1)
+
+        self.assertEqual(user.carriers.first(), carrier)
