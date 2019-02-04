@@ -13,6 +13,7 @@ import sentry_sdk
 from jwt_auth import views as jwt_auth_views
 
 from adock.core import views as core_views
+from adock.carriers import views as carriers_views
 
 from . import mails as accounts_mails
 from . import models as accounts_models
@@ -67,6 +68,27 @@ def account_activate(request, user_id, token):
     json_data = jwt_auth_views.jwt_get_json_with_token(token)
     json_data["message"] = "Le compte utilisateur est activé."
     return JsonResponse(json_data)
+
+
+def account_profile(request):
+    if request.user.is_anonymous or not request.user.is_active:
+        return JsonResponse(
+            {"message": "Impossible d'obtenir les informations de l'utilisateur."},
+            status=403,
+        )
+
+    # Returns only informations not in JWT payload
+    return JsonResponse(
+        {
+            "user": {
+                "last_login": request.user.last_login,
+                "date_joined": request.user.date_joined,
+                "provider": request.user.provider,
+                "provider_display": request.user.get_provider_display(),
+                "provider_data": request.user.provider_data,
+            }
+        }
+    )
 
 
 def france_connect_authorize(request):

@@ -11,6 +11,7 @@ urlpatterns = [
         name="accounts_activate",
     ),
     path("login/", jwt_auth_views.jwt_token, name="accounts_log_in"),
+    path("profile/", views.account_profile, name="accounts_profile"),
     path(
         "fc/authorize/", views.france_connect_authorize, name="france_connect_authorize"
     ),
