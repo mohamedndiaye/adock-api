@@ -86,6 +86,9 @@ def account_profile(request):
                 "provider": request.user.provider,
                 "provider_display": request.user.get_provider_display(),
                 "provider_data": request.user.provider_data,
+                "carriers": list(
+                    request.user.carriers.values(*carriers_views.CARRIER_LIST_FIELDS)
+                ),
             }
         }
     )
