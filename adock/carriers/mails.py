@@ -86,30 +86,3 @@ Adresse électronique confirmée : {email}
         email=carrier.email,
     )
     mail_managers(subject, message, fail_silently=True)
-
-
-def mail_carrier_edit_code(carrier):
-    subject = "%sCode de modification" % settings.EMAIL_SUBJECT_PREFIX
-    max_edit_time = carrier.edit_code_at + settings.CARRIER_EDIT_CODE_INTERVAL
-    message = """
-Votre code de modification est {edit_code}.
-
-Ce code vous permet de modifier la fiche du transporteur « {enseigne} » jusqu'à {max_edit_time_display}.
-
-Cordialement,
-L'équipe A Dock
-    """.format(
-        enseigne=carrier.enseigne,
-        edit_code=carrier.edit_code,
-        max_edit_time_display=timezone.localtime(max_edit_time).strftime(
-            "%H:%M (%d/%m/%Y)"
-        ),
-    )
-    recipient_list = get_recipient_list_from_env(carrier)
-    send_mail(
-        subject,
-        message,
-        settings.SERVER_EMAIL,
-        recipient_list,
-        fail_silently=settings.DEBUG,
-    )

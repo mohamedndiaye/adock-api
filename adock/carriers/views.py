@@ -293,9 +293,6 @@ def carrier_detail(request, carrier_siret):
         if not form.is_valid():
             return JsonResponse({"errors": form.errors}, status=400)
 
-        # Exclude edit code from changes if not up to you to define it!
-        form.cleaned_data.pop("edit_code")
-
         # Limit cleaned_data to the keys of the payload but only accept keys of cleaned_data (intersection)
         # to only update the submitted values
         cleaned_payload = {
@@ -318,10 +315,7 @@ def carrier_detail(request, carrier_siret):
             if "email" in updated_fields:
                 # New email should invalidate email confirmation and edit code
                 carrier.email_confirmed_at = None
-                carrier.reset_edit_code()
-                updated_fields.extend(
-                    ["email_confirmed_at", "edit_code", "edit_code_at"]
-                )
+                updated_fields.extend(["email_confirmed_at"])
                 # If not empty
                 if carrier.email:
                     confirmation_email_to_send = True
@@ -366,42 +360,6 @@ def carrier_confirm_email(request, carrier_siret, token):
 
     return JsonResponse(
         {"message": "Impossible de confirmer l'adresse électronique."}, status=400
-    )
-
-
-def carrier_send_edit_code(request, carrier_siret):
-    carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
-
-    if not carrier.is_locked():
-        return JsonResponse(
-            {"message": "L'adresse électronique n'est pas confirmée."}, status=409
-        )
-
-    if carrier.edit_code_has_expired():
-        carrier.set_edit_code()
-        try:
-            mails.mail_carrier_edit_code(carrier)
-        except ConnectionRefusedError as e:
-            carrier.reset_edit_code()
-            sentry_sdk.capture_exception(e)
-            message = "Impossible d'envoyer le code de modification."
-            status = 503
-        else:
-            carrier.save()
-            message = "Un code de modification a été envoyé par courriel."
-            status = 201
-    else:
-        message = "Le précédent code de modification envoyé est toujours valide."
-        status = 200
-
-    return JsonResponse(
-        {
-            "message": message,
-            "email": carrier.email,
-            "edit_code_at": carrier.edit_code_at,
-            "edit_code_timeout_at": carrier.get_edit_code_timeout_at(),
-        },
-        status=status,
     )
 
 

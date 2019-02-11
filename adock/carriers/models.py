@@ -177,8 +177,6 @@ class Carrier(models.Model):
         null=True,
         help_text="Date de la suppression de l'établissement de la base Sirene.",
     )
-    edit_code = models.IntegerField(blank=True, null=True)
-    edit_code_at = models.DateTimeField(blank=True, null=True)
     objectif_co2 = models.CharField(
         max_length=8, choices=OBJECTIF_CO2_CHOICES, blank=True, null=False, default=""
     )
@@ -249,54 +247,6 @@ class Carrier(models.Model):
         except accounts_models.User.DoesNotExist:
             owner = CarrierUser.objects.create(carrier=self, user=user)
         return owner
-
-    def get_edit_code_timeout_at(self):
-        if self.edit_code_at is None:
-            return None
-
-        return self.edit_code_at + settings.CARRIER_EDIT_CODE_INTERVAL
-
-    def edit_code_has_expired(self):
-        if not self.edit_code:
-            # Unset is considered expired
-            return True
-
-        if self.get_edit_code_timeout_at() < timezone.now():
-            # The stored edit code has expired
-            return True
-
-        return False
-
-    def check_edit_code(self, edit_code):
-        if not self.is_locked():
-            # Access granted to not locked carrier
-            return True
-
-        if self.edit_code_has_expired():
-            # The current edit code is too old
-            return False
-
-        if not edit_code:
-            # Wrong edit code
-            return False
-
-        try:
-            edit_code = int(edit_code)
-        except ValueError:
-            return False
-
-        if self.edit_code != edit_code:
-            return False
-
-        return True
-
-    def set_edit_code(self):
-        self.edit_code = random.randint(100000, 999999)
-        self.edit_code_at = timezone.now()
-
-    def reset_edit_code(self):
-        self.edit_code = None
-        self.edit_code_at = None
 
     def get_latest_certificate(self):
         try:

@@ -14,7 +14,6 @@ class DetailForm(forms.ModelForm):
             "specialities",
             "website",
             "description",
-            "edit_code",
         ]
 
     def __init__(self, data, carrier):
@@ -37,14 +36,6 @@ class DetailForm(forms.ModelForm):
             formated_departements.append("{:0>2}".format(departement))
         # Unique and sorted
         return sorted(set(formated_departements))
-
-    def clean_edit_code(self):
-        # Access control to locked carrier
-        edit_code = self.cleaned_data.get("edit_code")
-        if not self.carrier.check_edit_code(edit_code):
-            raise forms.ValidationError("Le code de modification n'est pas valide.")
-
-        return edit_code
 
     def clean(self):
         cleaned_data = super().clean()

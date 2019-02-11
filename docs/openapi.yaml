@@ -224,37 +224,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/inline_response_400_1"
-  /carriers/send_code/:
-    get:
-      tags:
-        - carrier
-      summary: envoie un code de modification à une adresse électronique confirmée
-      operationId: sendCarrierCode
-      responses:
-        200:
-          description: le précédent code de modification envoyé est toujours valide.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CarrierSendEditCodeResponse"
-        201:
-          description: un code de modification a été envoyé par courriel
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CarrierSendEditCodeResponse"
-        409:
-          description: impossible quand l'adresse électronique n'est pas confirmée
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CarrierSendEditCodeResponse"
-        503:
-          description: impossible d'envoyer le code de modification
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CarrierSendEditCodeResponse"
   /meta/:
     get:
       tags:
@@ -524,21 +493,6 @@ components:
           type: string
           description: date de la supression de l'établissement du registre des transports
           format: date
-    CarrierSendEditCodeResponse:
-      type: object
-      properties:
-        message:
-          type: string
-        email:
-          type: string
-        edit_code_at:
-          type: string
-          description: date de génération du code de modification
-          format: date-time
-        edit_code_timeout_at:
-          type: string
-          description: date d'expiration du code de modification
-          format: date-time
     inline_response_200:
       type: object
       properties:

@@ -122,13 +122,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         self.assertEqual(carrier_log.data["working_area_departements"], ["2A", "56"])
 
         self.patch_carrier(
-            {
-                "telephone": PHONE,
-                "email": EMAIL,
-                "working_area_departements": "2A, 57",
-                # Should be ignored from log
-                "edit_code": "123456",
-            },
+            {"telephone": PHONE, "email": EMAIL, "working_area_departements": "2A, 57"},
             200,
         )
         self.assertEqual(models.CarrierLog.objects.count(), 4)

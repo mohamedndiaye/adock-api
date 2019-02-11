@@ -10,11 +10,6 @@ urlpatterns = [
         views.carrier_confirm_email,
         name="carriers_confirm_email",
     ),
-    path(
-        "<str:carrier_siret>/send_code/",
-        views.carrier_send_edit_code,
-        name="carriers_send_code",
-    ),
     # POST to create SQL entry and GET to generate PDF
     path(
         "<str:carrier_siret>/certificate/",

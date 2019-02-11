@@ -98,21 +98,9 @@ class CarrierEmailConfirmationTestCase(test.CarrierTestCase):
         self.detail_url = reverse(
             "carriers_detail", kwargs={"carrier_siret": self.carrier.siret}
         )
-        # Unable to change it w/o edit code
-        data = self.patch_carrier(
-            {"telephone": "0102030405", "email": "bar@example.com"}, 400
-        )
-
-        self.carrier.set_edit_code()
-        self.carrier.save()
         # Invalidate previous lock by changing email
         data = self.patch_carrier(
-            {
-                "telephone": "0102030405",
-                "email": "bar@example.com",
-                "edit_code": self.carrier.edit_code,
-            },
-            200,
+            {"telephone": "0102030405", "email": "bar@example.com"}, 200
         )
         self.assertFalse(data["carrier"]["is_locked"])
         self.carrier.refresh_from_db()
