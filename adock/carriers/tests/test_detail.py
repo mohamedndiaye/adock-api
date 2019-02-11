@@ -80,21 +80,19 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         self.assertEqual(data["carrier"]["telephone"], "")
 
     def test_get_no_email(self):
+        # Don't publish not validated email
         response = self.client.get(self.detail_url)
         data = response.json()
         self.assertNotIn("email", data["carrier"])
 
-    def get_get_mail(self):
-        self.carrier.validated_at = timezone.now
+    def test_get_mail(self):
+        self.carrier.validated_at = timezone.now()
         self.carrier.save()
         response = self.client.get(self.detail_url)
         data = response.json()
         self.assertIn("email", data["carrier"])
 
     def test_patch_log(self):
-        self.carrier.email = ""
-        self.carrier.save()
-
         old_phone = self.carrier.telephone
         carrier = self.patch_carrier({"telephone": PHONE}, 200)["carrier"]
         # Initial and new entry
@@ -244,19 +242,33 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         data = self.patch_carrier({"foo": "42"}, 200)
         self.assertNotIn("foo", data["carrier"])
 
+    def test_patch_email_required(self):
+        # Only possible to PATCH w/o email when the carrier already contains an email
+        data = self.patch_carrier({"telephone": str(self.carrier.telephone)}, 200)
+
+        # Remove email on the instance
+        self.carrier.email = ""
+        self.carrier.save()
+
+        data = self.patch_carrier({"telephone": str(self.carrier.telephone)}, 400)
+        self.assertEqual(data["errors"]["email"][0], "Ce champ est obligatoire.")
+
+        self.patch_carrier(
+            {"telephone": PHONE, "email": "foo@example.com"}, 200
+        )
+
     def test_patch_phone_required(self):
-        # Accepted
+        # Only possible to PATCH w/o phone when the carrier already contains a phone
         data = self.patch_carrier({"email": self.carrier.email}, 200)
 
         # Remove phone on the instance
         self.carrier.telephone = ""
         self.carrier.save()
 
-        # Only possible to PATCH w/o phone when the carrier already contains a phone
         data = self.patch_carrier({"email": self.carrier.email}, 400)
         self.assertEqual(data["errors"]["telephone"][0], "Ce champ est obligatoire.")
 
-        data = self.patch_carrier(
+        self.patch_carrier(
             {"telephone": PHONE, "email": self.carrier.email}, 200
         )
 

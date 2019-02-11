@@ -1,6 +1,3 @@
-import random
-
-from django.conf import settings
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
 from django.db.models import Lookup
@@ -106,9 +103,9 @@ class Carrier(models.Model):
     ville = models.CharField(max_length=32)
     # code_departement from Registre
     departement = models.CharField(max_length=3, blank=True, null=False, default="")
-    # telephone from GRECO used as default (changed)
+    # telephone from GRECO used as default (changed) but required in form
     telephone = PhoneNumberField(blank=True, default="")
-    # mail from GRECO used as default (changed)
+    # mail from GRECO used as default (changed) but required in form
     email = models.EmailField(blank=True, default="")
     # Set when the user clicks on the provided URL with one time token and to
     # None when the email is modified.

@@ -20,13 +20,20 @@ class DetailForm(forms.ModelForm):
         super().__init__(data)
         self.carrier = carrier
 
-    def clean_telephone(self):
+    def field_required(self, field_name):
         """Should be submitted or present in instance"""
-        telephone = self.cleaned_data.get("telephone") or self.carrier.telephone
-        if not telephone:
+        value = self.cleaned_data.get(field_name) or getattr(self.carrier, field_name)
+        if not value:
             raise forms.ValidationError("Ce champ est obligatoire.")
 
-        return telephone
+        return value
+
+    def clean_telephone(self):
+        return self.field_required("telephone")
+
+    def clean_email(self):
+        """Should be submitted or present in instance"""
+        return self.field_required("email")
 
     def clean_working_area_departements(self):
         """Pads departement numbers lesser than 10 with a zero"""

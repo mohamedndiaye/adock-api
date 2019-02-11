@@ -64,14 +64,17 @@ class CarrierEmailConfirmationTestCase(test.CarrierTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
-    def test_validated_carrier_wo_existing_mail(self):
+    def test_validated_carrier_wo_previous_mail(self):
         self.assertIsNone(self.carrier.validated_at)
         self.carrier.email = ""
         self.carrier.save()
 
-        data = self.patch_carrier({"telephone": "0102030405"}, 200)
-        self.assertFalse(data["confirmation_email_sent"])
-        self.assertEqual(len(mail.outbox), 1)
+        data = self.patch_carrier(
+            {"telephone": "0102030405", "email": "foo@example.com"}, 200
+        )
+        self.assertTrue(data["confirmation_email_sent"])
+        # One mail to carrier to confirm email and one to admin
+        self.assertEqual(len(mail.outbox), 2)
         message = "[A Dock] Modification du transporteur %s" % self.carrier.siret
         self.assertEqual(mail.outbox[0].subject, message)
         self.carrier.refresh_from_db()
@@ -82,7 +85,7 @@ class CarrierEmailConfirmationTestCase(test.CarrierTestCase):
         self.assertGreaterEqual(len(self.carrier.email), 1)
 
         data = self.patch_carrier({"telephone": "0102030405"}, 200)
-        self.assertEqual(data["carrier"]["email"], "")
+        self.assertEqual(data["carrier"]["email"], self.carrier.email)
         self.assertFalse(data["confirmation_email_sent"])
         self.assertEqual(len(mail.outbox), 1)
         message = "[A Dock] Modification du transporteur %s" % self.carrier.siret
