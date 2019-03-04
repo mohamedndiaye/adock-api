@@ -1,5 +1,7 @@
 from django.test import TestCase
 
+from adock.accounts import models as accounts_models
+
 from . import test
 from .. import factories
 
@@ -15,3 +17,10 @@ class CarrierModelTestCase(TestCase):
     def test_enseigne_unaccent(self):
         carrier = factories.CarrierFactory(raison_sociale="DÉMÉNAGEURS MALADROITS")
         self.assertEqual(carrier.enseigne_unaccent, "DEMENAGEURS MALADROITS")
+
+
+class CarrierExtendModelTestCase(TestCase):
+    def test_create(self):
+        carrier_editable = factories.CarrierEditableFactory()
+        owner = accounts_models.User.objects.get()
+        self.assertEqual(carrier_editable.created_by, owner)

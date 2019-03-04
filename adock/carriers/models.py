@@ -260,6 +260,54 @@ class Carrier(models.Model):
         super().save(*args, **kwargs)
 
 
+class CarrierEditable(models.Model):
+    """Editable part of the carrier.
+    The history of changes on carriers are set by the list of CarrierEditable.
+    """
+
+    carrier = models.ForeignKey(
+        Carrier, on_delete=models.CASCADE, related_name="changes"
+    )
+    # telephone from GRECO used as default (changed) but required in form
+    telephone = PhoneNumberField(blank=True, default="")
+    email = models.EmailField(blank=True, default="")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(
+        accounts_models.User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="carrier_changes",
+    )
+    validated_at = models.DateTimeField(blank=True, null=True)
+    working_area = models.CharField(
+        max_length=15,
+        choices=WORKING_AREA_CHOICES,
+        blank=True,
+        default=WORKING_AREA_UNDEFINED,
+    )
+    # This field is used when working_area is set to WORKING_AREA_DEPARTEMENT
+    # The default value is the departement of the company
+    # Ex. 44, 2A, 976
+    working_area_departements = ArrayField(
+        models.CharField(max_length=3),
+        blank=True,
+        null=True,
+        validators=[carriers_validators.validate_french_departement],
+    )
+    specialities = ArrayField(
+        models.CharField(max_length=63, choices=SPECIALITY_CHOICES),
+        blank=True,
+        null=True,
+    )
+    website = models.URLField(blank=True)
+    # Filled by the user to describe his activity
+    description = models.TextField(blank=True, default="")
+
+    class Meta:
+        db_table = "carrier_editable"
+
+
 class CarrierLog(models.Model):
     carrier = models.ForeignKey(Carrier, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -8,6 +8,7 @@ from factory import fuzzy
 import unidecode
 from faker import Faker
 
+from adock.accounts import factories as accounts_factories
 from . import models, validators
 
 faker = Faker("fr_FR")
@@ -56,6 +57,19 @@ class CarrierFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = models.Carrier
+
+
+class CarrierEditableFactory(factory.DjangoModelFactory):
+    carrier = factory.SubFactory(CarrierFactory)
+    created_by = factory.SubFactory(accounts_factories.UserFactory)
+    telephone = factory.Faker("phone_number", locale="fr_FR")
+    email = factory.Faker("email", locale="fr_FR")
+    working_area = models.WORKING_AREA_DEPARTEMENT
+    working_area_departements = ["35", "44"]
+    specialities = ["TEMPERATURE", "URBAIN"]
+
+    class Meta:
+        model = models.CarrierEditable
 
 
 class CarrierCertificateFactory(factory.DjangoModelFactory):
