@@ -3,7 +3,7 @@ from django.test import TestCase
 from adock.accounts import models as accounts_models
 
 from . import test
-from .. import factories
+from .. import factories, models
 
 
 class CarrierModelTestCase(TestCase):
@@ -24,3 +24,7 @@ class CarrierExtendModelTestCase(TestCase):
         carrier_editable = factories.CarrierEditableFactory()
         owner = accounts_models.User.objects.get()
         self.assertEqual(carrier_editable.created_by, owner)
+
+        carrier = models.Carrier.objects.get()
+        self.assertEqual(carrier.changes.first(), carrier_editable)
+        self.assertEqual(carrier_editable.carrier, carrier)

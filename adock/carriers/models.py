@@ -182,6 +182,13 @@ class Carrier(models.Model):
     objectif_co2_end = models.DateField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
     latitude = models.FloatField(blank=True, null=True)
+    editable = models.ForeignKey(
+        "CarrierEditable",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="+",
+    )
     owners = models.ManyToManyField(
         accounts_models.User, through="CarrierUser", related_name="carriers"
     )
