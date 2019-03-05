@@ -8,7 +8,6 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.utils.formats import date_format
-import sentry_sdk
 
 from adock.core import pdf as core_pdf
 from adock.core import views as core_views
