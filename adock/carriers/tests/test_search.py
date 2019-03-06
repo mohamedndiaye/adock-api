@@ -92,17 +92,17 @@ class CarrierSearchQueryTestCase(CarrierSearchTestCase):
         carriers = self.get_carriers({"q": "xpo DIS, 49"})
         self.assertEqual(len(carriers), 0)
 
-    def test_search_ordering(self):
-        # FIXME
-        # Name is set according to the expected ordering
-        t3 = factories.CarrierFactory(enseigne="T3", email="")
-        t4 = factories.CarrierFactory(enseigne="T4", email="", telephone="")
+    def test_search_ordering_on_enseigne(self):
+        # Sorted by -completeness then enseigne
+        t3 = factories.CarrierFactory(enseigne="T3")
+        t4 = factories.CarrierFactory(enseigne="T4", with_editable=True)
         t2 = factories.CarrierFactory(enseigne="T2")
-        t1 = factories.CarrierFactory(enseigne="T1", validated_at=timezone.now())
+        t1 = factories.CarrierFactory(enseigne="T1")
+
         carriers = self.get_carriers({"q": "t"})
         self.assertEqual(len(carriers), 4)
         self.assertListEqual(
-            [t["siret"] for t in carriers], [t.siret for t in [t1, t2, t3, t4]]
+            [t["siret"] for t in carriers], [t.siret for t in [t4, t1, t2, t3]]
         )
 
     @override_settings(CARRIERS_LIMIT=2)
@@ -240,7 +240,7 @@ class CarrierSearchDepartementTestCase(CarrierSearchTestCase):
         )
         self.assertEqual(len(carriers), 0)
 
-    def test_search_ordering(self):
+    def test_search_ordering_small_working_area(self):
         # Fewer number of departements first
         expected_ordering = (
             "DEP. 72",
