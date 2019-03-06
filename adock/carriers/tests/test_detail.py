@@ -1,8 +1,9 @@
 import re
 
-from adock.accounts.test import AuthTestCaseBase
 from django.core import mail
 from django.urls import reverse
+
+from adock.accounts.test import AuthTestCaseBase
 
 from . import test
 from .. import factories, models, validators

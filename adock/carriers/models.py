@@ -3,7 +3,6 @@ from django.db import models
 from django.db.models import Lookup
 from django.db.models.fields import Field
 from django.urls import reverse
-from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 
 from adock.accounts import models as accounts_models
@@ -283,16 +282,6 @@ class CarrierEditable(models.Model):
     class Meta:
         db_table = "carrier_editable"
         get_latest_by = "pk"
-
-
-class CarrierLog(models.Model):
-    carrier = models.ForeignKey(Carrier, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    # Contains the previous data of the instance
-    data = JSONField()
-
-    class Meta:
-        db_table = "carrier_log"
 
 
 class CarrierFeed(models.Model):

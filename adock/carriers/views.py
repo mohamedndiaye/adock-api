@@ -89,9 +89,7 @@ def get_carrier_as_json(carrier):
         carrier_json[field] = getattr(carrier, field)
 
     editable = carrier.editable
-    # FIXME
     carrier_json["is_locked"] = bool(editable.confirmed_at)
-
     carrier_json["telephone"] = (
         editable.telephone
         if isinstance(editable.telephone, str)
@@ -258,21 +256,6 @@ def get_carrier_changes(carrier, cleaned_payload):
             old_data_changed[k] = get_carrier_value_for_json(k, v)
 
     return old_data_changed
-
-
-def add_carrier_log(carrier, old_data_changed, cleaned_payload):
-    """
-    Add an entry to carrier log. Take care to create an initial entry
-    with old data when no entries exist yet.
-    """
-    if not models.CarrierLog.objects.filter(carrier=carrier).exists():
-        models.CarrierLog.objects.create(carrier=carrier, data=old_data_changed)
-
-    new_data_changed = {
-        k: get_carrier_value_for_json(k, cleaned_payload[k])
-        for k in old_data_changed.keys()
-    }
-    models.CarrierLog.objects.create(carrier=carrier, data=new_data_changed)
 
 
 RE_MANY_COMMAS = re.compile(r",+")
