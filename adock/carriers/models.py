@@ -278,9 +278,9 @@ class CarrierEditable(models.Model):
     carrier = models.ForeignKey(
         Carrier, on_delete=models.CASCADE, related_name="changes"
     )
-    # telephone from GRECO used as default (changed) but required in form
-    telephone = PhoneNumberField(blank=True, default="")
-    email = models.EmailField(blank=True, default="")
+    # FIXME Should we expose not validated phone?
+    telephone = PhoneNumberField(blank=False, null=False)
+    email = models.EmailField(blank=False, null=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
@@ -289,7 +289,7 @@ class CarrierEditable(models.Model):
         null=True,
         related_name="carrier_changes",
     )
-    validated_at = models.DateTimeField(blank=True, null=True)
+    confirmed_at = models.DateTimeField(blank=True, null=True)
     working_area = models.CharField(
         max_length=15,
         choices=WORKING_AREA_CHOICES,
@@ -316,6 +316,7 @@ class CarrierEditable(models.Model):
 
     class Meta:
         db_table = "carrier_editable"
+        get_latest_by = "pk"
 
 
 class CarrierLog(models.Model):

@@ -1,27 +1,31 @@
 from django.conf import settings
 from django.core import mail
 from django.test import TestCase, override_settings
-from django.utils import timezone
 
 from .. import factories, mails
 
 
 class PreproductionTestCase(TestCase):
-    def mail_carrier_to_confirm_email(self, carrier):
-        mails.mail_carrier_to_confirm_email(carrier)
+    def mail_carrier_editable_to_confirm(self, carrier_editable):
+        mails.mail_carrier_editable_to_confirm(
+            carrier_editable,
+            ["email"],
+            {"email": "foo"},
+            {"email": carrier_editable.email},
+        )
         self.assertEqual(len(mail.outbox), 1)
         return mail.outbox[0]
 
     @override_settings(PREPRODUCTION=False)
     def test_mail_to_carrier(self):
-        carrier = factories.CarrierFactory()
-        mail_sent = self.mail_carrier_to_confirm_email(carrier)
-        self.assertEqual(mail_sent.recipients(), [carrier.email])
+        carrier = factories.CarrierFactory(with_editable=True)
+        mail_sent = self.mail_carrier_editable_to_confirm(carrier.editable)
+        self.assertEqual(mail_sent.recipients(), [carrier.editable.email])
 
     @override_settings(PREPRODUCTION=True)
     def test_mail_to_carrier_preproduction(self):
-        carrier = factories.CarrierFactory()
-        mail_sent = self.mail_carrier_to_confirm_email(carrier)
+        carrier = factories.CarrierFactory(with_editable=True)
+        mail_sent = self.mail_carrier_editable_to_confirm(carrier.editable)
         self.assertEqual(
             mail_sent.recipients(), [email for (name, email) in settings.MANAGERS]
         )

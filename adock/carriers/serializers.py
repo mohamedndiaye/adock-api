@@ -4,6 +4,43 @@ from rest_framework import serializers
 from . import models as carriers_models
 
 
+class CarrierEditableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = carriers_models.CarrierEditable
+        fields = (
+            "telephone",
+            "email",
+            "working_area",
+            "working_area_departements",
+            "specialities",
+            "website",
+            "description",
+        )
+
+    def validate_working_area_departements(self, value):
+        """Pads departement numbers lesser than 10 with a zero"""
+        formated_departements = []
+        for departement in value:
+            formated_departements.append("{:0>2}".format(departement))
+
+        # Unique and sorted
+        return sorted(set(formated_departements))
+
+    def validate(self, attrs):
+        if attrs.get(
+            "working_area"
+        ) == carriers_models.WORKING_AREA_DEPARTEMENT and not attrs.get(
+            "working_area_departements", []
+        ):
+            raise serializers.ValidationError(
+                {
+                    "working_area_departements": "Des départements doivent être "
+                    "renseignés quand l'aire de travail est départementale."
+                }
+            )
+        return attrs
+
+
 class WorkerSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100)
     date = serializers.CharField(max_length=64)

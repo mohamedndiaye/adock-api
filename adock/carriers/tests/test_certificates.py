@@ -34,7 +34,7 @@ CERTIFICATE_DATA_WORKERS = [
 
 class SignCarrierCertificateTestCase(TestCase):
     def setUp(self):
-        self.carrier = factories.CarrierFactory()
+        self.carrier = factories.CarrierFactory(with_editable=True)
         self.url = reverse(
             "carriers_certificate", kwargs={"carrier_siret": self.carrier.siret}
         )

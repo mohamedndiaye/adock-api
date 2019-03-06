@@ -8,8 +8,8 @@ class CarrierTestCase(TestCase):
         super().setUp()
         self.detail_url = "TO_SET"
 
-    def patch_carrier(self, data, status_code):
-        response = self.client.patch(
+    def post_carrier(self, data, status_code):
+        response = self.client.post(
             self.detail_url, data, content_type="application/json"
         )
         self.assertEqual(response.status_code, status_code)

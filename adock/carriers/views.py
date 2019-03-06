@@ -12,7 +12,7 @@ from django.utils.formats import date_format
 from adock.core import pdf as core_pdf
 from adock.core import views as core_views
 
-from . import forms, mails, models, tokens, validators
+from . import mails, models, tokens, validators
 from . import serializers as carriers_serializers
 
 CARRIER_LIST_FIELDS = (
@@ -91,21 +91,16 @@ def get_carrier_as_json(carrier):
 
     editable = carrier.editable
     # FIXME
-    carrier_json["is_locked"] = bool(editable)
+    carrier_json["is_locked"] = bool(editable.confirmed_at)
 
-    if editable:
-        carrier_json["telephone"] = (
-            editable.telephone
-            if isinstance(editable.telephone, str)
-            else "0" + editable.telephone.format_as(settings.PHONENUMBER_DEFAULT_REGION)
-        )
+    carrier_json["telephone"] = (
+        editable.telephone
+        if isinstance(editable.telephone, str)
+        else "0" + editable.telephone.format_as(settings.PHONENUMBER_DEFAULT_REGION)
+    )
 
-        for field in CARRIER_DETAIL_EDITABLE_FIELDS:
-            carrier_json[field] = getattr(editable, field)
-    else:
-        carrier_json["telephone"] = ""
-        for field in CARRIER_DETAIL_EDITABLE_FIELDS:
-            carrier_json[field] = ""
+    for field in CARRIER_DETAIL_EDITABLE_FIELDS:
+        carrier_json[field] = getattr(editable, field)
 
     return carrier_json
 
@@ -280,98 +275,90 @@ def add_carrier_log(carrier, old_data_changed, cleaned_payload):
 
 RE_MANY_COMMAS = re.compile(r",+")
 
-
+# FIXME Check and add created_by on PATCH
 def carrier_detail(request, carrier_siret):
-    response_json = {}
     # Access to deleted carriers is allowed.
     # Get existing carrier if any
     carrier = get_object_or_404(
         models.Carrier.objects.select_related("editable"), siret=carrier_siret
     )
 
-    if request.method == "PATCH":
-        if not request.content_type == "application/json":
-            return JsonResponse(
-                {"message": "Seules les requêtes PATCH en JSON sont prises en charge."},
-                status=400,
-            )
-
-        payload, response = core_views.request_load(request)
+    if request.method == "POST":
+        notification_email_to_send = False
+        new_serializer, response = core_views.request_validate(
+            request, carriers_serializers.CarrierEditableSerializer
+        )
         if response:
             return response
 
-        # Emails stored in DB aren't exposed before validation.
-        # If not provided on first validation, emails are deleted (and logged).
-        if not carrier.validated_at and not "email" in payload:
-            payload["email"] = ""
+        if carrier.editable:
+            # 1. Compare values
+            changed_fields = []
+            current_serializer = carriers_serializers.CarrierEditableSerializer(
+                carrier.editable
+            )
 
-        # Form is not bound to the carrier instance but we need it to check edit code
-        form = forms.DetailForm(payload, carrier=carrier)
-        if not form.is_valid():
-            return JsonResponse({"errors": form.errors}, status=400)
+            current_data = current_serializer.data
+            validated_data = new_serializer.validated_data
+            for field in validated_data:
+                if current_data[field] != validated_data[field]:
+                    changed_fields.append(field)
 
-        # Limit cleaned_data to the keys of the payload but only accept keys of cleaned_data (intersection)
-        # to only update the submitted values
-        cleaned_payload = {
-            k: form.cleaned_data[k] for k in payload.keys() if k in form.cleaned_data
-        }
+            new_editable_to_create = bool(changed_fields)
 
-        # Only set in PATCH request
-        confirmation_email_to_send = False
+            # 2. Previous email for notification
+            if "email" in changed_fields and carrier.editable.email:
+                notification_email_to_send = True
+        else:
+            new_editable_to_create = True
 
-        # Only apply the submitted values if they are different in DB
-        old_data_changed = get_carrier_changes(carrier, cleaned_payload)
-        if old_data_changed:
-            # Data has been modified so saving is required
-            # Don't use form.save to edit only the submitted fields of the instance
-            updated_fields = list(old_data_changed.keys())
+        if new_editable_to_create:
+            new_carrier_editable = new_serializer.save(carrier=carrier)
 
-            for field in updated_fields:
-                setattr(carrier, field, cleaned_payload[field])
-
-            if "email" in updated_fields:
-                # New email should invalidate email confirmation and edit code
-                carrier.email_confirmed_at = None
-                updated_fields.extend(["email_confirmed_at"])
-                # If not empty
-                if carrier.email:
-                    confirmation_email_to_send = True
-
-            carrier.validated_at = timezone.now()
-            updated_fields.append("validated_at")
-
-            with transaction.atomic(savepoint=False):
-                carrier.save(force_update=True, update_fields=updated_fields)
-                add_carrier_log(carrier, old_data_changed, cleaned_payload)
-
-            mails.mail_managers_changes(carrier, old_data_changed)
-
-        if confirmation_email_to_send:
-            mails.mail_carrier_to_confirm_email(carrier)
-
-        response_json["confirmation_email_sent"] = confirmation_email_to_send
+            if notification_email_to_send:
+                mails.mail_carrier_to_old_email(
+                    carrier, changed_fields, current_data, validated_data
+                )
+            mails.mail_carrier_editable_to_confirm(
+                new_carrier_editable, changed_fields, current_data, validated_data
+            )
+            mails.mail_managers_carrier_changes(
+                carrier, changed_fields, current_data, validated_data
+            )
 
     carrier_json = get_carrier_as_json(carrier)
     carrier_json["other_facilities"] = get_other_facilities_as_json(carrier)
     carrier_json["latest_certificate"] = get_latest_certificate_as_json(carrier)
-    response_json["carrier"] = carrier_json
-    return JsonResponse(response_json)
+    return JsonResponse({"carrier": carrier_json})
 
 
-def carrier_confirm_email(request, carrier_siret, token):
+def carrier_editable_confirm(request, carrier_editable_id, token):
     try:
-        carrier = models.Carrier.objects.get(pk=carrier_siret)
-    except models.Carrier.DoesNotExist:
-        carrier = None
+        carrier_editable = models.CarrierEditable.objects.select_related("carrier").get(
+            pk=carrier_editable_id
+        )
+    except models.CarrierEditable.DoesNotExist:
+        carrier_editable = None
 
-    if carrier and tokens.email_confirmation_token.check_token(carrier, token):
-        carrier.lock()
-        carrier.save()
-        mails.mail_managers_lock(carrier)
-        return JsonResponse({"message": "L'adresse électronique est confirmée."})
+    if carrier_editable and tokens.carrier_editable_token.check_token(
+        carrier_editable, token
+    ):
+        with transaction.atomic(savepoint=False):
+            carrier_editable.confirmed_at = timezone.now()
+            carrier_editable.save()
+            carrier_editable.carrier.editable = carrier_editable
+            carrier_editable.carrier.save()
+
+        mails.mail_managers_carrier_confirmed(carrier_editable.carrier)
+        return JsonResponse(
+            {"message": "Les modifications de la fiche sont confirmées."}
+        )
 
     return JsonResponse(
-        {"message": "Impossible de confirmer l'adresse électronique."}, status=400
+        {
+            "message": "Impossible de confirmer les modifications de la fiche transporteur."
+        },
+        status=400,
     )
 
 

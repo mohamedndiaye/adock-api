@@ -6,9 +6,9 @@ urlpatterns = [
     path("search/", views.carrier_search, name="carriers_search"),
     path("<str:carrier_siret>/", views.carrier_detail, name="carriers_detail"),
     path(
-        "<str:carrier_siret>/confirm_email/<token>/",
-        views.carrier_confirm_email,
-        name="carriers_confirm_email",
+        "editable/<int:carrier_editable_id>/confirm/<token>/",
+        views.carrier_editable_confirm,
+        name="carriers_carrier_editable_confirm",
     ),
     # POST to create SQL entry and GET to generate PDF
     path(

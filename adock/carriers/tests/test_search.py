@@ -93,6 +93,7 @@ class CarrierSearchQueryTestCase(CarrierSearchTestCase):
         self.assertEqual(len(carriers), 0)
 
     def test_search_ordering(self):
+        # FIXME
         # Name is set according to the expected ordering
         t3 = factories.CarrierFactory(enseigne="T3", email="")
         t4 = factories.CarrierFactory(enseigne="T4", email="", telephone="")

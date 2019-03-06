@@ -1,44 +1,47 @@
 from django.conf import settings
 from django.core.mail import mail_managers, send_mail
-from django.utils import timezone
 
 from . import tokens
 
 
-def get_recipient_list_from_env(carrier):
+def get_recipient_list_from_env(email):
     if settings.PREPRODUCTION:
         return (email for (name, email) in settings.MANAGERS)
 
-    return (carrier.email,)
+    return (email,)
 
 
-def mail_carrier_to_confirm_email(carrier):
-    if not carrier.email:
-        return
+def get_message_of_changes(changed_fields, current_data, validated_data):
+    message = ""
+    for field in changed_fields:
+        message += "\n- {field} : {current_value} => {new_value}".format(
+            field=field,
+            current_value=current_data[field],
+            new_value=validated_data[field],
+        )
+    return message
 
-    token = tokens.email_confirmation_token.make_token(carrier)
+
+def mail_carrier_to_old_email(carrier, changed_fields, current_data, validated_data):
     subject = (
-        "%sConfirmation de l'adresse électronique du transporteur"
+        "%sNotification de modification de votre fiche transporteur"
         % settings.EMAIL_SUBJECT_PREFIX
     )
     message = """
-Merci d'avoir renseigné votre fiche sur A Dock, l'application
-qui facilite la relation chargeur et transporteur.
+Votre fiche transporteur {http_client_url}transporteur/{siret}
+est en cours de modification avec les changements suivants :
 
-Cliquez sur le lien pour confirmer votre adresse électronique « {email} »
-et ainsi sécuriser la fiche transporteur :
+{changes}
 
-{http_client_url}transporteur/{siret}/confirm/{token}/
+Si vous n'êtes pas d'accord avec ces changements, veuillez contacter les responsables du site A Dock.
 
 Cordialement,
-L'équipe A Dock
-    """.format(
+L'équipe A Dock""".format(
         http_client_url=settings.HTTP_CLIENT_URL,
         siret=carrier.siret,
-        email=carrier.email,
-        token=token,
+        changes=get_message_of_changes(changed_fields, current_data, validated_data),
     )
-    recipient_list = get_recipient_list_from_env(carrier)
+    recipient_list = get_recipient_list_from_env(carrier.editable.email)
     send_mail(
         subject,
         message,
@@ -48,41 +51,75 @@ L'équipe A Dock
     )
 
 
-def mail_managers_changes(carrier, old_data_changed):
+def mail_carrier_editable_to_confirm(
+    carrier_editable, changed_fields, current_data, validated_data
+):
+    token = tokens.carrier_editable_token.make_token(carrier_editable)
+    subject = (
+        "%sEn attente de confirmation de votre fiche transporteur"
+        % settings.EMAIL_SUBJECT_PREFIX
+    )
+    message = """
+Merci d'avoir renseigné votre fiche sur A Dock, l'application
+qui facilite la relation chargeur et transporteur.
+
+Pour confirmer les changements suivant sur votre fiche :
+
+{changes}
+
+Cliquez sur ce lien :
+
+{http_client_url}transporteur/changement/{carrier_editable_id}/confirmer/{token}/
+
+Cordialement,
+L'équipe A Dock
+    """.format(
+        http_client_url=settings.HTTP_CLIENT_URL,
+        carrier_editable_id=carrier_editable.id,
+        token=token,
+        changes=get_message_of_changes(changed_fields, current_data, validated_data),
+    )
+    recipient_list = get_recipient_list_from_env(validated_data["email"])
+    send_mail(
+        subject,
+        message,
+        settings.SERVER_EMAIL,
+        recipient_list,
+        fail_silently=settings.DEBUG,
+    )
+
+
+def mail_managers_carrier_changes(
+    carrier, changed_fields, current_data, validated_data
+):
     # Send a mail to managers to track changes
     # The URL is detail view of the front application
     subject = "Modification du transporteur %s" % carrier.siret
     message = """
-Modification du transporteur : {enseigne}
+Modification en cours du transporteur : {enseigne}
 SIRET : {siret}
 {http_client_url}transporteur/{siret}
 
-Valeurs modifiées :
+Informations modifiées :
     """.format(
         enseigne=carrier.enseigne,
         siret=carrier.siret,
         http_client_url=settings.HTTP_CLIENT_URL,
     )
 
-    for field, old_value in old_data_changed.items():
-        message += "\n- {field} : {old_value} => {new_value}".format(
-            field=field, old_value=old_value, new_value=getattr(carrier, field)
-        )
+    message += get_message_of_changes(changed_fields, current_data, validated_data)
     mail_managers(subject, message, fail_silently=True)
 
 
-def mail_managers_lock(carrier):
-    subject = "Verrouillage du transporteur %s" % carrier.siret
+def mail_managers_carrier_confirmed(carrier):
+    subject = "La modification du transporteur %s est confirmée." % carrier.siret
     message = """
-Verrouillage du transporteur : {enseigne}
-SIRET : {siret}
-{http_client_url}transporteur/{siret}
-
-Adresse électronique confirmée : {email}
+        Transporteur modifié : {enseigne}
+        SIRET : {siret}
+        {http_client_url}transporteur/{siret}
     """.format(
         enseigne=carrier.enseigne,
         siret=carrier.siret,
         http_client_url=settings.HTTP_CLIENT_URL,
-        email=carrier.email,
     )
     mail_managers(subject, message, fail_silently=True)
