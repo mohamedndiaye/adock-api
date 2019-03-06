@@ -8,7 +8,6 @@ from factory import fuzzy
 import unidecode
 from faker import Faker
 
-from adock.accounts import factories as accounts_factories
 from . import models, validators
 
 faker = Faker("fr_FR")

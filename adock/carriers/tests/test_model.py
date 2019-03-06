@@ -1,7 +1,5 @@
 from django.test import TestCase
 
-from adock.accounts import models as accounts_models
-
 from . import test
 from .. import factories, models
 
