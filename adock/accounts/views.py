@@ -13,6 +13,7 @@ import sentry_sdk
 from jwt_auth import views as jwt_auth_views
 
 from adock.core import views as core_views
+from adock.carriers import models as carriers_models
 from adock.carriers import views as carriers_views
 
 from . import mails as accounts_mails
@@ -77,6 +78,11 @@ def account_profile(request):
             status=403,
         )
 
+    carriers = carriers_models.Carrier.objects.filter(
+        changes__created_by=request.user
+    ).select_related("editable")
+    carriers_json = carriers_views.get_carriers_as_json(carriers, ["enseigne"])
+
     # Returns only informations not in JWT payload
     return JsonResponse(
         {
@@ -86,9 +92,7 @@ def account_profile(request):
                 "provider": request.user.provider,
                 "provider_display": request.user.get_provider_display(),
                 "provider_data": request.user.provider_data,
-                "carriers": list(
-                    request.user.carriers.values(*carriers_views.CARRIER_LIST_FIELDS)
-                ),
+                "carriers": carriers_json,
             }
         }
     )

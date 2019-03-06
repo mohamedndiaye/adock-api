@@ -25,7 +25,6 @@ CARRIER_LIST_FIELDS = (
     "completeness",
     "lti_nombre",
     "lc_nombre",
-    "editable__working_area",
 )
 
 CARRIER_DETAIL_FIELDS = (
@@ -103,6 +102,14 @@ def get_carrier_as_json(carrier):
         carrier_json[field] = getattr(editable, field)
 
     return carrier_json
+
+
+def get_carriers_as_json(carriers, order_by_list):
+    return list(
+        carriers.order_by(*order_by_list)
+        .values(*CARRIER_LIST_FIELDS)
+        .annotate(working_area=F("editable__working_area"))[: settings.CARRIERS_LIMIT]
+    )
 
 
 def get_other_facilities_as_json(carrier):
@@ -231,16 +238,11 @@ def carrier_search(request):
 
     # By completeness and enseigne
     order_by_list.extend(("-completeness", "enseigne"))
-    # FIXME annotate
-    carriers = (
-        carriers.order_by(*order_by_list)
-        .values(*CARRIER_LIST_FIELDS)
-        .annotate(working_area=F("editable__working_area"))[: settings.CARRIERS_LIMIT]
-    )
+    payload = {"carriers": get_carriers_as_json(carriers, order_by_list)}
 
-    payload = {"carriers": list(carriers)}
     if len(payload["carriers"]) == settings.CARRIERS_LIMIT:
         payload["limit"] = settings.CARRIERS_LIMIT
+
     return JsonResponse(payload)
 
 

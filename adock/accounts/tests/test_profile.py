@@ -15,9 +15,9 @@ class ProfileTestCase(AuthTestCaseBase):
         self.assertEqual(response.status_code, 403)
 
     def test_profile(self):
-        carrier = carriers_factories.CarrierFactory()
-        carrier.add_owner(self.user)
-
+        carrier = carriers_factories.CarrierFactory(
+            with_editable={"created_by": self.user}
+        )
         http_authorization = self.log_in()
         response = self.client.get(self.url, HTTP_AUTHORIZATION=http_authorization)
         self.assertEqual(response.status_code, 200)
