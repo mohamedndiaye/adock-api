@@ -3,7 +3,6 @@ import datetime
 import random
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 
@@ -19,7 +18,6 @@ class StatsTestCase(AuthTestCaseBase):
 
     @skipIf(settings.AUTHENTICATION_DISABLED, "Authentication is disabled")
     def test_staff_only(self):
-        User = get_user_model()
         user = accounts_factories.UserFactory(
             email="courriel@example.com", is_staff=False
         )
@@ -37,24 +35,24 @@ class StatsTestCase(AuthTestCaseBase):
     def test_stats(self):
         STATS_NB_MONTHS = 6
 
-        # One carrier not validated
-        carriers_factories.CarrierFactory(validated_at=None)
+        # One carrier not confirmed
+        carriers_factories.CarrierFactory(with_editable=True)
 
-        # First day in one of 10 previous months
-        validated_date = (
-            timezone.now()
-            - datetime.timedelta(days=random.randint(1, STATS_NB_MONTHS - 1) * 31)
-        ).replace(day=1)
-        carriers_factories.CarrierFactory(validated_at=validated_date)
+        for _ in range(3):
+            confirmed_at = (
+                timezone.now()
+                - datetime.timedelta(days=random.randint(1, STATS_NB_MONTHS - 1) * 31)
+            ).replace(day=1)
+            carriers_factories.CarrierFactory(
+                with_editable={"confirmed_at": confirmed_at}
+            )
 
         # One carrier validated outside of the range of stats
         carriers_factories.CarrierFactory(
-            validated_at=timezone.now() - datetime.timedelta(days=STATS_NB_MONTHS * 31)
-        )
-
-        # 2 locked sheets
-        carriers_factories.CarrierFactory.create_batch(
-            3, email_confirmed_at=validated_date
+            with_editable={
+                "confirmed_at": timezone.now()
+                - datetime.timedelta(days=STATS_NB_MONTHS * 31)
+            }
         )
 
         http_authorization = self.log_in()
@@ -66,17 +64,11 @@ class StatsTestCase(AuthTestCaseBase):
         self.assertEqual(response.status_code, 200)
         stats = response.json()
 
-        self.assertEqual(stats["locked_carriers"], 3)
-        self.assertEqual(stats["validated_carriers"], 2)
+        self.assertEqual(stats["modified_carriers"], 4)
 
-        validated_carriers = stats["validated_carriers_per_month"]
         # 6 months
-        self.assertEqual(len(validated_carriers), STATS_NB_MONTHS)
-        self.assertEqual(sum([item["count"] for item in validated_carriers]), 1)
-        validated_date_str = str(validated_date.date())
-
-        # Filter on month of the factory (one validation)
-        filtered_months = list(
-            filter(lambda item: item["month"] == validated_date_str, validated_carriers)
+        modified_carriers_per_month = stats["modified_carriers_per_month"]
+        self.assertEqual(len(modified_carriers_per_month), STATS_NB_MONTHS)
+        self.assertEqual(
+            sum([item["count"] for item in modified_carriers_per_month]), 3
         )
-        self.assertEqual(filtered_months[0]["count"], 1)
