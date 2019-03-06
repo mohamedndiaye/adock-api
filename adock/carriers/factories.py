@@ -51,9 +51,19 @@ class CarrierFactory(factory.django.DjangoModelFactory):
         lambda o: o.lti_date_debut + datetime.timedelta(days=6 * 364)
     )
     lti_nombre = fuzzy.FuzzyInteger(1, 20)
-    working_area = models.WORKING_AREA_DEPARTEMENT
-    working_area_departements = ["35", "44"]
-    specialities = ["TEMPERATURE", "URBAIN"]
+    editable = None
+
+    @factory.post_generation
+    def with_editable(self, create, extracted, **kwargs):
+        """Allow to add editable with CarrierFactory(with_editable=True)"""
+        if not create:
+            return
+
+        if extracted is True:
+            self.editable = CarrierEditableFactory(carrier=self)
+        elif extracted:
+            self.editable = CarrierEditableFactory(carrier=self, **extracted)
+            self.save()
 
     class Meta:
         model = models.Carrier

@@ -12,7 +12,9 @@ EMAIL = "foo@example.com"
 
 class CarrierDetailTestCase(test.CarrierTestCase):
     def setUp(self):
-        self.carrier = factories.CarrierFactory(siret=test.VALID_SIRET)
+        self.carrier = factories.CarrierFactory(
+            siret=test.VALID_SIRET, with_editable=True
+        )
         self.detail_url = reverse(
             "carriers_detail", kwargs={"carrier_siret": self.carrier.siret}
         )
@@ -253,9 +255,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         data = self.patch_carrier({"telephone": str(self.carrier.telephone)}, 400)
         self.assertEqual(data["errors"]["email"][0], "Ce champ est obligatoire.")
 
-        self.patch_carrier(
-            {"telephone": PHONE, "email": "foo@example.com"}, 200
-        )
+        self.patch_carrier({"telephone": PHONE, "email": "foo@example.com"}, 200)
 
     def test_patch_phone_required(self):
         # Only possible to PATCH w/o phone when the carrier already contains a phone
@@ -268,9 +268,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         data = self.patch_carrier({"email": self.carrier.email}, 400)
         self.assertEqual(data["errors"]["telephone"][0], "Ce champ est obligatoire.")
 
-        self.patch_carrier(
-            {"telephone": PHONE, "email": self.carrier.email}, 200
-        )
+        self.patch_carrier({"telephone": PHONE, "email": self.carrier.email}, 200)
 
     def test_patch_invalid_phone(self):
         data = self.patch_carrier(

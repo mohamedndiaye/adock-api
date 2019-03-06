@@ -175,26 +175,33 @@ class CarrierSearchDepartementTestCase(CarrierSearchTestCase):
         super().setUp()
         factories.CarrierFactory(
             raison_sociale="UNDEFINED",
-            working_area=models.WORKING_AREA_UNDEFINED,
-            # Be sure filtering on working are is applied
-            working_area_departements=["35", "44"],
+            with_editable={
+                "working_area": models.WORKING_AREA_UNDEFINED,
+                # Be sure filtering on working are is applied
+                "working_area_departements": ["35", "44"],
+            },
         )
         factories.CarrierFactory(
             raison_sociale="INTERNATIONAL",
-            working_area=models.WORKING_AREA_INTERNATIONAL,
+            with_editable={"working_area": models.WORKING_AREA_INTERNATIONAL},
         )
         factories.CarrierFactory(
-            raison_sociale="FRANCE", working_area=models.WORKING_AREA_FRANCE
+            raison_sociale="FRANCE",
+            with_editable={"working_area": models.WORKING_AREA_FRANCE},
         )
         factories.CarrierFactory(
             raison_sociale="DEP. 35, 44",
-            working_area=models.WORKING_AREA_DEPARTEMENT,
-            working_area_departements=["35", "44"],
+            with_editable={
+                "working_area": models.WORKING_AREA_DEPARTEMENT,
+                "working_area_departements": ["35", "44"],
+            },
         )
         factories.CarrierFactory(
             raison_sociale="DEP. 72",
-            working_area=models.WORKING_AREA_DEPARTEMENT,
-            working_area_departements=["72"],
+            with_editable={
+                "working_area": models.WORKING_AREA_DEPARTEMENT,
+                "working_area_departements": ["72"],
+            },
         )
 
     def test_search_invalid(self):
@@ -249,8 +256,10 @@ class CarrierSearchDepartementTestCase(CarrierSearchTestCase):
         factories.CarrierFactory(
             raison_sociale="DEP. 72 ET SIEGE 72",
             departement="72",
-            working_area=models.WORKING_AREA_DEPARTEMENT,
-            working_area_departements=["72"],
+            with_editable={
+                "working_area": models.WORKING_AREA_DEPARTEMENT,
+                "working_area_departements": ["72"],
+            },
         )
         expected_ordering = (
             "DEP. 72 ET SIEGE 72",
@@ -263,13 +272,19 @@ class CarrierSearchDepartementTestCase(CarrierSearchTestCase):
             self.assertEqual(carriers[i]["raison_sociale"], raison_sociale)
 
 
-class CarrierhSearchSpecialitiesTestCase(CarrierSearchTestCase):
+class CarrierSearchSpecialitiesTestCase(CarrierSearchTestCase):
     def setUp(self):
         super().setUp()
-        factories.CarrierFactory(raison_sociale="NO SPECIALITIES", specialities=None)
-        factories.CarrierFactory(raison_sociale="LOT", specialities=["LOT"])
         factories.CarrierFactory(
-            raison_sociale="LOT, ANIMAL", specialities=["LOT", "ANIMAL"]
+            raison_sociale="NO SPECIALITIES", with_editable={"specialities": None}
+        )
+
+        factories.CarrierFactory(
+            raison_sociale="LOT", with_editable={"specialities": ["LOT"]}
+        )
+        factories.CarrierFactory(
+            raison_sociale="LOT, ANIMAL",
+            with_editable={"specialities": ["LOT", "ANIMAL"]},
         )
 
     def test_no_filter(self):

@@ -2,7 +2,7 @@ import re
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import F, Q
 from django.db.models.expressions import OrderBy, RawSQL
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -25,7 +25,7 @@ CARRIER_LIST_FIELDS = (
     "completeness",
     "lti_nombre",
     "lc_nombre",
-    "working_area",
+    "editable__working_area",
 )
 
 CARRIER_DETAIL_FIELDS = (
@@ -178,21 +178,21 @@ def carrier_search(request):
 
     if departements:
         carriers = carriers.filter(
-            Q(working_area=models.WORKING_AREA_INTERNATIONAL)
-            | Q(working_area=models.WORKING_AREA_FRANCE)
+            Q(editable__working_area=models.WORKING_AREA_INTERNATIONAL)
+            | Q(editable__working_area=models.WORKING_AREA_FRANCE)
             | Q(
-                working_area__in=(
+                editable__working_area__in=(
                     models.WORKING_AREA_DEPARTEMENT,
                     models.WORKING_AREA_REGION,
                 ),
-                working_area_departements__contains=departements,
+                editable__working_area_departements__contains=departements,
             )
         )
 
     # Filtering on specialities
     specialities = request.GET.getlist("specialities[]")
     if specialities:
-        carriers = carriers.filter(specialities__contains=specialities)
+        carriers = carriers.filter(editable__specialities__contains=specialities)
 
     # Ordering
 
@@ -200,9 +200,9 @@ def carrier_search(request):
     order_departement_counter = OrderBy(
         RawSQL(
             """
-            CASE working_area
-            WHEN 'DEPARTEMENT' THEN array_length(working_area_departements, 1)
-            WHEN 'REGION' THEN array_length(working_area_departements, 1)
+            CASE "carrier_editable"."working_area"
+            WHEN 'DEPARTEMENT' THEN array_length("carrier_editable"."working_area_departements", 1)
+            WHEN 'REGION' THEN array_length("carrier_editable"."working_area_departements", 1)
             WHEN 'FRANCE' THEN 101
             WHEN 'INTERNATIONAL' THEN 102
             END
@@ -223,9 +223,12 @@ def carrier_search(request):
 
     # By completeness and enseigne
     order_by_list.extend(("-completeness", "enseigne"))
-    carriers = carriers.order_by(*order_by_list).values(*CARRIER_LIST_FIELDS)[
-        : settings.CARRIERS_LIMIT
-    ]
+    # FIXME annotate
+    carriers = (
+        carriers.order_by(*order_by_list)
+        .values(*CARRIER_LIST_FIELDS)
+        .annotate(working_area=F("editable__working_area"))[: settings.CARRIERS_LIMIT]
+    )
 
     payload = {"carriers": list(carriers)}
     if len(payload["carriers"]) == settings.CARRIERS_LIMIT:

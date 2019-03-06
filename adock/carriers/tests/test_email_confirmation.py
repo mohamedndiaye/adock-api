@@ -7,7 +7,11 @@ from .. import factories, tokens
 
 class CarrierEmailConfirmationTestCase(test.CarrierTestCase):
     def setUp(self):
-        self.carrier = factories.CarrierFactory()
+        self.carrier = factories.CarrierFactory.create()
+        self.carrier.editable = factories.CarrierEditableFactory.create(
+            carrier=self.carrier
+        )
+        self.carrier.save()
         self.detail_url = reverse(
             "carriers_detail", kwargs={"carrier_siret": self.carrier.siret}
         )
