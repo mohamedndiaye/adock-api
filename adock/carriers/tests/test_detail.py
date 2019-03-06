@@ -1,5 +1,6 @@
 import re
 
+from adock.accounts.test import AuthTestCaseBase
 from django.core import mail
 from django.urls import reverse
 
@@ -11,7 +12,7 @@ PHONE_DISPLAY = "02 40 42 45 46"
 EMAIL = "foo@example.com"
 
 
-class CarrierDetailTestCase(test.CarrierTestCase):
+class CarrierDetailTestCase(test.CarrierTestCaseMixin):
     def setUp(self):
         self.carrier = factories.CarrierFactory(
             siret=test.VALID_SIRET, with_editable=True
@@ -80,6 +81,55 @@ class CarrierDetailTestCase(test.CarrierTestCase):
             certificate.get_kind_display(),
         )
 
+    def test_completeness(self):
+        # The default factory sets all fields
+        self.assertEqual(
+            self.carrier.completeness,
+            models.COMPLETENESS_PERCENT_MIN + 4 * models.EARNED_POINT_VALUE,
+        )
+        self.assertEqual(self.carrier.completeness, 100.0)
+
+        # No telephone and no working area
+        # Still email and specialities.
+        self.carrier.editable.working_area = models.WORKING_AREA_UNDEFINED
+        self.carrier.editable.telephone = ""
+        self.assertEqual(
+            self.carrier.compute_completeness(),
+            models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE,
+        )
+
+        # No email
+        self.carrier.editable.email = ""
+        self.assertEqual(
+            self.carrier.compute_completeness(),
+            models.COMPLETENESS_PERCENT_MIN + models.EARNED_POINT_VALUE,
+        )
+
+        # No specialities
+        self.carrier.editable.specialities = None
+        self.assertEqual(
+            self.carrier.compute_completeness(), models.COMPLETENESS_PERCENT_MIN
+        )
+
+        # Compute is also triggered by save()
+        self.carrier.save()
+        self.assertEqual(self.carrier.completeness, models.COMPLETENESS_PERCENT_MIN)
+
+    def test_post_not_allowed(self):
+        self.post_carrier({"telephone": PHONE, "email": EMAIL}, 405)
+
+
+class CarrierDetailPostTestCase(AuthTestCaseBase, test.CarrierTestCaseMixin):
+    def setUp(self):
+        super().setUp()
+        self.carrier = factories.CarrierFactory(
+            siret=test.VALID_SIRET, with_editable=True
+        )
+        self.detail_url = reverse(
+            "carriers_detail", kwargs={"carrier_siret": self.carrier.siret}
+        )
+        self.http_authorization = self.log_in()
+
     def test_post_workflow(self):
         # Check initial status of factory
         self.assertNotEqual(self.carrier.editable.telephone, PHONE)
@@ -87,7 +137,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         self.assertEqual(models.CarrierEditable.objects.count(), 1)
 
         # POST
-        data = self.post_carrier({"telephone": PHONE, "email": EMAIL}, 200)
+        data = self.post_carrier_logged({"telephone": PHONE, "email": EMAIL}, 200)
         self.assertEqual(models.CarrierEditable.objects.count(), 2)
 
         # Not validated yet
@@ -148,7 +198,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         # Apply same changes so field comparison detects there is no changes
         mail.outbox = []
 
-        data = self.post_carrier({"telephone": PHONE, "email": EMAIL}, 200)
+        data = self.post_carrier_logged({"telephone": PHONE, "email": EMAIL}, 200)
         self.assertEqual(models.CarrierEditable.objects.count(), 2)
         self.assertEqual(len(mail.outbox), 0)
 
@@ -156,14 +206,15 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         self.assertEqual(self.carrier.editable, latest_editable)
         self.assertEqual(str(self.carrier.editable.telephone), PHONE)
         self.assertEqual(self.carrier.editable.email, EMAIL)
-        self.assertIsNotNone(self.carrier.editable)
+        self.assertIsNotNone(self.carrier.editable.created_at)
+        self.assertEqual(self.carrier.editable.created_by, self.user)
 
     def test_post_response(self):
         NEW_PHONE = "+33240424546"
         NEW_EMAIL = "foo@example.com"
 
         # Apply changes with working area
-        data = self.post_carrier(
+        data = self.post_carrier_logged(
             {
                 "telephone": NEW_PHONE,
                 "email": NEW_EMAIL,
@@ -200,7 +251,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
 
     def test_post_website(self):
         WEBSITE = "http://www.example.com"
-        data = self.post_carrier(
+        data = self.post_carrier_logged(
             {"email": EMAIL, "telephone": PHONE, "website": WEBSITE}, 200
         )
         self.assertEqual(data["carrier"]["website"], self.carrier.website)
@@ -209,30 +260,37 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         self.assertEqual(latest_editable.website, WEBSITE)
 
     def test_post_invalid_mimetype(self):
-        response = self.client.post(self.detail_url, {"foo": "foo"})
+        response = self.client.post(
+            self.detail_url, {"foo": "foo"}, HTTP_AUTHORIZATION=self.http_authorization
+        )
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertEqual(data["message"], "Le format des données n'est pas valide.")
 
     def test_post_invalid_payload(self):
-        response = self.client.post(self.detail_url, "foo", "application/json")
+        response = self.client.post(
+            self.detail_url,
+            "foo",
+            "application/json",
+            HTTP_AUTHORIZATION=self.http_authorization,
+        )
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertEqual(data["message"], "Le format des données n'est pas valide.")
 
     def test_post_unknown_payload(self):
-        self.post_carrier({"foo": "42"}, 400)
+        self.post_carrier_logged({"foo": "42"}, 400)
 
     def test_post_email_required(self):
-        data = self.post_carrier({"telephone": str(self.carrier.telephone)}, 400)
+        data = self.post_carrier_logged({"telephone": str(self.carrier.telephone)}, 400)
         self.assertEqual(data["errors"]["email"][0], "Ce champ est obligatoire.")
 
     def test_post_phone_required(self):
-        data = self.post_carrier({"email": self.carrier.email}, 400)
+        data = self.post_carrier_logged({"email": self.carrier.email}, 400)
         self.assertEqual(data["errors"]["telephone"][0], "Ce champ est obligatoire.")
 
     def test_post_invalid_phone(self):
-        data = self.post_carrier(
+        data = self.post_carrier_logged(
             {"telephone": "11223344556", "email": self.carrier.email}, 400
         )
         self.assertEqual(
@@ -240,7 +298,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         )
 
     def test_post_unexisting_working_area_departements(self):
-        data = self.post_carrier(
+        data = self.post_carrier_logged(
             {"telephone": PHONE, "email": EMAIL, "working_area_departements": ["20"]},
             400,
         )
@@ -250,7 +308,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         )
 
     def test_post_invalid_working_area_departements(self):
-        data = self.post_carrier(
+        data = self.post_carrier_logged(
             {
                 "telephone": PHONE,
                 "email": EMAIL,
@@ -264,7 +322,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         )
 
     def test_post_empty_working_area_departements(self):
-        data = self.post_carrier(
+        data = self.post_carrier_logged(
             {
                 "telephone": PHONE,
                 "email": EMAIL,
@@ -280,7 +338,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         )
 
     def test_post_no_working_area_departements(self):
-        data = self.post_carrier(
+        data = self.post_carrier_logged(
             {
                 "telephone": PHONE,
                 "email": EMAIL,
@@ -295,7 +353,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         )
 
     def test_post_format_working_area_departements(self):
-        self.post_carrier(
+        self.post_carrier_logged(
             {
                 "telephone": PHONE,
                 "email": EMAIL,
@@ -308,37 +366,3 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         self.assertListEqual(
             carrier_editable.working_area_departements, ["01", "05", "10", "2A", "976"]
         )
-
-    def test_completeness(self):
-        # The default factory sets all fields
-        self.assertEqual(
-            self.carrier.completeness,
-            models.COMPLETENESS_PERCENT_MIN + 4 * models.EARNED_POINT_VALUE,
-        )
-        self.assertEqual(self.carrier.completeness, 100.0)
-
-        # No telephone and no working area
-        # Still email and specialities.
-        self.carrier.editable.working_area = models.WORKING_AREA_UNDEFINED
-        self.carrier.editable.telephone = ""
-        self.assertEqual(
-            self.carrier.compute_completeness(),
-            models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE,
-        )
-
-        # No email
-        self.carrier.editable.email = ""
-        self.assertEqual(
-            self.carrier.compute_completeness(),
-            models.COMPLETENESS_PERCENT_MIN + models.EARNED_POINT_VALUE,
-        )
-
-        # No specialities
-        self.carrier.editable.specialities = None
-        self.assertEqual(
-            self.carrier.compute_completeness(), models.COMPLETENESS_PERCENT_MIN
-        )
-
-        # Compute is also triggered by save()
-        self.carrier.save()
-        self.assertEqual(self.carrier.completeness, models.COMPLETENESS_PERCENT_MIN)

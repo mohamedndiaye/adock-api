@@ -275,7 +275,7 @@ def add_carrier_log(carrier, old_data_changed, cleaned_payload):
 
 RE_MANY_COMMAS = re.compile(r",+")
 
-# FIXME Check and add created_by on PATCH
+
 def carrier_detail(request, carrier_siret):
     # Access to deleted carriers is allowed.
     # Get existing carrier if any
@@ -284,6 +284,14 @@ def carrier_detail(request, carrier_siret):
     )
 
     if request.method == "POST":
+        if request.user.is_anonymous:
+            return JsonResponse(
+                {
+                    "message": "Vous devez être connecté pour modifier une fiche transporteur."
+                },
+                status=405,
+            )
+
         notification_email_to_send = False
         new_serializer, response = core_views.request_validate(
             request, carriers_serializers.CarrierEditableSerializer
@@ -313,7 +321,9 @@ def carrier_detail(request, carrier_siret):
             new_editable_to_create = True
 
         if new_editable_to_create:
-            new_carrier_editable = new_serializer.save(carrier=carrier)
+            new_carrier_editable = new_serializer.save(
+                carrier=carrier, created_by=request.user
+            )
 
             if notification_email_to_send:
                 mails.mail_carrier_to_old_email(

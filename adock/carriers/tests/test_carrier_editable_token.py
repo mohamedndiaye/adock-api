@@ -1,4 +1,3 @@
-from django.core import mail
 from django.urls import reverse
 from django.utils import timezone
 
@@ -6,7 +5,7 @@ from . import test
 from .. import factories, tokens
 
 
-class CarrierEmailConfirmationTestCase(test.CarrierTestCase):
+class CarrierEmailConfirmationTestCase(test.CarrierTestCaseMixin):
     def setUp(self):
         self.carrier = factories.CarrierFactory(with_editable=True)
         self.detail_url = reverse(
