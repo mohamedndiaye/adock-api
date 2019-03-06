@@ -36,8 +36,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
 
         # To test JSON serialization with NULL values
         self.carrier.debut_activite = None
-        self.carrier.specialities = None
-        self.carrier.save()
+        self.carrier.editable.delete()
         response = self.client.get(self.detail_url)
         carrier_data = response.json()["carrier"]
         self.assertEqual(carrier_data["debut_activite"], None)
@@ -69,26 +68,6 @@ class CarrierDetailTestCase(test.CarrierTestCase):
             carrier_data["latest_certificate"]["kind_display"],
             certificate.get_kind_display(),
         )
-
-    def test_get_empty_phone(self):
-        self.carrier.telephone = ""
-        self.carrier.save()
-        response = self.client.get(self.detail_url)
-        data = response.json()
-        self.assertEqual(data["carrier"]["telephone"], "")
-
-    def test_get_no_email(self):
-        # Don't publish not validated email
-        response = self.client.get(self.detail_url)
-        data = response.json()
-        self.assertNotIn("email", data["carrier"])
-
-    def test_get_mail(self):
-        self.carrier.validated_at = timezone.now()
-        self.carrier.save()
-        response = self.client.get(self.detail_url)
-        data = response.json()
-        self.assertIn("email", data["carrier"])
 
     def test_patch_log(self):
         old_phone = self.carrier.telephone
@@ -169,7 +148,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         self.carrier.save()
         data = self.patch_carrier({"telephone": PHONE, "email": EMAIL}, 200)
         self.carrier.refresh_from_db()
-        self.assertEqual(data["carrier"]["completeness"], self.carrier.completeness)
+        self.assertEqual(data["carrier"]["46"], self.carrier.completeness)
         self.assertEqual(
             self.carrier.completeness,
             models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE,

@@ -54,13 +54,15 @@ CARRIER_DETAIL_FIELDS = (
     "objectif_co2_end",
     "deleted_at",
     "sirene_deleted_at",
-    # Boolean for real email_confirmed_at field to avoid privacy issue
-    "is_locked",
     "longitude",
     "latitude",
-    # From CarrierEditable
-    "telephone",
-    # "email" is added when the carrier is validated (not locked)
+    # is_locked boolean is added to indicate if editable is present
+)
+
+# From CarrierEditable
+CARRIER_DETAIL_EDITABLE_FIELDS = (
+    # "telephone" is manually added
+    "email",
     "working_area",
     "working_area_departements",
     "specialities",
@@ -81,20 +83,30 @@ OTHER_FACILITIES_LIST_FIELDS = (
 )
 
 
-def get_carrier_as_json(carrier, fields):
+def get_carrier_as_json(carrier):
     carrier_json = {}
-    for field in fields:
-        if field == "telephone" and not isinstance(carrier.telephone, str):
-            # Exception for PhoneNumberField
-            value = "0" + carrier.telephone.format_as(
-                settings.PHONENUMBER_DEFAULT_REGION
-            )
-        elif field == "is_locked":
-            value = bool(carrier.email_confirmed_at)
-        else:
-            value = getattr(carrier, field)
 
-        carrier_json[field] = value
+    for field in CARRIER_DETAIL_FIELDS:
+        carrier_json[field] = getattr(carrier, field)
+
+    editable = carrier.editable
+    # FIXME
+    carrier_json["is_locked"] = bool(editable)
+
+    if editable:
+        carrier_json["telephone"] = (
+            editable.telephone
+            if isinstance(editable.telephone, str)
+            else "0" + editable.telephone.format_as(settings.PHONENUMBER_DEFAULT_REGION)
+        )
+
+        for field in CARRIER_DETAIL_EDITABLE_FIELDS:
+            carrier_json[field] = getattr(editable, field)
+    else:
+        carrier_json["telephone"] = ""
+        for field in CARRIER_DETAIL_EDITABLE_FIELDS:
+            carrier_json[field] = ""
+
     return carrier_json
 
 
@@ -337,12 +349,7 @@ def carrier_detail(request, carrier_siret):
 
         response_json["confirmation_email_sent"] = confirmation_email_to_send
 
-    transporteur_detail_fields = CARRIER_DETAIL_FIELDS
-    if carrier.validated_at:
-        # Only emails of validated carriers are provided
-        transporteur_detail_fields += ("email",)
-
-    carrier_json = get_carrier_as_json(carrier, transporteur_detail_fields)
+    carrier_json = get_carrier_as_json(carrier)
     carrier_json["other_facilities"] = get_other_facilities_as_json(carrier)
     carrier_json["latest_certificate"] = get_latest_certificate_as_json(carrier)
     response_json["carrier"] = carrier_json
@@ -380,9 +387,7 @@ def _carrier_sign_certificate(request, carrier_siret):
     models.CarrierCertificate.objects.create(
         carrier=carrier, kind=kind, data=serializer.validated_data
     )
-    return JsonResponse(
-        {"carrier": get_carrier_as_json(carrier, CARRIER_DETAIL_FIELDS)}
-    )
+    return JsonResponse({"carrier": get_carrier_as_json(carrier)})
 
 
 def _carrier_get_certificate(request, carrier_siret, as_pdf=True):
