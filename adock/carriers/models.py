@@ -162,9 +162,6 @@ class Carrier(models.Model):
         null=True,
         related_name="+",
     )
-    owners = models.ManyToManyField(
-        accounts_models.User, through="CarrierUser", related_name="carriers"
-    )
 
     class Meta:
         db_table = "carrier"
@@ -209,16 +206,6 @@ class Carrier(models.Model):
             earned_points += 1
 
         return COMPLETENESS_PERCENT_MIN + earned_points * EARNED_POINT_VALUE
-
-    def has_owner(self):
-        return self.owners.exists()
-
-    def add_owner(self, user):
-        try:
-            owner = self.owners.get(carrieruser__user=user)
-        except accounts_models.User.DoesNotExist:
-            owner = CarrierUser.objects.create(carrier=self, user=user)
-        return owner
 
     def get_latest_certificate(self):
         try:

@@ -19,7 +19,7 @@ class CarrierModelTestCase(TestCase):
         self.assertEqual(carrier.enseigne_unaccent, "DEMENAGEURS MALADROITS")
 
 
-class CarrierExtendModelTestCase(TestCase):
+class CarrierEditableModelTestCase(TestCase):
     def test_create(self):
         carrier_editable = factories.CarrierEditableFactory()
         owner = accounts_models.User.objects.get()
