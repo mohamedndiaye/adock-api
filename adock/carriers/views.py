@@ -285,7 +285,9 @@ def carrier_detail(request, carrier_siret):
     response_json = {}
     # Access to deleted carriers is allowed.
     # Get existing carrier if any
-    carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
+    carrier = get_object_or_404(
+        models.Carrier.objects.select_related("editable"), siret=carrier_siret
+    )
 
     if request.method == "PATCH":
         if not request.content_type == "application/json":
