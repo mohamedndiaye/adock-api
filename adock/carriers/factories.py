@@ -71,7 +71,6 @@ class CarrierFactory(factory.django.DjangoModelFactory):
 
 class CarrierEditableFactory(factory.DjangoModelFactory):
     carrier = factory.SubFactory(CarrierFactory)
-    created_by = factory.SubFactory(accounts_factories.UserFactory)
     telephone = factory.Faker("phone_number", locale="fr_FR")
     email = factory.Faker("email", locale="fr_FR")
     working_area = models.WORKING_AREA_DEPARTEMENT
