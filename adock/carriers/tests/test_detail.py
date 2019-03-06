@@ -27,11 +27,7 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         self.assertEqual(
             carrier_data["debut_activite"], str(self.carrier.debut_activite)
         )
-        # Two original fields not validated, working area and specialities => 3 points
-        self.assertEqual(
-            carrier_data["completeness"],
-            models.COMPLETENESS_PERCENT_MIN + 3 * models.EARNED_POINT_VALUE,
-        )
+        self.assertEqual(carrier_data["completeness"], 100.0)
         self.assertEqual(carrier_data["working_area"], "DEPARTEMENT")
         self.assertEqual(carrier_data["working_area_departements"], ["35", "44"])
         self.assertEqual(
@@ -167,8 +163,9 @@ class CarrierDetailTestCase(test.CarrierTestCase):
 
     def test_patch_partial_completeness(self):
         # Remove other fields
-        self.carrier.working_area = models.WORKING_AREA_UNDEFINED
-        self.carrier.specialities = None
+        self.carrier.editable.working_area = models.WORKING_AREA_UNDEFINED
+        self.carrier.editable.specialities = None
+        self.carrier.editable.save()
         self.carrier.save()
         data = self.patch_carrier({"telephone": PHONE, "email": EMAIL}, 200)
         self.carrier.refresh_from_db()
@@ -320,57 +317,31 @@ class CarrierDetailTestCase(test.CarrierTestCase):
         )
 
     def test_completeness(self):
-        # The default factory sets telephone and email but they aren't validated
-        # a working area and specialities.
+        # The default factory sets all fields
         self.assertEqual(
             self.carrier.completeness,
-            models.COMPLETENESS_PERCENT_MIN + 3 * models.EARNED_POINT_VALUE,
+            models.COMPLETENESS_PERCENT_MIN + 4 * models.EARNED_POINT_VALUE,
         )
+        self.assertEqual(self.carrier.completeness, 100.0)
 
         # No telephone and no working area
-        # Still email not validated and specialities.
-        self.carrier.working_area = models.WORKING_AREA_UNDEFINED
-        self.carrier.telephone = ""
-        self.carrier.save()
+        # Still email and specialities.
+        self.carrier.editable.working_area = models.WORKING_AREA_UNDEFINED
+        self.carrier.editable.telephone = ""
         self.assertEqual(
-            self.carrier.completeness,
-            models.COMPLETENESS_PERCENT_MIN + 1.5 * models.EARNED_POINT_VALUE,
+            self.carrier.compute_completeness(),
+            models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE,
         )
 
         # No email
-        self.carrier.email = ""
-        self.carrier.save()
+        self.carrier.editable.email = ""
         self.assertEqual(
-            self.carrier.completeness,
+            self.carrier.compute_completeness(),
             models.COMPLETENESS_PERCENT_MIN + models.EARNED_POINT_VALUE,
         )
 
         # No specialities
-        self.carrier.specialities = None
-        self.carrier.save()
-        self.assertEqual(self.carrier.completeness, models.COMPLETENESS_PERCENT_MIN)
-
-        # Updated email
-        self.carrier.email = "foo@example.com"
-        self.carrier.validated_at = timezone.now()
-        self.carrier.save()
+        self.carrier.editable.specialities = None
         self.assertEqual(
-            self.carrier.completeness,
-            models.COMPLETENESS_PERCENT_MIN + models.EARNED_POINT_VALUE,
+            self.carrier.compute_completeness(), models.COMPLETENESS_PERCENT_MIN
         )
-
-        # Phone and email validated
-        self.carrier.telephone = "02 40 41 42 43"
-        self.carrier.validated_at = timezone.now()
-        self.carrier.save()
-        self.assertEqual(
-            self.carrier.completeness,
-            models.COMPLETENESS_PERCENT_MIN + 2 * models.EARNED_POINT_VALUE,
-        )
-
-        # Add working area and specialities
-        # Completeful 100%
-        self.carrier.working_area = models.WORKING_AREA_DEPARTEMENT
-        self.carrier.specialities = ["LOT"]
-        self.carrier.save()
-        self.assertEqual(self.carrier.completeness, 100)

@@ -221,15 +221,18 @@ class Carrier(models.Model):
         - +1 for all others (phone, email, working_area and specialities)
         Maximum: 4
         """
+        if not self.editable:
+            return COMPLETENESS_PERCENT_MIN
+
         earned_points = 0
-        original_fields_weight = 0.5 if self.validated_at is None else 1
-        if self.telephone:
-            earned_points += original_fields_weight
-        if self.email:
-            earned_points += original_fields_weight
-        if self.working_area != WORKING_AREA_UNDEFINED:
+
+        if self.editable.telephone:
             earned_points += 1
-        if self.specialities:
+        if self.editable.email:
+            earned_points += 1
+        if self.editable.working_area != WORKING_AREA_UNDEFINED:
+            earned_points += 1
+        if self.editable.specialities:
             earned_points += 1
 
         return COMPLETENESS_PERCENT_MIN + earned_points * EARNED_POINT_VALUE

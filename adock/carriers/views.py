@@ -36,8 +36,6 @@ CARRIER_DETAIL_FIELDS = (
     "adresse",
     "code_postal",
     "ville",
-    "telephone",
-    # "email" is added when the carrier is validated (not locked)
     "debut_activite",
     "code_ape",
     "libelle_ape",
@@ -51,11 +49,6 @@ CARRIER_DETAIL_FIELDS = (
     "lc_date_debut",
     "lc_date_fin",
     "lc_nombre",
-    "working_area",
-    "working_area_departements",
-    "specialities",
-    "website",
-    "description",
     "objectif_co2",
     "objectif_co2_begin",
     "objectif_co2_end",
@@ -65,6 +58,14 @@ CARRIER_DETAIL_FIELDS = (
     "is_locked",
     "longitude",
     "latitude",
+    # From CarrierEditable
+    "telephone",
+    # "email" is added when the carrier is validated (not locked)
+    "working_area",
+    "working_area_departements",
+    "specialities",
+    "website",
+    "description",
 )
 
 OTHER_FACILITIES_LIST_FIELDS = (
