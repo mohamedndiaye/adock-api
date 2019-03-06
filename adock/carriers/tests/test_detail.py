@@ -251,10 +251,11 @@ class CarrierDetailPostTestCase(AuthTestCaseBase, test.CarrierTestCaseMixin):
 
     def test_post_website(self):
         WEBSITE = "http://www.example.com"
+        self.assertNotEqual(self.carrier.editable.website, WEBSITE)
         data = self.post_carrier_logged(
             {"email": EMAIL, "telephone": PHONE, "website": WEBSITE}, 200
         )
-        self.assertEqual(data["carrier"]["website"], self.carrier.website)
+        self.assertEqual(data["carrier"]["website"], self.carrier.editable.website)
 
         latest_editable = models.CarrierEditable.objects.latest()
         self.assertEqual(latest_editable.website, WEBSITE)

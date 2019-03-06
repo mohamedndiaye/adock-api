@@ -107,9 +107,6 @@ class Carrier(models.Model):
     telephone = PhoneNumberField(blank=True, default="")
     # mail from GRECO used as default (changed) but required in form
     email = models.EmailField(blank=True, default="")
-    # Set when the user clicks on the provided URL with one time token and to
-    # None when the email is modified.
-    email_confirmed_at = models.DateTimeField(blank=True, null=True)
     # dcret from Sirene (inscription_activite from GRECO).
     # Can be null (not present in Sirene)
     date_creation = models.DateField(blank=True, null=True)
@@ -135,29 +132,6 @@ class Carrier(models.Model):
     lc_nombre = models.PositiveSmallIntegerField(default=0)
     # To store computed vat_number (computed by PostgreSQL on import)
     numero_tva = models.CharField(max_length=13, blank=True, null=True)
-    working_area = models.CharField(
-        max_length=15,
-        choices=WORKING_AREA_CHOICES,
-        blank=True,
-        default=WORKING_AREA_UNDEFINED,
-    )
-    # This field is used when working_area is set to WORKING_AREA_DEPARTEMENT
-    # The default value is the departement of the company
-    # Ex. 44, 2A, 976
-    working_area_departements = ArrayField(
-        models.CharField(max_length=3),
-        blank=True,
-        null=True,
-        validators=[carriers_validators.validate_french_departement],
-    )
-    specialities = ArrayField(
-        models.CharField(max_length=63, choices=SPECIALITY_CHOICES),
-        blank=True,
-        null=True,
-    )
-    website = models.URLField(blank=True)
-    # Filled by the user to describe his activity
-    description = models.TextField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     # The field is updated when the form is submitted by the user.
     # It means a user has validated the information.
@@ -236,14 +210,6 @@ class Carrier(models.Model):
             earned_points += 1
 
         return COMPLETENESS_PERCENT_MIN + earned_points * EARNED_POINT_VALUE
-
-    def lock(self):
-        self.email_confirmed_at = timezone.now()
-        self.save()
-
-    def is_locked(self):
-        # The email has been confirmed
-        return bool(self.email_confirmed_at)
 
     def has_owner(self):
         return self.owners.exists()
