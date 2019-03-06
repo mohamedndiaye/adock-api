@@ -1,6 +1,7 @@
 import re
 
 from django.core import mail
+from django.conf import settings
 from django.urls import reverse
 
 from adock.accounts.test import AuthTestCaseBase
@@ -180,7 +181,8 @@ class CarrierDetailPostTestCase(AuthTestCaseBase, test.CarrierTestCaseMixin):
 
         # Confirm changes by extracting the token provided to the UI in #2 mail
         url_search = re.search(
-            r"http://localhost:8080/transporteur/changement/(?P<carrier_editable_id>\d+)/confirmer/(?P<token>.+)/",
+            r"%stransporteur/changement/(?P<carrier_editable_id>\d+)/confirmer/(?P<token>.+)/"
+            % settings.HTTP_CLIENT_URL,
             mail.outbox[1].body,
         )
         self.assertIsNotNone(url_search)

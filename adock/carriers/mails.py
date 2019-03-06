@@ -14,7 +14,7 @@ def get_recipient_list_from_env(email):
 def get_message_of_changes(changed_fields, current_data, validated_data):
     message = ""
     for field in changed_fields:
-        message += "\n- {field} : {current_value} => {new_value}".format(
+        message += "- {field} : {current_value} => {new_value}\n".format(
             field=field,
             current_value=current_data[field],
             new_value=validated_data[field],
@@ -32,7 +32,6 @@ Votre fiche transporteur {http_client_url}transporteur/{siret}
 est en cours de modification avec les changements suivants :
 
 {changes}
-
 Si vous n'êtes pas d'accord avec ces changements, veuillez contacter les responsables du site A Dock.
 
 Cordialement,
@@ -66,7 +65,6 @@ qui facilite la relation chargeur et transporteur.
 Pour confirmer les changements suivant sur votre fiche :
 
 {changes}
-
 Cliquez sur ce lien :
 
 {http_client_url}transporteur/changement/{carrier_editable_id}/confirmer/{token}/
