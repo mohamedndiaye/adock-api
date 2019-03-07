@@ -8,7 +8,7 @@ phonenumbers==8.10.1
 django-phonenumber-field==2.1.0
 sentry_sdk==0.6.6
 requests==2.20.1
-webstack-django-jwt-auth==1.1.1
+webstack-django-jwt-auth==1.1.2
 # To import labelled carriers of Objectif CO2
 openpyxl
 # To parse Sirene page

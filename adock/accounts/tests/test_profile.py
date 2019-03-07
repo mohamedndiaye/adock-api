@@ -1,7 +1,9 @@
+import json
+
+from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse
 
 from adock.accounts.test import AuthTestCaseBase
-
 from adock.carriers import factories as carriers_factories
 
 
@@ -22,6 +24,10 @@ class ProfileTestCase(AuthTestCaseBase):
         response = self.client.get(self.url, HTTP_AUTHORIZATION=http_authorization)
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        self.assertEqual(self.user.last_login, data["user"]["last_login"])
+        self.user.refresh_from_db()
+        self.assertEqual(
+            json.dumps(self.user.last_login, cls=DjangoJSONEncoder).strip('"'),
+            data["user"]["last_login"],
+        )
         self.assertEqual(self.user.provider, data["user"]["provider"])
         self.assertEqual(carrier.siret, data["user"]["carriers"][0]["siret"])
