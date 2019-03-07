@@ -17,6 +17,11 @@ class StatsTestCase(AuthTestCaseBase):
         self.url = reverse("stats")
 
     @skipIf(settings.AUTHENTICATION_DISABLED, "Authentication is disabled")
+    def test_no_logged(self):
+        response = self.client.get(self.url, content_type="application/json")
+        self.assertEqual(response.status_code, 401)
+
+    @skipIf(settings.AUTHENTICATION_DISABLED, "Authentication is disabled")
     def test_staff_only(self):
         user = accounts_factories.UserFactory(
             email="courriel@example.com", is_staff=False
@@ -30,7 +35,7 @@ class StatsTestCase(AuthTestCaseBase):
             content_type="application/json",
             HTTP_AUTHORIZATION=http_authorization,
         )
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 403)
 
     def test_stats(self):
         STATS_NB_MONTHS = 6

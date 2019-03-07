@@ -75,7 +75,7 @@ def account_profile(request):
     if request.user.is_anonymous or not request.user.is_active:
         return JsonResponse(
             {"message": "Impossible d'obtenir les informations de l'utilisateur."},
-            status=403,
+            status=401,
         )
 
     carriers = carriers_models.Carrier.objects.filter(

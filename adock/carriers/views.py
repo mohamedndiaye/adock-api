@@ -274,7 +274,7 @@ def carrier_detail(request, carrier_siret):
                 {
                     "message": "Vous devez être connecté pour modifier une fiche transporteur."
                 },
-                status=405,
+                status=401,
             )
 
         notification_email_to_send = False

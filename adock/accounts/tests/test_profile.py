@@ -14,7 +14,7 @@ class ProfileTestCase(AuthTestCaseBase):
 
     def test_anonymous(self):
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
     def test_profile(self):
         carrier = carriers_factories.CarrierFactory(

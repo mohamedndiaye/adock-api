@@ -117,8 +117,8 @@ class CarrierDetailTestCase(test.CarrierTestCaseMixin):
         self.carrier.save()
         self.assertEqual(self.carrier.completeness, models.COMPLETENESS_PERCENT_MIN)
 
-    def test_post_not_allowed(self):
-        self.post_carrier({"telephone": PHONE, "email": EMAIL}, 405)
+    def test_post_unauthorized(self):
+        self.post_carrier({"telephone": PHONE, "email": EMAIL}, 401)
 
 
 class CarrierDetailPostTestCase(AuthTestCaseBase, test.CarrierTestCaseMixin):
