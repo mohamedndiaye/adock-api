@@ -321,8 +321,8 @@ class CarrierDetailPostTestCase(AuthTestCaseBase, test.CarrierTestCaseMixin):
             400,
         )
         self.assertEqual(
-            data["errors"]["working_area_departements"]["0"][0],
-            "Assurez-vous que ce champ comporte au plus 3 caractères.",
+            data["errors"]["working_area_departements"][0],
+            "Champ 1 : Assurez-vous que ce champ comporte au plus 3 caractères.",
         )
 
     def test_post_empty_working_area_departements(self):

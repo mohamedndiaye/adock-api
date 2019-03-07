@@ -27,6 +27,16 @@ def request_validate(request, Serializer):
     try:
         serializer.is_valid(raise_exception=True)
     except serializers.ValidationError:
-        return None, JsonResponse({"errors": serializer.errors}, status=400)
+        # Workaround strange error format of DRF for Array
+        errors = {}
+        for k_field, v_error in serializer.errors.items():
+            if isinstance(v_error, dict):
+                errors[k_field] = [
+                    "Champ %s : %s" % (int(k) + 1, ",".join(v))
+                    for k, v in v_error.items()
+                ]
+            else:
+                errors[k_field] = v_error
+        return None, JsonResponse({"errors": errors}, status=400)
 
     return serializer, None
