@@ -230,7 +230,6 @@ class CarrierEditable(models.Model):
     carrier = models.ForeignKey(
         Carrier, on_delete=models.CASCADE, related_name="changes"
     )
-    # FIXME Should we expose not validated phone?
     telephone = PhoneNumberField(blank=False, null=False)
     email = models.EmailField(blank=False, null=False)
 
@@ -246,7 +245,7 @@ class CarrierEditable(models.Model):
         max_length=15,
         choices=WORKING_AREA_CHOICES,
         blank=True,
-        default=WORKING_AREA_UNDEFINED,
+        default=WORKING_AREA_DEPARTEMENT,
     )
     # This field is used when working_area is set to WORKING_AREA_DEPARTEMENT
     # The default value is the departement of the company

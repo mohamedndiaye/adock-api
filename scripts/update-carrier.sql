@@ -10,14 +10,13 @@ insert into carrier
      adresse,
      code_postal, ville,
      departement,
+     -- Was used to import GRECO information but not published
      telephone, email,
      date_creation, debut_activite, code_ape, libelle_ape,
      gestionnaire,
      lti_numero, lti_date_debut, lti_date_fin, lti_nombre,
      lc_numero, lc_date_debut, lc_date_fin, lc_nombre,
-     working_area,
-     working_area_departements,
-     website, completeness, description,
+     completeness,
      numero_tva,
      created_at,
      deleted_at,
@@ -59,10 +58,7 @@ insert into carrier
            r.date_debut_validite_lc as lc_date_debut,
            r.date_fin_validite_lc as lc_date_fin,
            r.nombre_de_copies_lc_valides as lc_nombre,
-           'DEPARTEMENT' as working_area,
-           -- Default departement for working area departements in company departement
-           case when r.code_departement is null then null else array[r.code_departement] end as working_area_departements,
-           '' as website, 40 as completeness, '' as description,
+           40 as completeness,
            case r.siret::char(1)
            when 'P'
             then ''
@@ -117,6 +113,37 @@ update carrier
    set deleted_at = now()
  where not exists (select 1 from registre r where r.siret = carrier.siret)
    and deleted_at is null;
+
+-- Create default carrier editable (really nice query BTW :)
+with new_carrier_editable AS (
+  insert into carrier_editable (
+      carrier_id,
+      telephone,
+      email,
+      created_at,
+      confirmed_at,
+      working_area,
+      working_area_departements,
+      specialities,
+      website,
+      description
+    )
+    select
+      siret,
+      '' as telephone,
+      '' as email,
+      now() as created_at,
+      null as confirmed_at,
+      'DEPARTEMENT' as working_area,
+      -- Default departement for working area departements in company departement
+      case when departement is null then null else array[departement] end as working_area_departements,
+      null as specialities,
+      '' as website,
+      '' as description
+    from carrier
+    where carrier.editable_id is null
+  returning *
+) update carrier set editable_id = nce.id from new_carrier_editable nce where siret = nce.carrier_id;
 
 -- Update meta stats
 with json_data as (
