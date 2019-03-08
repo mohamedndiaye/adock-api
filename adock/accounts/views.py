@@ -78,9 +78,11 @@ def account_profile(request):
             status=401,
         )
 
-    carriers = carriers_models.Carrier.objects.filter(
-        changes__created_by=request.user
-    ).select_related("editable")
+    carriers = (
+        carriers_models.Carrier.objects.filter(changes__created_by=request.user)
+        .select_related("editable")
+        .distinct()
+    )
     carriers_json = carriers_views.get_carriers_as_json(carriers, ["enseigne"])
 
     # Returns only informations not in JWT payload
