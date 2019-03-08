@@ -19,7 +19,7 @@ HOSTNAME = "adock.webstack.fr"
 HTTP_CLIENT_URL = "https://" + HOSTNAME + "/"
 HTTP_SERVER_URL = "https://" + HOSTNAME + "/api/"
 
-EMAIL_SUBJECT_PREFIX = "[A Dock preprod]"
+EMAIL_SUBJECT_PREFIX = "[A Dock preprod] "
 
 # Web tool or ./manage.py generate_secret_key with Django extensions
 SECRET_KEY = ""
