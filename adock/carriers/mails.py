@@ -99,7 +99,7 @@ SIRET : {siret}
 {http_client_url}transporteur/{siret}
 
 Informations modifiées :
-    """.format(
+""".format(
         enseigne=carrier.enseigne,
         siret=carrier.siret,
         http_client_url=settings.HTTP_CLIENT_URL,
