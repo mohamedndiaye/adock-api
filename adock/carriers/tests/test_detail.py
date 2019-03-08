@@ -197,6 +197,7 @@ class CarrierDetailPostTestCase(AuthTestCaseBase, test.CarrierTestCaseMixin):
         )
         response = self.client.get(url_carrier_editable_confirm)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["siret"], self.carrier.siret)
 
         # Apply same changes so field comparison detects there is no changes
         mail.outbox = []

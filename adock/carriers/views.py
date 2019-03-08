@@ -334,7 +334,9 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
         )
     except models.CarrierEditable.DoesNotExist:
         carrier_editable = None
+        return JsonResponse({"message": "La modification n'existe pas."})
 
+    data = {"siret": carrier_editable.carrier_id}
     if carrier_editable and tokens.carrier_editable_token.check_token(
         carrier_editable, token
     ):
@@ -345,16 +347,13 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
             carrier_editable.carrier.save()
 
         mails.mail_managers_carrier_confirmed(carrier_editable.carrier)
-        return JsonResponse(
-            {"message": "Les modifications de la fiche sont confirmées."}
-        )
+        data["message"] = "Les modifications de la fiche sont confirmées."
+        return JsonResponse(data)
 
-    return JsonResponse(
-        {
-            "message": "Impossible de confirmer les modifications de la fiche transporteur."
-        },
-        status=400,
-    )
+    data[
+        "message"
+    ] = "Impossible de confirmer les modifications de la fiche transporteur."
+    return JsonResponse(data, status=400)
 
 
 # FIXME Check POST is done by carrier owner
