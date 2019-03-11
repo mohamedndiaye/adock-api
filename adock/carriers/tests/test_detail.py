@@ -4,7 +4,7 @@ from django.core import mail
 from django.conf import settings
 from django.urls import reverse
 
-from adock.accounts.test import AuthTestCaseBase
+from adock.accounts.test import AuthTestCase
 
 from . import test
 from .. import factories, models, validators
@@ -124,7 +124,7 @@ class CarrierDetailTestCase(test.CarrierTestCaseMixin):
         self.post_carrier({"telephone": PHONE, "email": EMAIL}, 401)
 
 
-class CarrierDetailPostTestCase(AuthTestCaseBase, test.CarrierTestCaseMixin):
+class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
     def setUp(self):
         super().setUp()
         self.carrier = factories.CarrierFactory(

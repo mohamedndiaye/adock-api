@@ -14,3 +14,19 @@ class CarrierEditableTokenGenerator(PasswordResetTokenGenerator):
 
 
 carrier_editable_token = CarrierEditableTokenGenerator()
+
+
+class CertificateTokenGenerator(PasswordResetTokenGenerator):
+    def _make_hash_value(self, certificate, timestamp):  # pylint: disable=W0221
+        # Ensure no others certificates have been confirmed in the meantime
+        current_certificate = certificate.carrier.get_latest_certificate()
+        current_certificate_pk = current_certificate.pk if current_certificate else None
+        return "%s%s%s%s" % (
+            current_certificate_pk,
+            certificate.pk,
+            certificate.confirmed_at or "",
+            timestamp,
+        )
+
+
+certificate_token = CertificateTokenGenerator()

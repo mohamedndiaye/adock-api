@@ -7,6 +7,7 @@ import factory
 from factory import fuzzy
 import unidecode
 from faker import Faker
+from django.utils import timezone
 
 from . import models, validators
 
@@ -83,6 +84,7 @@ class CarrierEditableFactory(factory.DjangoModelFactory):
 class CarrierCertificateFactory(factory.DjangoModelFactory):
     carrier = factory.SubFactory(CarrierFactory)
     kind = models.CERTIFICATE_NO_WORKERS
+    confirmed_at = factory.LazyAttribute(lambda _: timezone.now())
     data = {
         "first_name": "Régis",
         "last_name": "Dujardin",

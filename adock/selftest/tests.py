@@ -1,9 +1,9 @@
 from django.urls import reverse
 
-from ..accounts.test import AuthTestCaseBase
+from ..accounts.test import AuthTestCase
 
 
-class SelftestTestCase(AuthTestCaseBase):
+class SelftestTestCase(AuthTestCase):
     def test_selftest(self):
         http_authorization = self.log_in()
         url = reverse("selftest")

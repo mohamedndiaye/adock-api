@@ -209,7 +209,9 @@ class Carrier(models.Model):
 
     def get_latest_certificate(self):
         try:
-            return self.certificates.latest("created_at")
+            return self.certificates.exclude(confirmed_at__isnull=True).latest(
+                "created_at"
+            )
         except CarrierCertificate.DoesNotExist:
             return None
 
@@ -299,6 +301,13 @@ class CarrierCertificate(models.Model):
     )
     kind = models.CharField(max_length=32, choices=CERTIFICATE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(
+        accounts_models.User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="carrier_certificates",
+    )
+    confirmed_at = models.DateTimeField(blank=True, null=True)
     data = JSONField()
 
     def __str__(self):

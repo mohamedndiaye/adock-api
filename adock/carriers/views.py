@@ -335,9 +335,7 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
     )
 
     data = {"siret": carrier_editable.carrier_id}
-    if carrier_editable and tokens.carrier_editable_token.check_token(
-        carrier_editable, token
-    ):
+    if tokens.carrier_editable_token.check_token(carrier_editable, token):
         with transaction.atomic(savepoint=False):
             carrier_editable.confirmed_at = timezone.now()
             carrier_editable.save()
@@ -354,8 +352,12 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
     return JsonResponse(data, status=400)
 
 
-# FIXME Check POST is done by carrier owner
-def _carrier_sign_certificate(request, carrier_siret):
+def _certificate_sign(request, carrier_siret):
+    if request.user.is_anonymous:
+        return JsonResponse(
+            {"message": "Vous devez être connecté pour signer une attestation."},
+            status=401,
+        )
     carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
 
     serializer, response = core_views.request_validate(
@@ -365,13 +367,18 @@ def _carrier_sign_certificate(request, carrier_siret):
         return response
 
     kind = serializer.validated_data.pop("kind")
-    models.CarrierCertificate.objects.create(
-        carrier=carrier, kind=kind, data=serializer.validated_data
+    certificate = models.CarrierCertificate.objects.create(
+        carrier=carrier,
+        created_by=request.user,
+        data=serializer.validated_data,
+        kind=kind,
     )
+    mails.mail_carrier_certificate_to_confirm(carrier, certificate)
+    mails.mail_managers_new_certificate(certificate)
     return JsonResponse({"carrier": get_carrier_as_json(carrier)})
 
 
-def _carrier_get_certificate(request, carrier_siret, as_pdf=True):
+def _certificate_get(request, carrier_siret, as_pdf=True):
     carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
 
     # Get latest certificate of any kinds
@@ -409,8 +416,28 @@ def _carrier_get_certificate(request, carrier_siret, as_pdf=True):
     return response
 
 
-def carrier_certificate(request, *args, **kwargs):
+def certificate_detail(request, carrier_siret, as_pdf=True):
     if request.method == "POST":
-        return _carrier_sign_certificate(request, *args, **kwargs)
+        return _certificate_sign(request, carrier_siret)
 
-    return _carrier_get_certificate(request, *args, **kwargs)
+    return _certificate_get(request, carrier_siret, as_pdf)
+
+
+def certificate_confirm(request, certificate_id, token):
+    certificate = get_object_or_404(models.CarrierCertificate, pk=certificate_id)
+
+    if tokens.certificate_token.check_token(certificate, token):
+        certificate.confirmed_at = timezone.now()
+        certificate.save()
+        mails.mail_managers_certificate_confirmed(certificate)
+        return JsonResponse(
+            {"siret": certificate.carrier_id, "message": "L'attestation est confirmée"}
+        )
+    else:
+        return JsonResponse(
+            {
+                "siret": certificate.carrier_id,
+                "message": "Impossible de confirmer l'attestation.",
+            },
+            status=400,
+        )

@@ -7,11 +7,11 @@ from django.urls import reverse
 from django.utils import timezone
 
 from adock.carriers import factories as carriers_factories
-from adock.accounts.test import AuthTestCaseBase
+from adock.accounts.test import AuthTestCase
 from adock.accounts import factories as accounts_factories
 
 
-class StatsTestCase(AuthTestCaseBase):
+class StatsTestCase(AuthTestCase):
     def setUp(self):
         super().setUp()
         self.url = reverse("stats")

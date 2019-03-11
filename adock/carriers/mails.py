@@ -126,3 +126,83 @@ def mail_managers_carrier_confirmed(carrier_editable):
         http_client_url=settings.HTTP_CLIENT_URL,
     )
     mail_managers(subject, message, fail_silently=True)
+
+
+def mail_carrier_certificate_to_confirm(carrier, certificate):
+    token = tokens.certificate_token.make_token(certificate)
+    subject = (
+        "%sEn attente de confirmation d'une attestation" % settings.EMAIL_SUBJECT_PREFIX
+    )
+    message = """
+Merci d'avoir créé une attestation sur A Dock, l'application
+qui facilite la relation chargeur et transporteur.
+
+Pour la confirmer, cliquez sur ce lien :
+
+{http_client_url}transporteur/attestation/{certificate_id}/confirmer/{token}/
+
+Cordialement,
+L'équipe A Dock
+    """.format(
+        http_client_url=settings.HTTP_CLIENT_URL,
+        certificate_id=certificate.id,
+        token=token,
+    )
+    recipient_list = get_recipient_list_from_env(carrier.editable.email)
+    send_mail(
+        subject,
+        message,
+        settings.SERVER_EMAIL,
+        recipient_list,
+        fail_silently=settings.DEBUG,
+    )
+
+
+def mail_managers_new_certificate(certificate):
+    carrier = certificate.carrier
+    subject = "Nouvelle attestation %s pour le transporteur %s" % (
+        certificate.pk,
+        carrier.siret,
+    )
+    message = """
+Transporteur : {enseigne}
+Type d'attestation : {kind}
+Utilisateur : {user}
+Données :
+{data}
+
+{http_client_url}transporteur/{siret}
+""".format(
+        data=certificate.data,
+        enseigne=carrier.enseigne,
+        http_client_url=settings.HTTP_CLIENT_URL,
+        kind=certificate.get_kind_display(),
+        siret=carrier.siret,
+        user=certificate.created_by,
+    )
+    mail_managers(subject, message, fail_silently=True)
+
+
+def mail_managers_certificate_confirmed(certificate):
+    carrier = certificate.carrier
+    subject = "L'attestation %s du transporteur %s a été confirmée." % (
+        certificate.pk,
+        carrier.siret,
+    )
+    message = """
+Transporteur : {enseigne}
+Type d'attestation : {kind}
+Utilisateur : {user}
+Données :
+{data}
+
+{http_client_url}transporteur/{siret}
+    """.format(
+        data=certificate.data,
+        enseigne=carrier.enseigne,
+        http_client_url=settings.HTTP_CLIENT_URL,
+        kind=certificate.get_kind_display(),
+        siret=carrier.siret,
+        user=certificate.created_by,
+    )
+    mail_managers(subject, message, fail_silently=True)

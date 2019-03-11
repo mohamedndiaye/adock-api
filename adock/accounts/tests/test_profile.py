@@ -3,11 +3,11 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse
 
-from adock.accounts.test import AuthTestCaseBase
+from adock.accounts.test import AuthTestCase
 from adock.carriers import factories as carriers_factories
 
 
-class ProfileTestCase(AuthTestCaseBase):
+class ProfileTestCase(AuthTestCase):
     def setUp(self):
         self.url = reverse("accounts_profile")
         super().setUp()

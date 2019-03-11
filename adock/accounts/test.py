@@ -6,7 +6,7 @@ from django.urls import reverse
 from adock.accounts import factories as accounts_factories
 
 
-class AuthTestCaseBase(TestCase):
+class AuthTestCase(TestCase):
     def setUp(self):
         self.user = accounts_factories.UserFactory(
             email="courriel@fai.fr", is_staff=True
