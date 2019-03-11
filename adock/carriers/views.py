@@ -423,7 +423,9 @@ def certificate_detail(request, carrier_siret, as_pdf=True):
 
 
 def certificate_confirm(request, certificate_id, token):
-    certificate = get_object_or_404(models.CarrierCertificate, pk=certificate_id)
+    certificate = get_object_or_404(
+        models.CarrierCertificate.objects.select_related("carrier"), pk=certificate_id
+    )
 
     if tokens.certificate_token.check_token(certificate, token):
         certificate.confirmed_at = timezone.now()
