@@ -330,13 +330,9 @@ def carrier_detail(request, carrier_siret):
 
 
 def carrier_editable_confirm(request, carrier_editable_id, token):
-    try:
-        carrier_editable = models.CarrierEditable.objects.select_related("carrier").get(
-            pk=carrier_editable_id
-        )
-    except models.CarrierEditable.DoesNotExist:
-        carrier_editable = None
-        return JsonResponse({"message": "La modification n'existe pas."})
+    carrier_editable = get_object_or_404(
+        models.CarrierEditable.objects.select_related("carrier"), pk=carrier_editable_id
+    )
 
     data = {"siret": carrier_editable.carrier_id}
     if carrier_editable and tokens.carrier_editable_token.check_token(
