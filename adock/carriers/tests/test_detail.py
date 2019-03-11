@@ -253,6 +253,17 @@ class CarrierDetailPostTestCase(AuthTestCaseBase, test.CarrierTestCaseMixin):
         )
         self.assertEqual(carrier_editable.specialities, ["LOT"])
 
+    def test_post_no_changes(self):
+        self.post_carrier_logged(
+            {
+                "email": self.carrier.editable.email,
+                "telephone": str(self.carrier.editable.telephone),
+            },
+            200,
+        )
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(models.CarrierEditable.objects.count(), 1)
+
     def test_post_website(self):
         WEBSITE = "http://www.example.com"
         self.assertNotEqual(self.carrier.editable.website, WEBSITE)

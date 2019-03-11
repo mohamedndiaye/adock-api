@@ -82,6 +82,14 @@ OTHER_FACILITIES_LIST_FIELDS = (
 )
 
 
+def format_telephone(phonenumber):
+    return (
+        phonenumber
+        if isinstance(phonenumber, str)
+        else "0" + phonenumber.format_as(settings.PHONENUMBER_DEFAULT_REGION)
+    )
+
+
 def get_carrier_as_json(carrier):
     carrier_json = {}
 
@@ -90,11 +98,7 @@ def get_carrier_as_json(carrier):
 
     editable = carrier.editable
     carrier_json["is_locked"] = bool(editable.confirmed_at)
-    carrier_json["telephone"] = (
-        editable.telephone
-        if isinstance(editable.telephone, str)
-        else "0" + editable.telephone.format_as(settings.PHONENUMBER_DEFAULT_REGION)
-    )
+    carrier_json["telephone"] = format_telephone(editable.telephone)
 
     for field in CARRIER_DETAIL_EDITABLE_FIELDS:
         carrier_json[field] = getattr(editable, field)
@@ -287,18 +291,13 @@ def carrier_detail(request, carrier_siret):
         if carrier.editable:
             # 1. Compare values
             changed_fields = []
-            current_serializer = carriers_serializers.CarrierEditableSerializer(
-                carrier.editable
-            )
 
-            current_data = current_serializer.data
             validated_data = new_serializer.validated_data
             for field in validated_data:
-                if current_data[field] != validated_data[field]:
+                if getattr(carrier.editable, field) != validated_data[field]:
                     changed_fields.append(field)
 
             new_editable_to_create = bool(changed_fields)
-
             # 2. Previous email for notification
             if "email" in changed_fields and carrier.editable.email:
                 notification_email_to_send = True
@@ -312,14 +311,12 @@ def carrier_detail(request, carrier_siret):
 
             if notification_email_to_send:
                 mails.mail_carrier_to_old_email(
-                    carrier, changed_fields, current_data, validated_data
+                    changed_fields, carrier.editable, validated_data
                 )
             mails.mail_carrier_editable_to_confirm(
-                new_carrier_editable, changed_fields, current_data, validated_data
+                changed_fields, new_carrier_editable, validated_data
             )
-            mails.mail_managers_carrier_changes(
-                carrier, changed_fields, current_data, validated_data
-            )
+            mails.mail_managers_carrier_changes(changed_fields, new_carrier_editable, validated_data)
 
     carrier_json = get_carrier_as_json(carrier)
     carrier_json["other_facilities"] = get_other_facilities_as_json(carrier)
@@ -346,7 +343,7 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
             carrier_editable.carrier.editable = carrier_editable
             carrier_editable.carrier.save()
 
-        mails.mail_managers_carrier_confirmed(carrier_editable.carrier)
+        mails.mail_managers_carrier_confirmed(carrier_editable)
         data["message"] = "Les modifications de la fiche sont confirmées."
         return JsonResponse(data)
 

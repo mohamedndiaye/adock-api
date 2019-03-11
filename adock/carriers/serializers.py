@@ -1,4 +1,5 @@
 # pylint: disable=W0223
+from phonenumber_field import phonenumber
 from rest_framework import serializers
 
 from . import models as carriers_models
@@ -16,6 +17,14 @@ class CarrierEditableSerializer(serializers.ModelSerializer):
             "website",
             "description",
         )
+
+    def validate_telephone(self, value):
+        phone_number = phonenumber.to_python(value)
+        if phone_number and not phone_number.is_valid():
+            raise serializers.ValidationError(
+                "Le numéro de téléphone saisi n'est pas valide."
+            )
+        return phone_number
 
     def validate_working_area_departements(self, value):
         """Pads departement numbers lesser than 10 with a zero"""
