@@ -352,13 +352,12 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
     return JsonResponse(data, status=400)
 
 
-def _certificate_sign(request, carrier_siret):
+def _certificate_sign(request, carrier):
     if request.user.is_anonymous:
         return JsonResponse(
             {"message": "Vous devez être connecté pour signer une attestation."},
             status=401,
         )
-    carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
 
     serializer, response = core_views.request_validate(
         request, carriers_serializers.CertificateSerializer
@@ -378,9 +377,7 @@ def _certificate_sign(request, carrier_siret):
     return JsonResponse({"carrier": get_carrier_as_json(carrier)})
 
 
-def _certificate_get(request, carrier_siret, as_pdf=True):
-    carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
-
+def _certificate_get(request, carrier, as_pdf=True):
     # Get latest certificate of any kinds
     certificate = carrier.get_latest_certificate()
     if certificate is None:
@@ -417,10 +414,12 @@ def _certificate_get(request, carrier_siret, as_pdf=True):
 
 
 def certificate_detail(request, carrier_siret, as_pdf=True):
-    if request.method == "POST":
-        return _certificate_sign(request, carrier_siret)
+    carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
 
-    return _certificate_get(request, carrier_siret, as_pdf)
+    if request.method == "POST":
+        return _certificate_sign(request, carrier)
+
+    return _certificate_get(request, carrier, as_pdf)
 
 
 def certificate_confirm(request, certificate_id, token):
