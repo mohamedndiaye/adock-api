@@ -271,6 +271,9 @@ class CarrierEditable(models.Model):
         db_table = "carrier_editable"
         get_latest_by = "pk"
 
+    def __str__(self):
+        return "SIRET %s - pk %s" % (self.carrier.siret, self.pk)
+
 
 class CarrierFeed(models.Model):
     """The table Carrier is fed by various sources (Sirene, Registre ou GRECO)"""
