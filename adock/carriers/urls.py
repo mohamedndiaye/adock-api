@@ -24,7 +24,7 @@ urlpatterns = [
         kwargs={"as_pdf": False},
     ),
     path(
-        "certificate/<int:certificate_id>/confirm/<str:token>",
+        "certificate/<int:certificate_id>/confirm/<str:token>/",
         views.certificate_confirm,
         name="carriers_certificate_confirm",
     ),
