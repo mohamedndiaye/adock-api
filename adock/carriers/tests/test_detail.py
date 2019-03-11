@@ -25,7 +25,10 @@ class CarrierDetailTestCase(test.CarrierTestCaseMixin):
 
     def test_get(self):
         response = self.client.get(self.detail_url)
-        carrier_data = response.json()["carrier"]
+        data = response.json()
+        carrier_data = data["carrier"]
+        self.assertNotIn("confirmation_email_sent", data)
+
         self.assertEqual(carrier_data["siret"], test.VALID_SIRET)
         self.assertEqual(carrier_data["raison_sociale"], self.carrier.raison_sociale)
         self.assertEqual(
@@ -254,13 +257,14 @@ class CarrierDetailPostTestCase(AuthTestCaseBase, test.CarrierTestCaseMixin):
         self.assertEqual(carrier_editable.specialities, ["LOT"])
 
     def test_post_no_changes(self):
-        self.post_carrier_logged(
+        data = self.post_carrier_logged(
             {
                 "email": self.carrier.editable.email,
                 "telephone": str(self.carrier.editable.telephone),
             },
             200,
         )
+        self.assertFalse(data["confirmation_email_sent"])
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(models.CarrierEditable.objects.count(), 1)
 
@@ -270,6 +274,9 @@ class CarrierDetailPostTestCase(AuthTestCaseBase, test.CarrierTestCaseMixin):
         data = self.post_carrier_logged(
             {"email": EMAIL, "telephone": PHONE, "website": WEBSITE}, 200
         )
+        self.assertTrue(data["confirmation_email_sent"])
+
+        # Change not applied yet
         self.assertEqual(data["carrier"]["website"], self.carrier.editable.website)
 
         latest_editable = models.CarrierEditable.objects.latest()

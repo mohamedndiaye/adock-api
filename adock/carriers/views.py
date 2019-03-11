@@ -266,12 +266,12 @@ RE_MANY_COMMAS = re.compile(r",+")
 
 
 def carrier_detail(request, carrier_siret):
+    data_json = {}
     # Access to deleted carriers is allowed.
     # Get existing carrier if any
     carrier = get_object_or_404(
         models.Carrier.objects.select_related("editable"), siret=carrier_siret
     )
-
     if request.method == "POST":
         if request.user.is_anonymous:
             return JsonResponse(
@@ -316,12 +316,17 @@ def carrier_detail(request, carrier_siret):
             mails.mail_carrier_editable_to_confirm(
                 changed_fields, new_carrier_editable, validated_data
             )
-            mails.mail_managers_carrier_changes(changed_fields, new_carrier_editable, validated_data)
+            mails.mail_managers_carrier_changes(
+                changed_fields, new_carrier_editable, validated_data
+            )
+
+        data_json["confirmation_email_sent"] = new_editable_to_create
 
     carrier_json = get_carrier_as_json(carrier)
     carrier_json["other_facilities"] = get_other_facilities_as_json(carrier)
     carrier_json["latest_certificate"] = get_latest_certificate_as_json(carrier)
-    return JsonResponse({"carrier": carrier_json})
+    data_json["carrier"] = carrier_json
+    return JsonResponse(data_json)
 
 
 def carrier_editable_confirm(request, carrier_editable_id, token):
