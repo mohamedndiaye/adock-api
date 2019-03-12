@@ -311,13 +311,13 @@ def carrier_detail(request, carrier_siret):
 
             if notification_email_to_send:
                 mails.mail_carrier_to_old_email(
-                    changed_fields, carrier.editable, validated_data
+                    changed_fields, carrier.editable, new_carrier_editable
                 )
             mails.mail_carrier_editable_to_confirm(
-                changed_fields, new_carrier_editable, validated_data
+                changed_fields, carrier.editable, new_carrier_editable
             )
             mails.mail_managers_carrier_changes(
-                changed_fields, new_carrier_editable, validated_data
+                changed_fields, carrier.editable, new_carrier_editable
             )
 
         data_json["confirmation_email_sent"] = new_editable_to_create
@@ -333,7 +333,6 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
     carrier_editable = get_object_or_404(
         models.CarrierEditable.objects.select_related("carrier"), pk=carrier_editable_id
     )
-
     data = {"siret": carrier_editable.carrier_id}
     if tokens.carrier_editable_token.check_token(carrier_editable, token):
         with transaction.atomic(savepoint=False):

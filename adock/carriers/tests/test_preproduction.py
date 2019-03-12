@@ -7,8 +7,11 @@ from .. import factories, mails
 
 class PreproductionTestCase(TestCase):
     def mail_carrier_editable_to_confirm(self, carrier_editable):
+        new_carrier_editable = factories.CarrierEditableFactory(
+            carrier=carrier_editable.carrier, email=carrier_editable.email
+        )
         mails.mail_carrier_editable_to_confirm(
-            ["description"], carrier_editable, {"description": "Livraison par drone."}
+            ["description"], carrier_editable, new_carrier_editable
         )
         self.assertEqual(len(mail.outbox), 1)
         return mail.outbox[0]

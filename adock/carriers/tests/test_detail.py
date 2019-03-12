@@ -191,6 +191,10 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
         self.assertIsNotNone(url_search)
 
         results = url_search.groupdict()
+
+        # The mail refers to the new editable
+        self.assertEqual(latest_editable.pk, int(results["carrier_editable_id"]))
+
         url_carrier_editable_confirm = reverse(
             "carriers_carrier_editable_confirm",
             kwargs={
@@ -202,9 +206,12 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["siret"], self.carrier.siret)
 
-        # Apply same changes so field comparison detects there is no changes
+        self.carrier.refresh_from_db()
+        self.assertEqual(self.carrier.editable, latest_editable)
+
         mail.outbox = []
 
+        # Apply same changes so field comparison detects there is no changes
         data = self.post_carrier_logged({"telephone": PHONE, "email": EMAIL}, 200)
         self.assertEqual(models.CarrierEditable.objects.count(), 2)
         self.assertEqual(len(mail.outbox), 0)
@@ -261,6 +268,7 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
             {
                 "email": self.carrier.editable.email,
                 "telephone": str(self.carrier.editable.telephone),
+                "specialities": self.carrier.editable.specialities,
             },
             200,
         )

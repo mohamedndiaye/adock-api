@@ -11,19 +11,23 @@ def get_recipient_list_from_env(email):
     return (email,)
 
 
-def get_message_of_changes(changed_fields, carrier_editable, validated_data):
+def get_message_of_changes(
+    changed_fields, current_carrier_editable, new_carrier_editable
+):
     message = ""
     for field in changed_fields:
         message += "- {field} : {current_value} => {new_value}\n".format(
             field=field,
-            current_value=getattr(carrier_editable, field),
-            new_value=validated_data[field],
+            current_value=getattr(current_carrier_editable, field),
+            new_value=getattr(new_carrier_editable, field),
         )
     return message
 
 
-def mail_carrier_to_old_email(changed_fields, carrier_editable, validated_data):
-    carrier = carrier_editable.carrier
+def mail_carrier_to_old_email(
+    changed_fields, current_carrier_editable, new_carrier_editable
+):
+    carrier = current_carrier_editable.carrier
     subject = (
         "%sNotification de modification de votre fiche transporteur"
         % settings.EMAIL_SUBJECT_PREFIX
@@ -40,10 +44,10 @@ L'équipe A Dock""".format(
         http_client_url=settings.HTTP_CLIENT_URL,
         siret=carrier.siret,
         changes=get_message_of_changes(
-            changed_fields, carrier_editable, validated_data
+            changed_fields, current_carrier_editable, new_carrier_editable
         ),
     )
-    recipient_list = get_recipient_list_from_env(carrier_editable.email)
+    recipient_list = get_recipient_list_from_env(current_carrier_editable.email)
     send_mail(
         subject,
         message,
@@ -53,8 +57,10 @@ L'équipe A Dock""".format(
     )
 
 
-def mail_carrier_editable_to_confirm(changed_fields, carrier_editable, validated_data):
-    token = tokens.carrier_editable_token.make_token(carrier_editable)
+def mail_carrier_editable_to_confirm(
+    changed_fields, current_carrier_editable, new_carrier_editable
+):
+    token = tokens.carrier_editable_token.make_token(new_carrier_editable)
     subject = (
         "%sEn attente de confirmation de votre fiche transporteur"
         % settings.EMAIL_SUBJECT_PREFIX
@@ -68,21 +74,19 @@ Pour confirmer les changements suivant sur votre fiche :
 {changes}
 Cliquez sur ce lien :
 
-{http_client_url}transporteur/changement/{carrier_editable_id}/confirmer/{token}/
+{http_client_url}transporteur/changement/{new_carrier_editable_id}/confirmer/{token}/
 
 Cordialement,
 L'équipe A Dock
     """.format(
         http_client_url=settings.HTTP_CLIENT_URL,
-        carrier_editable_id=carrier_editable.id,
+        new_carrier_editable_id=new_carrier_editable.id,
         token=token,
         changes=get_message_of_changes(
-            changed_fields, carrier_editable, validated_data
+            changed_fields, current_carrier_editable, new_carrier_editable
         ),
     )
-    recipient_list = get_recipient_list_from_env(
-        validated_data.get("email", carrier_editable.email)
-    )
+    recipient_list = get_recipient_list_from_env(new_carrier_editable.email)
     send_mail(
         subject,
         message,
@@ -92,10 +96,12 @@ L'équipe A Dock
     )
 
 
-def mail_managers_carrier_changes(changed_fields, carrier_editable, validated_data):
+def mail_managers_carrier_changes(
+    changed_fields, current_carrier_editable, new_carrier_editable
+):
     # Send a mail to managers to track changes
     # The URL is detail view of the front application
-    carrier = carrier_editable.carrier
+    carrier = current_carrier_editable.carrier
     subject = "Modification du transporteur %s" % carrier.siret
     message = """
 Modification en cours du transporteur : {enseigne}
@@ -109,7 +115,9 @@ Informations modifiées :
         http_client_url=settings.HTTP_CLIENT_URL,
     )
 
-    message += get_message_of_changes(changed_fields, carrier_editable, validated_data)
+    message += get_message_of_changes(
+        changed_fields, current_carrier_editable, new_carrier_editable
+    )
     mail_managers(subject, message, fail_silently=True)
 
 
