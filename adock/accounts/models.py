@@ -72,8 +72,15 @@ class User(AbstractBaseUser):
     provider = models.CharField(
         _("provider"), max_length=2, choices=PROVIDER_CHOICES, default=PROVIDER_A_DOCK
     )
-
     provider_data = JSONField(blank=True, null=True)
+    has_accepted_cgu = models.BooleanField(
+        "A accepté les dernières CGU",
+        default=False,
+        help_text=(
+            "Chaque fois que les CGU sont modifiées, ce drapeau est remis à "
+            "faux pour l'ensemble des utilisateurs."
+        ),
+    )
 
     objects = UserManager()
 
