@@ -30,4 +30,5 @@ class ProfileTestCase(AuthTestCase):
             data["user"]["last_login"],
         )
         self.assertEqual(self.user.provider, data["user"]["provider"])
+        self.assertTrue(data["user"]["has_accepted_cgu"])
         self.assertEqual(carrier.siret, data["user"]["carriers"][0]["siret"])
