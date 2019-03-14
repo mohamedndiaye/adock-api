@@ -78,6 +78,15 @@ def account_profile(request):
             status=401,
         )
 
+    if request.method == "PATCH":
+        serializer, response = core_views.request_validate(
+            request, accounts_serializers.EditUserSerializer, instance=request.user
+        )
+        if response:
+            return response
+
+        request.user = serializer.save()
+
     carriers = (
         carriers_models.Carrier.objects.filter(changes__created_by=request.user)
         .select_related("editable")

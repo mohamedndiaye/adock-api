@@ -32,3 +32,31 @@ class ProfileTestCase(AuthTestCase):
         self.assertEqual(self.user.provider, data["user"]["provider"])
         self.assertTrue(data["user"]["has_accepted_cgu"])
         self.assertEqual(carrier.siret, data["user"]["carriers"][0]["siret"])
+
+    def test_patch_profile(self):
+        self.user.has_accepted_cgu = False
+        self.user.save()
+
+        http_authorization = self.log_in()
+
+        # Accept CGU
+        response = self.client.patch(
+            self.url,
+            {"has_accepted_cgu": True},
+            content_type="application/json",
+            HTTP_AUTHORIZATION=http_authorization,
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["user"]["has_accepted_cgu"])
+
+        # Try to revoke CGU
+        response = self.client.patch(
+            self.url,
+            {"has_accepted_cgu": False},
+            content_type="application/json",
+            HTTP_AUTHORIZATION=http_authorization,
+        )
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn("has_accepted_cgu", data["errors"])

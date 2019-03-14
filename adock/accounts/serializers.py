@@ -16,3 +16,19 @@ class CreateAccountSerializer(serializers.Serializer):
                 "Un compte utilisateur existe déjà avec cette adresse."
             )
         return value
+
+
+class EditUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = accounts_models.User
+        fields = ("has_accepted_cgu",)
+
+    def validate_has_accepted_cgu(self, value):
+        if not value:
+            raise serializers.ValidationError("L'acceptation des CGU est irréversible.")
+        return value
+
+    def update(self, instance, validated_data):
+        instance.has_accepted_cgu = validated_data["has_accepted_cgu"]
+        instance.save(update_fields=["has_accepted_cgu"])
+        return instance

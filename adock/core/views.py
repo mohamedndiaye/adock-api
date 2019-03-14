@@ -18,12 +18,12 @@ def request_load(request):
     return payload, None
 
 
-def request_validate(request, Serializer):
+def request_validate(request, Serializer, instance=None):
     payload, response = request_load(request)
     if response:
         return None, response
 
-    serializer = Serializer(data=payload)
+    serializer = Serializer(instance=instance, data=payload)
     try:
         serializer.is_valid(raise_exception=True)
     except serializers.ValidationError:
