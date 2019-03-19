@@ -24,6 +24,7 @@ class ProfileTestCase(AuthTestCase):
         response = self.client.get(self.url, HTTP_AUTHORIZATION=http_authorization)
         self.assertEqual(response.status_code, 200)
         data = response.json()
+        # For last log in
         self.user.refresh_from_db()
         self.assertEqual(
             json.dumps(self.user.last_login, cls=DjangoJSONEncoder).strip('"'),
@@ -31,6 +32,12 @@ class ProfileTestCase(AuthTestCase):
         )
         self.assertEqual(self.user.provider, data["user"]["provider"])
         self.assertTrue(data["user"]["has_accepted_cgu"])
+        self.assertNotIn("carriers", data["user"])
+
+        url_extended = reverse("accounts_profile_extended")
+        response = self.client.get(url_extended, HTTP_AUTHORIZATION=http_authorization)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
         self.assertEqual(carrier.siret, data["user"]["carriers"][0]["siret"])
 
     def test_patch_profile(self):

@@ -71,7 +71,7 @@ def account_activate(request, user_id, token):
     return JsonResponse(json_data)
 
 
-def account_profile(request):
+def account_profile(request, extended=False):
     if request.user.is_anonymous or not request.user.is_active:
         return JsonResponse(
             {"message": "Impossible d'obtenir les informations de l'utilisateur."},
@@ -87,27 +87,28 @@ def account_profile(request):
 
         request.user = serializer.save()
 
-    carriers = (
-        carriers_models.Carrier.objects.filter(changes__created_by=request.user)
-        .select_related("editable")
-        .distinct()
-    )
-    carriers_json = carriers_views.get_carriers_as_json(carriers, ["enseigne"])
+    user = {
+        "first_name": request.user.first_name,
+        "last_name": request.user.last_name,
+        "email": request.user.email,
+        "last_login": request.user.last_login,
+        "date_joined": request.user.date_joined,
+        "provider": request.user.provider,
+        "provider_display": request.user.get_provider_display(),
+        "provider_data": request.user.provider_data,
+        "has_accepted_cgu": request.user.has_accepted_cgu,
+    }
+
+    if extended:
+        carriers = (
+            carriers_models.Carrier.objects.filter(changes__created_by=request.user)
+            .select_related("editable")
+            .distinct()
+        )
+        user["carriers"] = carriers_views.get_carriers_as_json(carriers, ["enseigne"])
 
     # Returns only informations not in JWT payload
-    return JsonResponse(
-        {
-            "user": {
-                "last_login": request.user.last_login,
-                "date_joined": request.user.date_joined,
-                "provider": request.user.provider,
-                "provider_display": request.user.get_provider_display(),
-                "provider_data": request.user.provider_data,
-                "has_accepted_cgu": request.user.has_accepted_cgu,
-                "carriers": carriers_json,
-            }
-        }
-    )
+    return JsonResponse({"user": user})
 
 
 def france_connect_authorize(request):
