@@ -95,7 +95,6 @@ def account_profile(request, extended=False):
         "date_joined": request.user.date_joined,
         "provider": request.user.provider,
         "provider_display": request.user.get_provider_display(),
-        "provider_data": request.user.provider_data,
         "has_accepted_cgu": request.user.has_accepted_cgu,
     }
 
