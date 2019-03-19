@@ -226,7 +226,6 @@ def france_connect_callback(request):
         {
             "token_type": token_data.get("token_type", ""),
             "token": jwt_auth_views.jwt_encode_token(user),
-            # FIXME To check
             "expires_in": settings.JWT_EXPIRATION_DELTA.total_seconds(),
             "id_token": token_data.get("id_token", ""),
         }
