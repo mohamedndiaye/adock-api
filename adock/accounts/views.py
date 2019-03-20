@@ -132,7 +132,7 @@ def france_connect_authorize(request):
         "nonce": request.GET["nonce"],
         "redirect_uri": settings.FRANCE_CONNECT_URL_CALLBACK,
         "response_type": "code",
-        "scope": "openid identite_pivot email address phone",
+        "scope": "openid gender given_name family_name email address phone",
         "state": csrf_signed,
     }
     return HttpResponseRedirect(
