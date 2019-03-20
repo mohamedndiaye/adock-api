@@ -113,10 +113,14 @@ def account_profile(request, extended=False):
 def france_connect_authorize(request):
     # Possible to set acr_values=eidas1 (eidas2 or eidas3) to filter on provider
     # of identities on a security level.
+    if not request.GET.get("nonce"):
+        return JsonResponse(
+            {"message": "The 'nonce' parameter is not provided."}, status=400
+        )
+
     data = {
         "client_id": settings.FRANCE_CONNECT_CLIENT_ID,
-        # FIXME nonce should be tied to the user request (CSRF?) and checked in provided id token (cf #2)
-        "nonce": "test",
+        "nonce": request.GET["nonce"],
         "redirect_uri": settings.FRANCE_CONNECT_URL_CALLBACK,
         "response_type": "code",
         "scope": "openid identite_pivot email address phone",
@@ -185,7 +189,6 @@ def france_connect_callback(request):
         return JsonResponse({"message": message}, status=response.status_code)
 
     # Contains access_token, token_type, expires_in, id_token
-    # id_token contains a field 'nonce' to check (#2)
     token_data = response.json()
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.

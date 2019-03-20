@@ -74,7 +74,9 @@ class FranceConnectLoginTestCase(TestCase):
         self.url = reverse("france_connect_callback")
 
     def test_authorize(self):
-        response = self.client.get(reverse("france_connect_authorize"))
+        response = self.client.get(
+            reverse("france_connect_authorize"), {"nonce": "fakednonce"}
+        )
         self.assertEqual(response.status_code, 302)
         self.assertTrue(
             response.url.startswith(settings.FRANCE_CONNECT_URLS["authorize"])
