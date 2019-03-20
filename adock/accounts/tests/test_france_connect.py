@@ -226,7 +226,7 @@ class FranceConnectLogoutTestCase(TestCase):
         id_token = "54321"
         with requests_mock.mock() as m:
             m.get(
-                settings.FRANCE_CONNECT_URLS["logout"] + "?" + id_token, status_code=302
+                settings.FRANCE_CONNECT_URLS["logout"] + "?" + id_token, status_code=200
             )
             response = self.client.get(
                 self.url,
