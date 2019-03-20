@@ -110,3 +110,12 @@ class User(AbstractBaseUser):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+
+class FranceConnectState(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    # Length used in call to get_random_string()
+    csrf_string = models.CharField(max_length=12, blank=False, null=False)
+
+    class Meta:
+        db_table = "france_connect_state"

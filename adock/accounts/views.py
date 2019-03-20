@@ -1,13 +1,17 @@
+import datetime
 import json
 import logging
 import requests
+from urllib.parse import unquote
 
 from django.conf import settings
+from django.core import signing
 from django.db import IntegrityError
+from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
+from django.utils import crypto, timezone
 from django.views.decorators.http import require_POST
 
-# from django.utils.crypto import get_random_string
 from django.utils.http import urlencode
 import sentry_sdk
 from jwt_auth import views as jwt_auth_views
@@ -118,14 +122,18 @@ def france_connect_authorize(request):
             {"message": "The 'nonce' parameter is not provided."}, status=400
         )
 
+    signer = signing.Signer()
+    csrf_string = crypto.get_random_string(length=12)
+    csrf_signed = signer.sign(csrf_string)
+    accounts_models.FranceConnectState.objects.create(csrf_string=csrf_string)
+
     data = {
         "client_id": settings.FRANCE_CONNECT_CLIENT_ID,
         "nonce": request.GET["nonce"],
         "redirect_uri": settings.FRANCE_CONNECT_URL_CALLBACK,
         "response_type": "code",
         "scope": "openid identite_pivot email address phone",
-        # FIXME state should be random or CSRF? and checked (cf #1)
-        "state": "test",
+        "state": csrf_signed,
     }
     return HttpResponseRedirect(
         settings.FRANCE_CONNECT_URLS["authorize"] + "?" + urlencode(data)
@@ -165,12 +173,44 @@ def create_or_update_user(user_infos):
     return user, created
 
 
+def state_is_valid(state):
+    if not state:
+        return False
+
+    signer = signing.Signer()
+    try:
+        csrf_string = signer.unsign(unquote(state))
+    except signing.BadSignature:
+        return False
+
+    try:
+        accounts_models.FranceConnectState.objects.get(csrf_string=csrf_string)
+    except accounts_models.FranceConnectState.DoesNotExist as e:
+        sentry_sdk.capture_exception(e)
+        return False
+    except accounts_models.FranceConnectState.MultipleObjectsReturned:
+        sentry_sdk.capture_exception(e)
+        return False
+
+    accounts_models.FranceConnectState.objects.filter(
+        Q(created_at__lte=timezone.now() - datetime.timedelta(hours=1))
+        | Q(csrf_string=csrf_string)
+    ).delete()
+    return True
+
+
 def france_connect_callback(request):
     # state is also available and should be checked (#1)
     code = request.GET.get("code")
     if code is None:
         return JsonResponse(
             {"message": "La requête ne contient pas le paramètre « code »."}, status=400
+        )
+
+    state = request.GET.get("state")
+    if not state_is_valid(state):
+        return JsonResponse(
+            {"message": "Le paramètre « state » n'est pas valide."}, status=400
         )
 
     data = {
