@@ -1,7 +1,6 @@
 import datetime
 import json
 import logging
-import requests
 from urllib.parse import unquote
 
 from django.conf import settings
@@ -11,8 +10,8 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.utils import crypto, timezone
 from django.views.decorators.http import require_POST
-
 from django.utils.http import urlencode
+import requests
 import sentry_sdk
 from jwt_auth import views as jwt_auth_views
 
@@ -47,6 +46,7 @@ def account_create(request):
     )
     token = accounts_tokens.account_activation_token.make_token(user)
     accounts_mails.mail_user_to_activate(user, token)
+    accounts_mails.mail_managers_new_account(user)
     return JsonResponse(
         {"message": "Un email vous a été envoyé à « %s »." % user.email}
     )
@@ -259,7 +259,7 @@ def france_connect_callback(request):
 
     user, created = create_or_update_user(user_infos)
     if created:
-        logger.info("Nouvel utilisateur créé « %s ».", user.email)
+        accounts_mails.mail_managers_new_account(user)
 
     # Return JWT with id_token to allow logout from FC
     if user is None:

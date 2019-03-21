@@ -1,7 +1,8 @@
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
-
+from .. import models as accounts_models
 from .. import factories as accounts_factories
 from .. import jwt as accounts_jwt
 from .. import tokens as accounts_tokens
@@ -26,6 +27,7 @@ class CreateUserTestCase(TestCase):
         self.url = reverse("accounts_create")
 
     def test_create(self):
+        self.assertFalse(accounts_models.User.objects.exists())
         EMAIL = "foo@example.com"
         response = self.client.post(
             self.url,
@@ -40,6 +42,12 @@ class CreateUserTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json()["message"], "Un email vous a été envoyé à « %s »." % EMAIL
+        )
+        user = accounts_models.User.objects.get()
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(
+            mail.outbox[1].subject,
+            "[A Dock] Nouveau compte utilisateur %s" % user.email,
         )
 
     def test_failure(self):

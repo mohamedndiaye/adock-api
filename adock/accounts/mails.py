@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.mail import mail_managers
 
 
 def mail_user_to_activate(user, token):
@@ -23,3 +24,22 @@ L'équipe A Dock
         from_email=settings.SERVER_EMAIL,
         fail_silently=settings.DEBUG,
     )
+
+
+def mail_managers_new_account(user):
+    subject = "Nouveau compte utilisateur %s" % user.email
+    message = """
+Le nouveau compte utilisateur est :
+- {username}
+- {email}
+- {first_name} {last_name}
+
+Créé via {provider_display}
+""".format(
+        username=user.username,
+        email=user.email,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        provider_display=user.get_provider_display(),
+    )
+    mail_managers(subject, message, fail_silently=True)

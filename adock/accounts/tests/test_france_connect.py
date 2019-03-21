@@ -1,5 +1,6 @@
 import requests_mock
 
+from django.core import mail
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
@@ -148,6 +149,7 @@ class FranceConnectLoginTestCase(TestCase):
         )
 
     def test_create_user(self):
+        self.assertFalse(accounts_models.User.objects.exists())
         # Create a state in DB and return it
         response = self.client.get(self.authorize_url, {"nonce": "fake"})
         state = self.get_state_from_response(response)
@@ -181,6 +183,13 @@ class FranceConnectLoginTestCase(TestCase):
         self.assertIn("token", payload)
         self.assertIn("expires_in", payload)
         self.assertIn("id_token", payload)
+
+        user = accounts_models.User.objects.get()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            "[A Dock] Nouveau compte utilisateur %s" % user.email,
+        )
 
 
 class FranceConnectLogoutTestCase(TestCase):
