@@ -265,6 +265,32 @@ def get_carrier_changes(carrier, cleaned_payload):
 RE_MANY_COMMAS = re.compile(r",+")
 
 
+def check_user_is_allowed(user):
+    if user.is_anonymous:
+        return (
+            False,
+            JsonResponse(
+                {
+                    "message": "Vous devez être connecté pour modifier une fiche transporteur."
+                },
+                status=401,
+            ),
+        )
+
+    if not user.has_accepted_cgu:
+        return (
+            False,
+            JsonResponse(
+                {
+                    "message": "Vous devez accepter les Conditions Générales d'Utilisation."
+                },
+                status=401,
+            ),
+        )
+
+    return True, None
+
+
 def carrier_detail(request, carrier_siret):
     data_json = {}
     # Access to deleted carriers is allowed.
@@ -273,13 +299,9 @@ def carrier_detail(request, carrier_siret):
         models.Carrier.objects.select_related("editable"), siret=carrier_siret
     )
     if request.method == "POST":
-        if request.user.is_anonymous:
-            return JsonResponse(
-                {
-                    "message": "Vous devez être connecté pour modifier une fiche transporteur."
-                },
-                status=401,
-            )
+        allowed, response = check_user_is_allowed(request.user)
+        if not allowed:
+            return response
 
         notification_email_to_send = False
         new_serializer, response = core_views.request_validate(
@@ -352,12 +374,6 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
 
 
 def _certificate_sign(request, carrier):
-    if request.user.is_anonymous:
-        return JsonResponse(
-            {"message": "Vous devez être connecté pour signer une attestation."},
-            status=401,
-        )
-
     serializer, response = core_views.request_validate(
         request, carriers_serializers.CertificateSerializer
     )
@@ -416,6 +432,10 @@ def certificate_detail(request, carrier_siret, as_pdf=True):
     carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
 
     if request.method == "POST":
+        allowed, response = check_user_is_allowed(request.user)
+        if not allowed:
+            return response
+
         return _certificate_sign(request, carrier)
 
     return _certificate_get(request, carrier, as_pdf)

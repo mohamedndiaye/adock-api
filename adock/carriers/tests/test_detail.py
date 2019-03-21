@@ -397,3 +397,9 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
         self.assertListEqual(
             carrier_editable.working_area_departements, ["01", "05", "10", "2A", "976"]
         )
+
+    def test_post_cgu_not_accepted(self):
+        self.user.has_accepted_cgu = False
+        self.user.save()
+
+        self.post_carrier_logged({"telephone": PHONE, "email": EMAIL}, 401)
