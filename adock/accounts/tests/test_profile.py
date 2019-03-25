@@ -32,6 +32,7 @@ class ProfileTestCase(AuthTestCase):
         )
         self.assertEqual(self.user.provider, data["user"]["provider"])
         self.assertTrue(data["user"]["has_accepted_cgu"])
+        self.assertTrue(data["user"]["is_staff"])
         self.assertNotIn("carriers", data["user"])
 
         url_extended = reverse("accounts_profile_extended")
