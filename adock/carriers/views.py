@@ -416,6 +416,8 @@ def _certificate_get(request, carrier, as_pdf=True):
             "carrier": carrier,
             "certificate": certificate,
             "formated_date": date_format(certificate.created_at),
+            "HOSTNAME": settings.HOSTNAME,
+            "HTTP_CLIENT_URL": settings.HTTP_CLIENT_URL,
             "qr_code": qr_code,
         },
     )

@@ -2,21 +2,23 @@
 <head>
     <style>
     .wrapper {
+      padding: 1em 5em 2em;
       display: grid;
-      grid-gap: 3em;
-      grid-auto-rows: minmax(100px, auto);
+      grid-row-gap: 2em;
+      grid-auto-rows: minmax(80px, auto);
       grid-template-areas:
-        ". t t t ."
-        ". c c c ."
-        ". q s s ."
+        "t t t"
+        "c c c"
+        "q s s"
+        "m m m"
     }
 
     .title {
-      padding-top: 6em;
+      padding-top: 2em;
       grid-area: t;
       justify-self: center;
       align-self: center;
-      text-align: center
+      text-align: center;
     }
 
     .content {
@@ -24,62 +26,86 @@
     }
 
     .signature {
+      padding-bottom: 4em;
       grid-area: s;
+      text-align: center;
     }
 
     .qr-code {
       grid-area: q;
-      text-align: right;
+      text-align: center;
+    }
+
+    .mention {
+      grid-area: m;
+      font-size: 14px;
+    }
+
+    blockquote {
+      font-size: 14px;
     }
     </style>
 </head>
 <body>
   <div class="wrapper">
     <div class="title">
-      <h3>Attestation de non-emploi de travailleurs étrangers</h3>
-      <p>Au regard des articles D8254-2 et L5221-2 du Code du travail</p>
+      <h3>Attestation de non-emploi de travailleurs étrangers soumis à autorisation de travail</h3>
+      <p>Au regard des articles L5221-2 et D8254-2 du Code du travail</p>
     </div>
     <div class="content">
-      <p>Je, soussigné Mr / Mme {{ certificate.data.first_name }} {{ certificate.data.last_name}}, agissant en
-      qualité de {{ certificate.data.position }}, de la société {{ carrier.enseigne }}
-      immatriculée sous le {{ carrier.siret }}, dont le siège social est {{
+      <p>Je, soussigné <strong>{{ certificate.data.first_name }} {{ certificate.data.last_name}}</strong>, agissant en
+      qualité de {{ certificate.data.position }}, de la société <strong>{{ carrier.enseigne }}</strong>
+      immatriculée sous le <strong>SIRET {{ carrier.siret }}</strong>, dont le siège social est {{
       carrier.adresse }} {{ carrier.code_postal }} {{ carrier.ville }},</p>
 
-      <p>Atteste sur l’honneur que :</p>
+      <p><strong>Atteste sur l’honneur que :</strong></p>
 
-      <p>La société n’emploie pas de salariés étrangers entrant dans le cadre
-      des articles D8254-2 et L5221-2 du Code du travail.</p>
+      <ul>
+        <li><p>La société n’emploie pas de salariés étrangers entrant dans le cadre
+        des articles L5221-2 et D8254-2 du Code du travail.</p></li>
 
-      <p>Dans le cas où cette situation changerait, la société s’engage lors du
-      renouvellement des documents obligatoires imposé par l’article L. 8222-1
-      du Code du travail à déclarer ses salariés étrangers dans les conditions
-      établies par les articles D8254-2 et L5221-2 du Code du travail.</p>
+        <li><p>Qu'en cas de changement de situation, la société s'engage lors du
+        renouvellement des formalités imposées par l’article L8222-1 du Code du
+        travail, à déclarer ses salariés étrangers soumis à autorisation de
+        travail dans les conditions établies par les articles L5221-2 et D8254-2
+        du Code du travail.</p></li>
 
-      <p>Je déclare avoir pris connaissance de l’article 441-7 du Code Pénal
-      (ci-dessous).</p>
+        <li><p>Avoir pris connaissance de l’article 441-7 du Code Pénal, cité ci-dessous :</p>
 
-      <p>Article 441-7 Code Pénal :</p>
+          <blockquote>
+            <p>« Indépendamment des cas prévus au présent chapitre, est puni d’un an
+            d’emprisonnement et de 15 000 euros d’amende le fait :</p>
+            <ol>
+              <li>D’établir une attestation ou un certificat faisant état de faits matériellement inexacts ;</li>
+              <li>De falsifier une attestation ou un certificat originairement sincère ;</li>
+              <li>De faire usage d’une attestation ou d’un certificat inexact ou
+              falsifié.</li>
+            </ol>
 
-      <p>Indépendamment des cas prévus au présent chapitre, est puni d’un an
-      d’emprisonnement et de 15 000 euros d’amende le fait :
-      <ol>
-        <li>D’établir une attestation ou un certificat faisant état de faits matériellement inexacts ;</li>
-        <li>De falsifier une attestation ou un certificat originairement sincère ;</li>
-        <li>De faire usage d’une attestation ou d’un certificat inexact ou
-        falsifié.</li>
-      </ol>
-      </p>
+            <p>Les peines sont portées à trois ans d’emprisonnement et à 45 000 €
+            d’amende lorsque l’infraction est commise en vue de porter préjudice au
+            Trésor public ou au patrimoine d’autrui, soit en vue d'obtenir un titre de
+            séjour ou le bénéfice d'une protection contre l'éloignement.</p>
 
-      <p>Les peines sont portées à trois ans d’emprisonnement et à 45 000 € d’amende
-      lorsque l’infraction est commise en vue de porter préjudice au trésor public ou
-      au patrimoine d’autrui.</p>
+            <p>NOTA : conformément à l'article 71 de la loi n°2018-778 du 10 septembre
+            2018, les présentes dispositions s’appliquent aux infractions postérieures
+            à la date de publication de ladite loi.</p>
+          </blockquote>
+        </li>
+      </ul>
     </div>
     <div class="qr-code">
       {{ qr_code | safe }}
     </div>
     <div class="signature">
       <p>Fait à {{ certificate.data.location }}, le {{ formated_date }}</p>
-      <p>Signature du dirigeant + cachet de l’entreprise</p>
+      <p>Signature + cachet de l’entreprise</p>
+    </div>
+    <div class="mention">
+      <p>La présente attestation a été générée sur <a href="{{ HTTP_CLIENT_URL
+      }}">{{ HOSTNAME }}</a>, service numérique développé par la Direction
+      générale des infrastructures, des transports et de la mer – Ministère de
+      la Transition Ecologique et Solidaire.</p>
     </div>
   </div>
 </body>
