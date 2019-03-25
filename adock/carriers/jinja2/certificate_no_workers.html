@@ -10,7 +10,7 @@
         "t t t"
         "c c c"
         "q s s"
-        "m m m"
+        "m m m";
     }
 
     .title {
@@ -26,9 +26,9 @@
     }
 
     .signature {
-      padding-bottom: 4em;
       grid-area: s;
-      text-align: center;
+      padding-bottom: 4em;
+      text-align: right;
     }
 
     .qr-code {
@@ -98,7 +98,7 @@
       {{ qr_code | safe }}
     </div>
     <div class="signature">
-      <p>Fait à {{ certificate.data.location }}, le {{ formated_date }}</p>
+      Fait à {{ certificate.data.location }}, le {{ formated_date }}
       <p>Signature + cachet de l’entreprise</p>
     </div>
     <div class="mention">

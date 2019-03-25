@@ -2,17 +2,19 @@
 <head>
     <style>
     .wrapper {
+      padding: 1em 5em 2em;
       display: grid;
-      grid-gap: 3em;
-      grid-auto-rows: minmax(100px, auto);
+      grid-row-gap: 2em;
+      grid-auto-rows: minmax(80px, auto);
       grid-template-areas:
-        ". t t t ."
-        ". c c c ."
-        ". q s s .";
+        "t t t"
+        "c c c"
+        "q s s"
+        "m m m";
     }
 
     .title {
-      padding-top: 6em;
+      padding-top: 2em;
       grid-area: t;
       justify-self: center;
       align-self: center;
@@ -25,11 +27,22 @@
 
     .signature {
       grid-area: s;
+      padding-bottom: 4em;
+      text-align: right;
     }
 
     .qr-code {
       grid-area: q;
-      text-align: right;
+      text-align: center;
+    }
+
+    .mention {
+      grid-area: m;
+      font-size: 14px;
+    }
+
+    .adock-note {
+      font-size: 14px;
     }
 
     .table {
@@ -50,39 +63,29 @@
 <body>
   <div class="wrapper">
     <div class="title">
-      <h2>Liste nominative des salariés étrangers soumis à autorisation de travail</h2>
-      <p>Application de l’article D8254-2 du Code du travail</p>
+      <h2>Attestation d'emploi de travailleurs étrangers soumis à autorisation de travail</h2>
+      <p>Au regard des articles L5221-2 et D8254-2 du Code du travail</p>
     </div>
     <div class="content">
-       <p>Je, soussigné Mr / Mme {{ certificate.data.first_name }} {{ certificate.data.last_name}}, agissant en
-      qualité de {{ certificate.data.position }}, de la société {{ carrier.enseigne }}
-      immatriculée sous le {{ carrier.siret }}, dont le siège social est {{
-      carrier.adresse }} {{ carrier.code_postal }} {{ carrier.ville }},</p>
+       <p>Je, soussigné <strong>{{ certificate.data.first_name }} {{
+       certificate.data.last_name}}</strong>, agissant en qualité de {{
+       certificate.data.position }}, de la société <strong>{{ carrier.enseigne }}</strong>
+       immatriculée sous le <strong>SIRET {{ carrier.siret }}</strong>, dont le siège social est
+       {{carrier.adresse }} {{ carrier.code_postal }} {{ carrier.ville }},</p>
 
-      <strong>Déclare ci-dessous les salariés étrangers soumis à l'autorisation de
-      travail mentionnée à l'article L5221-2 du code du travail</strong>
+      <p><strong>Atteste que la société emploie des salariés étrangers soumis à
+      l'autorisation de travail mentionnée à l'article L5221-2 du Code du
+      travail et, de ce fait, en déclare la liste nominative exigée par
+      l'article D8254-2 du Code du travail.</strong></p>
 
-      <p>Ne sont pas soumis à autorisation de travail :</p>
-      <ul>
-        <li>Les ressortissants des états membres de l’Union Européenne :
-        Allemagne, Autriche, Belgique, Danemark, Espagne, Grèce, Finlande,
-        Irlande, Italie, Luxembourg, Pays Bas, Portugal, Royaume-Uni, Suède,
-        Chypre, Malte, République Tchèque, Estonie, Lettonie, Lituanie, Hongrie,
-        Pologne, Slovénie et Slovaquie ;
-        </li>
-        <li>
-        Les ressortissants des autres états parties à l’accord sur l’Espace
-        économique européen : Islande, Liechtenstein et Norvège ;</li>
-        <li>Les ressortissants de la Confédération Helvétique.</li>
-      </ul>
-
+      <p>Liste nominative des salariés étrangers soumis à autorisation de travail</p>
       <table class="table">
         <thead>
           <tr>
-            <th>Nom salarié</th>
-            <th>Date embauche</th>
+            <th>Nom et prénom</th>
+            <th>Date d'embauche</th>
             <th>Nationalité</th>
-            <th>Type / N°ordre titre valant autorisation de travail</th>
+            <th>Titre et n° d'ordre du titre valant autorisation de travail</th>
           </tr>
         </thead>
         <tbody>
@@ -96,13 +99,35 @@
           {% endfor %}
         </tbody>
       </table>
+
+      <div class="adock-note">
+        <p>Ne sont pas soumis à autorisation de travail :</p>
+        <ul>
+          <li>Les ressortissants des états membres de l’Union Européenne :
+          Allemagne, Autriche, Belgique, Danemark, Espagne, Grèce, Finlande,
+          Irlande, Italie, Luxembourg, Pays Bas, Portugal, Royaume-Uni, Suède,
+          Chypre, Malte, République Tchèque, Estonie, Lettonie, Lituanie, Hongrie,
+          Pologne, Slovénie et Slovaquie ;
+          </li>
+          <li>
+          Les ressortissants des autres états parties à l’accord sur l’Espace
+          économique européen : Islande, Liechtenstein et Norvège ;</li>
+          <li>Les ressortissants de la Confédération Helvétique.</li>
+        </ul>
+      </div>
     </div>
     <div class="qr-code">
       {{ qr_code | safe }}
     </div>
     <div class="signature">
-      <p>Fait à {{ certificate.data.location }}, le {{ formated_date }}</p>
+      Fait à {{ certificate.data.location }}, le {{ formated_date }}
       <p>Signature du dirigeant + cachet de l’entreprise</p>
+    </div>
+    <div class="mention">
+      <p>La présente attestation a été générée sur <a href="{{ HTTP_CLIENT_URL
+      }}">{{ HOSTNAME }}</a>, service numérique développé par la Direction
+      générale des infrastructures, des transports et de la mer – Ministère de
+      la Transition Ecologique et Solidaire.</p>
     </div>
   </div>
 </body>
