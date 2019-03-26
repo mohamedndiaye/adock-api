@@ -24,8 +24,6 @@ from . import models as accounts_models
 from . import serializers as accounts_serializers
 from . import tokens as accounts_tokens
 
-logger = logging.getLogger(__name__)
-
 
 @require_POST
 def account_create(request):
@@ -178,7 +176,6 @@ def create_or_update_user(user_infos):
             user.save()
         except IntegrityError as e:
             # Don't update the fields
-            logger.error("Unable to update the user: %s", e.__cause__)
             sentry_sdk.capture_exception(e)
             # Take care to refresh the user...
 
@@ -238,7 +235,6 @@ def france_connect_callback(request):
     response = requests.post(settings.FRANCE_CONNECT_URLS["token"], data=data)
     if response.status_code != 200:
         message = "Impossible d'obtenir le jeton de FranceConnect."
-        logger.error(message, response.content)
         sentry_sdk.capture_message("%s\n%s" % (message, response.content))
         # The response is certainly ignored by FC but it's convenient for our tests
         return JsonResponse({"message": message}, status=response.status_code)
@@ -254,7 +250,6 @@ def france_connect_callback(request):
     )
     if response.status_code != 200:
         message = "Impossible d'obtenir les informations utilisateur de FranceConnect."
-        logger.error(message)
         sentry_sdk.capture_message(message)
         return JsonResponse({"message": message}, status=response.status_code)
 
@@ -304,7 +299,6 @@ def france_connect_logout(request):
         response = requests.get(settings.FRANCE_CONNECT_URLS["logout"], params=data)
         if response.status_code != 200:
             message = "Impossible de déconnecter l'utilisateur de FranceConnect."
-            logger.error(message)
             sentry_sdk.capture_message(message)
             return JsonResponse({"message": message}, status=400)
 
