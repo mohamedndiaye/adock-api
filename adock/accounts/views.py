@@ -115,6 +115,15 @@ def account_profile(request, extended=False):
     return JsonResponse({"user": user})
 
 
+def get_callback_redirect_uri(request):
+    redirect_uri = settings.FRANCE_CONNECT_URL_CALLBACK
+    next_url = request.GET.get("next")
+    if next_url:
+        redirect_uri += "?next=%s" % next_url
+
+    return redirect_uri
+
+
 def france_connect_authorize(request):
     # Possible to set acr_values=eidas1 (eidas2 or eidas3) to filter on provider
     # of identities on a security level.
@@ -122,6 +131,8 @@ def france_connect_authorize(request):
         return JsonResponse(
             {"message": "The 'nonce' parameter is not provided."}, status=400
         )
+
+    redirect_uri = get_callback_redirect_uri(request)
 
     signer = signing.Signer()
     csrf_string = crypto.get_random_string(length=12)
@@ -131,7 +142,7 @@ def france_connect_authorize(request):
     data = {
         "client_id": settings.FRANCE_CONNECT_CLIENT_ID,
         "nonce": request.GET["nonce"],
-        "redirect_uri": settings.FRANCE_CONNECT_URL_CALLBACK,
+        "redirect_uri": redirect_uri,
         "response_type": "code",
         "scope": "openid gender given_name family_name email address phone",
         "state": csrf_signed,
@@ -214,17 +225,20 @@ def france_connect_callback(request):
             {"message": "Le paramètre « state » n'est pas valide."}, status=400
         )
 
+    redirect_uri = get_callback_redirect_uri(request)
+
     data = {
         "client_id": settings.FRANCE_CONNECT_CLIENT_ID,
         "client_secret": settings.FRANCE_CONNECT_CLIENT_SECRET,
         "code": code,
         "grant_type": "authorization_code",
-        "redirect_uri": settings.FRANCE_CONNECT_URL_CALLBACK,
+        # FIXME To remove?
+        "redirect_uri": redirect_uri,
     }
     response = requests.post(settings.FRANCE_CONNECT_URLS["token"], data=data)
     if response.status_code != 200:
         message = "Impossible d'obtenir le jeton de FranceConnect."
-        logger.error(message)
+        logger.error(message, response.content)
         sentry_sdk.capture_message("%s\n%s" % (message, response.content))
         # The response is certainly ignored by FC but it's convenient for our tests
         return JsonResponse({"message": message}, status=response.status_code)
