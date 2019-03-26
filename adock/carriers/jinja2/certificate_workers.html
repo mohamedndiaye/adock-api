@@ -14,7 +14,7 @@
     }
 
     .title {
-      padding-top: 2em;
+      padding: 2em 2em 0 2em;
       grid-area: t;
       justify-self: center;
       align-self: center;
@@ -23,12 +23,15 @@
 
     .content {
       grid-area: c;
+      font-size: 14px;
+      text-align: justify;
     }
 
     .signature {
       grid-area: s;
       padding-bottom: 4em;
       text-align: right;
+      font-size: 14px;
     }
 
     .qr-code {
@@ -38,16 +41,18 @@
 
     .mention {
       grid-area: m;
-      font-size: 14px;
+      font-size: 13px;
+      text-align: center;
     }
 
     .adock-note {
-      font-size: 14px;
+      font-size: 12px;
     }
 
     .table {
       width: 100%;
       border-collapse: collapse;
+      font-size: 13px;
     }
 
     .table, .table th, .table td {
@@ -63,7 +68,7 @@
 <body>
   <div class="wrapper">
     <div class="title">
-      <h2>Attestation d'emploi de travailleurs étrangers soumis à autorisation de travail</h2>
+      <h3>Attestation d'emploi de travailleurs étrangers soumis à autorisation de travail</h3>
       <p>Au regard des articles L5221-2 et D8254-2 du Code du travail</p>
     </div>
     <div class="content">
@@ -120,7 +125,7 @@
       {{ qr_code | safe }}
     </div>
     <div class="signature">
-      Fait à {{ certificate.data.location }}, le {{ formated_date }}
+      <strong>Fait à {{ certificate.data.location }}, le {{ formated_date }}</strong>
       <p>Signature du dirigeant + cachet de l’entreprise</p>
     </div>
     <div class="mention">

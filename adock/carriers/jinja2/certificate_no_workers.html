@@ -14,7 +14,7 @@
     }
 
     .title {
-      padding-top: 2em;
+      padding: 4em 2em 0 2em;
       grid-area: t;
       justify-self: center;
       align-self: center;
@@ -23,12 +23,15 @@
 
     .content {
       grid-area: c;
+      font-size: 14px;
+      text-align: justify;
     }
 
     .signature {
       grid-area: s;
       padding-bottom: 4em;
       text-align: right;
+      font-size: 14px;
     }
 
     .qr-code {
@@ -37,12 +40,14 @@
     }
 
     .mention {
+      margin-top: 7em;
       grid-area: m;
-      font-size: 14px;
+      font-size: 13px;
+      text-align: center;
     }
 
     blockquote {
-      font-size: 14px;
+      font-size: 13px;
     }
     </style>
 </head>
@@ -98,7 +103,7 @@
       {{ qr_code | safe }}
     </div>
     <div class="signature">
-      Fait à {{ certificate.data.location }}, le {{ formated_date }}
+      <strong>Fait à {{ certificate.data.location }}, le {{ formated_date }}</strong>
       <p>Signature + cachet de l’entreprise</p>
     </div>
     <div class="mention">
