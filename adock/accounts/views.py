@@ -1,7 +1,6 @@
 import datetime
 import json
-import logging
-from urllib.parse import unquote
+from urllib.parse import unquote, urlencode
 
 from django.conf import settings
 from django.core import signing
@@ -97,6 +96,7 @@ def account_profile(request, extended=False):
         "date_joined": request.user.date_joined,
         "provider": request.user.provider,
         "provider_display": request.user.get_provider_display(),
+        "provider_data": request.user.provider_data,
         "is_staff": request.user.is_staff,
         "has_accepted_cgu": request.user.has_accepted_cgu,
     }
@@ -290,16 +290,13 @@ def france_connect_logout(request):
         return JsonResponse({"message": "L'utilisateur n'est pas authentifié."})
 
     id_token = request.GET.get("id_token")
-    if id_token:
-        data = {
-            "id_token_hint": id_token,
-            "state": "test",
-            "post_logout_redirect_uri": settings.HTTP_CLIENT_URL,
-        }
-        response = requests.get(settings.FRANCE_CONNECT_URLS["logout"], params=data)
-        if response.status_code != 200:
-            message = "Impossible de déconnecter l'utilisateur de FranceConnect."
-            sentry_sdk.capture_message(message)
-            return JsonResponse({"message": message}, status=400)
+    if not id_token:
+        return JsonResponse({"message": "Le paramètre « id_token » est manquant."}, status=400)
 
-    return JsonResponse({"message": "L'utilisateur est déconnecté."})
+    params = {
+        "id_token_hint": id_token,
+        "state": "adock",
+        "post_logout_redirect_uri": settings.HTTP_CLIENT_URL + "fc/postlogout/",
+    }
+    redirect_url = settings.FRANCE_CONNECT_URLS["logout"] + "/?" + urlencode(params)
+    return JsonResponse({"url": redirect_url}, status=302)

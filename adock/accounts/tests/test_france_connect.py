@@ -209,38 +209,18 @@ class FranceConnectLogoutTestCase(TestCase):
         response = self.client.get(
             self.url, **{"HTTP_AUTHORIZATION": "Bearer %s" % token}
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["message"], "L'utilisateur est déconnecté.")
-
-    def test_logout_error(self):
-        token = jwt_auth_views.jwt_encode_token(self.user)
-        id_token = "54321"
-        with requests_mock.mock() as m:
-            m.get(
-                settings.FRANCE_CONNECT_URLS["logout"] + "?" + id_token, status_code=400
-            )
-            response = self.client.get(
-                self.url,
-                {"id_token": id_token},
-                **{"HTTP_AUTHORIZATION": "Bearer %s" % token}
-            )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            response.json()["message"],
-            "Impossible de déconnecter l'utilisateur de FranceConnect.",
+            response.json()["message"], "Le paramètre « id_token » est manquant."
         )
 
-    def test_logout_success(self):
+    def test_logout_url(self):
         token = jwt_auth_views.jwt_encode_token(self.user)
         id_token = "54321"
-        with requests_mock.mock() as m:
-            m.get(
-                settings.FRANCE_CONNECT_URLS["logout"] + "?" + id_token, status_code=200
-            )
-            response = self.client.get(
-                self.url,
-                {"id_token": id_token},
-                **{"HTTP_AUTHORIZATION": "Bearer %s" % token}
-            )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["message"], "L'utilisateur est déconnecté.")
+        response = self.client.get(
+            self.url,
+            {"id_token": id_token},
+            **{"HTTP_AUTHORIZATION": "Bearer %s" % token}
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("url", response.json())
