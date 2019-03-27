@@ -187,7 +187,7 @@ if not CORS_ORIGIN_WHITELIST:
 if not ALLOWED_HOSTS:
     ALLOWED_HOSTS = [HOSTNAME]
 
-SERVER_EMAIL = "no-reply@" + HOSTNAME
+SERVER_EMAIL = "contact@" + HOSTNAME
 
 LOGGING = {
     "version": 1,

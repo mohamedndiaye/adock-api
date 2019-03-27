@@ -20,6 +20,7 @@ HTTP_CLIENT_URL = "https://" + HOSTNAME + "/"
 HTTP_SERVER_URL = "https://" + HOSTNAME + "/api/"
 
 EMAIL_SUBJECT_PREFIX = "[A Dock preprod] "
+SERVER_EMAIL = "no-reply@" + HOSTNAME
 
 # Web tool or ./manage.py generate_secret_key with Django extensions
 SECRET_KEY = ""
