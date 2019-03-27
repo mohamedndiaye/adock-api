@@ -264,6 +264,11 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
         self.assertEqual(carrier_editable.specialities, ["LOT"])
 
     def test_post_no_changes(self):
+        # https://github.com/joke2k/faker/pull/933
+        # will be in faker v1.0.5
+        self.carrier.editable.telephone = "+33601020304"
+        self.carrier.editable.save()
+
         data = self.post_carrier_logged(
             {
                 "email": self.carrier.editable.email,
