@@ -145,12 +145,12 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
         data = self.post_carrier_logged({"telephone": PHONE, "email": EMAIL}, 200)
         self.assertEqual(models.CarrierEditable.objects.count(), 2)
 
-        # Not validated yet
+        # Not confirmed yet
         carrier = data["carrier"]
         self.assertEqual(carrier["telephone"], self.carrier.editable.telephone)
         self.assertEqual(carrier["email"], self.carrier.editable.email)
 
-        # Check CarrierEditable to validate
+        # Check CarrierEditable to confirm
         latest_editable = models.CarrierEditable.objects.latest()
         self.assertIsNone(latest_editable.confirmed_at)
         self.assertEqual(str(latest_editable.telephone), PHONE)

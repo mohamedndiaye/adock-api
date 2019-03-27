@@ -50,18 +50,23 @@ def account_create(request):
 
 
 def account_activate(request, user_id, token):
-    try:
-        user = accounts_models.User.objects.get(pk=user_id)
-    except accounts_models.User.DoesNotExist:
-        return JsonResponse({"message": "L'utilisateur n'existe pas."}, status=400)
+    if settings.ENVIRONMENT == "E2E":
+        # Used only by E2E tests to confirm account
+        user = accounts_models.User.objects.get(email="joemartin@example.com")
+        user.has_accepted_cgu = False
+    else:
+        try:
+            user = accounts_models.User.objects.get(pk=user_id)
+        except accounts_models.User.DoesNotExist:
+            return JsonResponse({"message": "L'utilisateur n'existe pas."}, status=400)
 
-    if user.is_active:
-        return JsonResponse({"message": "Le compte utilisateur est déjà actif."})
+        if user.is_active:
+            return JsonResponse({"message": "Le compte utilisateur est déjà actif."})
 
-    if not accounts_tokens.account_activation_token.check_token(user, token):
-        return JsonResponse(
-            {"message": "Le jeton d'activation n'est pas valide."}, status=400
-        )
+        if not accounts_tokens.account_activation_token.check_token(user, token):
+            return JsonResponse(
+                {"message": "Le jeton d'activation n'est pas valide."}, status=400
+            )
 
     user.is_active = True
     user.save()

@@ -352,25 +352,34 @@ def carrier_detail(request, carrier_siret):
 
 
 def carrier_editable_confirm(request, carrier_editable_id, token):
-    carrier_editable = get_object_or_404(
-        models.CarrierEditable.objects.select_related("carrier"), pk=carrier_editable_id
-    )
-    data = {"siret": carrier_editable.carrier_id}
-    if tokens.carrier_editable_token.check_token(carrier_editable, token):
-        with transaction.atomic(savepoint=False):
-            carrier_editable.confirmed_at = timezone.now()
-            carrier_editable.save()
-            carrier_editable.carrier.editable = carrier_editable
-            carrier_editable.carrier.save()
+    if settings.ENVIRONMENT == "E2E":
+        carrier_editable = (
+            models.CarrierEditable.objects.select_related("carrier")
+            .filter(carrier__pk="80005226884728")
+            .latest()
+        )
+        data = {"siret": carrier_editable.carrier_id}
+    else:
+        carrier_editable = get_object_or_404(
+            models.CarrierEditable.objects.select_related("carrier"),
+            pk=carrier_editable_id,
+        )
+        data = {"siret": carrier_editable.carrier_id}
+        if not tokens.carrier_editable_token.check_token(carrier_editable, token):
+            data[
+                "message"
+            ] = "Impossible de confirmer les modifications de la fiche transporteur."
+            return JsonResponse(data, status=400)
 
-        mails.mail_managers_carrier_confirmed(carrier_editable)
-        data["message"] = "Les modifications de la fiche sont confirmées."
-        return JsonResponse(data)
+    with transaction.atomic(savepoint=False):
+        carrier_editable.confirmed_at = timezone.now()
+        carrier_editable.save()
+        carrier_editable.carrier.editable = carrier_editable
+        carrier_editable.carrier.save()
 
-    data[
-        "message"
-    ] = "Impossible de confirmer les modifications de la fiche transporteur."
-    return JsonResponse(data, status=400)
+    mails.mail_managers_carrier_confirmed(carrier_editable)
+    data["message"] = "Les modifications de la fiche sont confirmées."
+    return JsonResponse(data)
 
 
 def _certificate_sign(request, carrier):
@@ -444,22 +453,29 @@ def certificate_detail(request, carrier_siret, as_pdf=True):
 
 
 def certificate_confirm(request, certificate_id, token):
-    certificate = get_object_or_404(
-        models.CarrierCertificate.objects.select_related("carrier"), pk=certificate_id
-    )
-
-    if tokens.certificate_token.check_token(certificate, token):
-        certificate.confirmed_at = timezone.now()
-        certificate.save()
-        mails.mail_managers_certificate_confirmed(certificate)
-        return JsonResponse(
-            {"siret": certificate.carrier_id, "message": "L'attestation est confirmée"}
+    if settings.ENVIRONMENT == "E2E":
+        certificate = (
+            models.CarrierCertificate.objects.select_related("carrier")
+            .filter(carrier__siret="80005226884728")
+            .latest("pk")
         )
     else:
-        return JsonResponse(
-            {
-                "siret": certificate.carrier_id,
-                "message": "Impossible de confirmer l'attestation.",
-            },
-            status=400,
+        certificate = get_object_or_404(
+            models.CarrierCertificate.objects.select_related("carrier"),
+            pk=certificate_id,
         )
+        if not tokens.certificate_token.check_token(certificate, token):
+            return JsonResponse(
+                {
+                    "siret": certificate.carrier_id,
+                    "message": "Impossible de confirmer l'attestation.",
+                },
+                status=400,
+            )
+
+    certificate.confirmed_at = timezone.now()
+    certificate.save()
+    mails.mail_managers_certificate_confirmed(certificate)
+    return JsonResponse(
+        {"siret": certificate.carrier_id, "message": "L'attestation est confirmée"}
+    )
