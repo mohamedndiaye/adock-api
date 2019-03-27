@@ -19,12 +19,10 @@ class CarrierEditableSerializer(serializers.ModelSerializer):
         )
 
     def validate_telephone(self, value):
-        phone_number = phonenumber.to_python(value)
-        if phone_number and not phone_number.is_valid():
-            raise serializers.ValidationError(
-                "Le numéro de téléphone saisi n'est pas valide."
-            )
-        return phone_number
+        # Validated by phonenumber before
+        if not value:
+            raise serializers.ValidationError("Ce champ ne peut être vide.")
+        return value
 
     def validate_working_area_departements(self, value):
         """Pads departement numbers lesser than 10 with a zero"""

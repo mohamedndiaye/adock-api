@@ -325,6 +325,18 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
         data = self.post_carrier_logged({"email": self.carrier.email}, 400)
         self.assertEqual(data["errors"]["telephone"][0], "Ce champ est obligatoire.")
 
+    def test_post_phone_empty(self):
+        data = self.post_carrier_logged(
+            {"telephone": "", "email": self.carrier.email}, 400
+        )
+        self.assertEqual(data["errors"]["telephone"][0], "Ce champ ne peut être vide.")
+
+    def test_post_email_empty(self):
+        data = self.post_carrier_logged(
+            {"telephone": str(self.carrier.telephone), "email": ""}, 400
+        )
+        self.assertEqual(data["errors"]["email"][0], "Ce champ ne peut être vide.")
+
     def test_post_invalid_phone(self):
         data = self.post_carrier_logged(
             {"telephone": "11223344556", "email": self.carrier.email}, 400
