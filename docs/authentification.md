@@ -41,27 +41,6 @@ sequenceDiagram
 Les paramètres de développement de `adock-api` utilisent les URL France
 Connect de la plateforme d'intégration.
 
-La plateforme d'intégration doit être en mesure d'accéder à l'application UI de
-développement locale pour appeller le callback en HTTPS. Le port de l'UI doit
-être exporté via ngrok ou serveo, etc (par ex. `ssh -R 80:localhost:8080 serveo.net`).
-Le nom de domaine fournit devra ensuite être utilisé dans le settings :
-
-```
-yarn serve --public https://illis.serveo.net
-```
-
-il faut aussi définir le domaine autorisé dans le fichier
-`vue.config.js` :
-
-```javascript
-module.exports = {
-  productionSourceMap: true,
-  devServer: {
-    allowedHosts: [".serveo.net"]
-  }
-};
-```
-
 L'utilisateur `123-4567` avec le mot de passe `dupont` peut être utilisé sinon
 La plateforme d'intégration de FranceConnect permet de créer des jeu de données
 utilisateur via le formulaire
@@ -75,8 +54,8 @@ l'application serveur dans le fichier `settings_local.py` (ainsi que
 puisse accéder _localement_ au serveur (il n'est pas nécessaire d'écouter les IP
 publiques).
 
-L'adresse de callback `https://illi.serveo.net/fc/callback/` doit être connue de
-FranceConnect et renseignée dans https://partenaires.franceconnect.gouv.fr/monprojet/decouverte
+Les URL de callback et de logout doivent être connues de FranceConnect et
+renseignées dans https://partenaires.franceconnect.gouv.fr/monprojet/decouverte
 
 ```mermaid
 sequenceDiagram
