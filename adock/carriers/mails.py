@@ -5,7 +5,7 @@ from . import tokens
 
 
 def get_recipient_list_from_env(email):
-    if settings.PREPRODUCTION:
+    if settings.ENVIRONMENT == "PREPRODUCTION":
         return (email for (name, email) in settings.MANAGERS)
 
     return (email,)

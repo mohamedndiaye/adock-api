@@ -16,13 +16,13 @@ class PreproductionTestCase(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         return mail.outbox[0]
 
-    @override_settings(PREPRODUCTION=False)
+    @override_settings(ENVIRONMENT="PRODUCTION")
     def test_mail_to_carrier(self):
         carrier = factories.CarrierFactory(with_editable=True)
         mail_sent = self.mail_carrier_editable_to_confirm(carrier.editable)
         self.assertEqual(mail_sent.recipients(), [carrier.editable.email])
 
-    @override_settings(PREPRODUCTION=True)
+    @override_settings(ENVIRONMENT="PREPRODUCTION")
     def test_mail_to_carrier_preproduction(self):
         carrier = factories.CarrierFactory(with_editable=True)
         mail_sent = self.mail_carrier_editable_to_confirm(carrier.editable)
