@@ -291,12 +291,14 @@ def france_connect_logout(request):
 
     id_token = request.GET.get("id_token")
     if not id_token:
-        return JsonResponse({"message": "Le paramètre « id_token » est manquant."}, status=400)
+        return JsonResponse(
+            {"message": "Le paramètre « id_token » est manquant."}, status=400
+        )
 
     params = {
         "id_token_hint": id_token,
         "state": "adock",
-        "post_logout_redirect_uri": settings.HTTP_CLIENT_URL + "fc/postlogout/",
+        "post_logout_redirect_uri": settings.FRANCE_CONNECT_URL_POST_LOGOUT,
     }
     redirect_url = settings.FRANCE_CONNECT_URLS["logout"] + "/?" + urlencode(params)
     return JsonResponse({"url": redirect_url}, status=302)

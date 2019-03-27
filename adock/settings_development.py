@@ -7,12 +7,10 @@ HOSTNAME = "localhost"
 HTTP_SERVER_URL = "http://" + HOSTNAME + ":8000/"
 HTTP_CLIENT_URL = "http://" + HOSTNAME + ":8080/"
 
-CORS_ORIGIN_WHITELIST = (HOSTNAME + ":8080/",)
-
 # According to your ngrok or serveo URL...
 # ssh -R 80:localhost:8000 serveo.net
 PUBLIC_HOSTNAME = "foo.serveo.net"
-CORS_ORIGIN_WHITELIST = (HOSTNAME, PUBLIC_HOSTNAME)
+CORS_ORIGIN_WHITELIST = (HOSTNAME + ":8080", PUBLIC_HOSTNAME)
 
 EMAIL_PORT = 1025
 
@@ -24,8 +22,7 @@ PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
 
 AUTHENTICATION_DISABLED = False
 
-# To copy/paste from integration
+# https://partenaires.franceconnect.gouv.fr/monprojet/
+FRANCE_CONNECT_URL_ROOT = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
 FRANCE_CONNECT_CLIENT_ID = ""
 FRANCE_CONNECT_CLIENT_SECRET = ""
-
-FRANCE_CONNECT_URL_CALLBACK = "https://" + PUBLIC_HOSTNAME + "/fc/callback/"

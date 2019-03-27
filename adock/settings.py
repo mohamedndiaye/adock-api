@@ -162,21 +162,24 @@ AUTHENTICATION_DISABLED = False
 JWT_EXPIRATION_DELTA = datetime.timedelta(seconds=3600)
 JWT_PAYLOAD_HANDLER = "adock.accounts.jwt.jwt_payload_handler"
 
-FRANCE_CONNECT_URL_ROOT = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
+# https://partenaires.franceconnect.gouv.fr/monprojet/
+FRANCE_CONNECT_URL_ROOT = "https://app.franceconnect.gouv.fr/api/v1/"
+FRANCE_CONNECT_CLIENT_ID = ""
+FRANCE_CONNECT_CLIENT_SECRET = ""
+
+try:
+    from .settings_local import *  # pylint: disable=W0401
+except ImportError:  # pragma: no cover
+    pass
+
 FRANCE_CONNECT_URLS = {
     "authorize": FRANCE_CONNECT_URL_ROOT + "authorize",
     "token": FRANCE_CONNECT_URL_ROOT + "token",
     "userinfo": FRANCE_CONNECT_URL_ROOT + "userinfo",
     "logout": FRANCE_CONNECT_URL_ROOT + "logout",
 }
-FRANCE_CONNECT_CLIENT_ID = ""
-FRANCE_CONNECT_CLIENT_SECRET = ""
-FRANCE_CONNECT_URL_CALLBACK = "https://adock.beta.gouv.fr/fc/callback/"
-
-try:
-    from .settings_local import *  # pylint: disable=W0401
-except ImportError:  # pragma: no cover
-    pass
+FRANCE_CONNECT_URL_CALLBACK = HTTP_CLIENT_URL + "fc/callback/"
+FRANCE_CONNECT_URL_POST_LOGOUT = HTTP_CLIENT_URL + "fc/postlogout/"
 
 if not CORS_ORIGIN_WHITELIST:
     CORS_ORIGIN_WHITELIST = (HOSTNAME,)

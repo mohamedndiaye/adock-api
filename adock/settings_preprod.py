@@ -26,6 +26,7 @@ SECRET_KEY = ""
 
 SENTRY_DSN = "https://URL-TO-PASTE-FROM-SENTRY-IO"
 
+# https://partenaires.franceconnect.gouv.fr/monprojet/
+FRANCE_CONNECT_URL_ROOT = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
 FRANCE_CONNECT_CLIENT_ID = ""
 FRANCE_CONNECT_CLIENT_SECRET = ""
-FRANCE_CONNECT_URL_CALLBACK = HTTP_CLIENT_URL + "fc/callback/"
