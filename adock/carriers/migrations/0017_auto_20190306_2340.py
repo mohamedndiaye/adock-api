@@ -5,16 +5,9 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('carriers', '0016_auto_20190306_2336'),
-    ]
+    dependencies = [("carriers", "0016_auto_20190306_2336")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='carrierlog',
-            name='carrier',
-        ),
-        migrations.DeleteModel(
-            name='CarrierLog',
-        ),
+        migrations.RemoveField(model_name="carrierlog", name="carrier"),
+        migrations.DeleteModel(name="CarrierLog"),
     ]

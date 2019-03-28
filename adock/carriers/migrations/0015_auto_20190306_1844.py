@@ -6,28 +6,25 @@ import phonenumber_field.modelfields
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('carriers', '0014_set_active_editable'),
-    ]
+    dependencies = [("carriers", "0014_set_active_editable")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='carriereditable',
-            options={'get_latest_by': 'pk'},
+            name="carriereditable", options={"get_latest_by": "pk"}
         ),
         migrations.RenameField(
-            model_name='carriereditable',
-            old_name='validated_at',
-            new_name='confirmed_at',
+            model_name="carriereditable",
+            old_name="validated_at",
+            new_name="confirmed_at",
         ),
         migrations.AlterField(
-            model_name='carriereditable',
-            name='email',
+            model_name="carriereditable",
+            name="email",
             field=models.EmailField(max_length=254),
         ),
         migrations.AlterField(
-            model_name='carriereditable',
-            name='telephone',
+            model_name="carriereditable",
+            name="telephone",
             field=phonenumber_field.modelfields.PhoneNumberField(max_length=128),
         ),
     ]

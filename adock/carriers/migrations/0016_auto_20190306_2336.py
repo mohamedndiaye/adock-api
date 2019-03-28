@@ -5,33 +5,13 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('carriers', '0015_auto_20190306_1844'),
-    ]
+    dependencies = [("carriers", "0015_auto_20190306_1844")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='carrier',
-            name='description',
-        ),
-        migrations.RemoveField(
-            model_name='carrier',
-            name='email_confirmed_at',
-        ),
-        migrations.RemoveField(
-            model_name='carrier',
-            name='specialities',
-        ),
-        migrations.RemoveField(
-            model_name='carrier',
-            name='website',
-        ),
-        migrations.RemoveField(
-            model_name='carrier',
-            name='working_area',
-        ),
-        migrations.RemoveField(
-            model_name='carrier',
-            name='working_area_departements',
-        ),
+        migrations.RemoveField(model_name="carrier", name="description"),
+        migrations.RemoveField(model_name="carrier", name="email_confirmed_at"),
+        migrations.RemoveField(model_name="carrier", name="specialities"),
+        migrations.RemoveField(model_name="carrier", name="website"),
+        migrations.RemoveField(model_name="carrier", name="working_area"),
+        migrations.RemoveField(model_name="carrier", name="working_area_departements"),
     ]

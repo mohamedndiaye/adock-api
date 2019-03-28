@@ -9,23 +9,39 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('carriers', '0019_default_carrier_editable'),
+        ("carriers", "0019_default_carrier_editable"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='carriercertificate',
-            name='confirmed_at',
+            model_name="carriercertificate",
+            name="confirmed_at",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='carriercertificate',
-            name='created_by',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='carrier_certificates', to=settings.AUTH_USER_MODEL),
+            model_name="carriercertificate",
+            name="created_by",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="carrier_certificates",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='carriereditable',
-            name='working_area',
-            field=models.CharField(blank=True, choices=[('', 'Non définie'), ('INTERNATIONAL', 'Internationale'), ('FRANCE', 'France'), ('REGION', 'Régionale'), ('DEPARTEMENT', 'Départementale')], default='DEPARTEMENT', max_length=15),
+            model_name="carriereditable",
+            name="working_area",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("", "Non définie"),
+                    ("INTERNATIONAL", "Internationale"),
+                    ("FRANCE", "France"),
+                    ("REGION", "Régionale"),
+                    ("DEPARTEMENT", "Départementale"),
+                ],
+                default="DEPARTEMENT",
+                max_length=15,
+            ),
         ),
     ]

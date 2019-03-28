@@ -5,14 +5,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('accounts', '0004_auto_20190130_2130'),
-    ]
+    dependencies = [("accounts", "0004_auto_20190130_2130")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='has_accepted_cgu',
-            field=models.BooleanField(default=False, help_text="Chaque fois que les CGU sont modifiées, ce drapeau est remis à faux pour l'ensemble des utilisateurs.", verbose_name='A accepté les dernières CGU'),
-        ),
+            model_name="user",
+            name="has_accepted_cgu",
+            field=models.BooleanField(
+                default=False,
+                help_text="Chaque fois que les CGU sont modifiées, ce drapeau est remis à faux pour l'ensemble des utilisateurs.",
+                verbose_name="A accepté les dernières CGU",
+            ),
+        )
     ]

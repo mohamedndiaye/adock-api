@@ -5,20 +5,24 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('accounts', '0005_user_has_accepted_cgu'),
-    ]
+    dependencies = [("accounts", "0005_user_has_accepted_cgu")]
 
     operations = [
         migrations.CreateModel(
-            name='FranceConnectState',
+            name="FranceConnectState",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('csrf_string', models.CharField(max_length=12)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("csrf_string", models.CharField(max_length=12)),
             ],
-            options={
-                'db_table': 'france_connect_state',
-            },
-        ),
+            options={"db_table": "france_connect_state"},
+        )
     ]

@@ -5,14 +5,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('accounts', '0003_auto_20190122_2133'),
-    ]
+    dependencies = [("accounts", "0003_auto_20190122_2133")]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='provider',
-            field=models.CharField(choices=[('AD', 'A Dock'), ('FC', 'FranceConnect')], default='AD', max_length=2, verbose_name='provider'),
-        ),
+            model_name="user",
+            name="provider",
+            field=models.CharField(
+                choices=[("AD", "A Dock"), ("FC", "FranceConnect")],
+                default="AD",
+                max_length=2,
+                verbose_name="provider",
+            ),
+        )
     ]

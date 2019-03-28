@@ -9,29 +9,50 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('carriers', '0007_auto_20190118_1505'),
+        ("carriers", "0007_auto_20190118_1505"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CarrierUser',
+            name="CarrierUser",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('carrier', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='carriers.Carrier')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "carrier",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="carriers.Carrier",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
-            options={
-                'db_table': 'carrier_user',
-            },
+            options={"db_table": "carrier_user"},
         ),
         migrations.AddField(
-            model_name='carrier',
-            name='owners',
-            field=models.ManyToManyField(related_name='carriers', through='carriers.CarrierUser', to=settings.AUTH_USER_MODEL),
+            model_name="carrier",
+            name="owners",
+            field=models.ManyToManyField(
+                related_name="carriers",
+                through="carriers.CarrierUser",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='carrieruser',
-            unique_together={('carrier', 'user')},
+            name="carrieruser", unique_together={("carrier", "user")}
         ),
     ]
