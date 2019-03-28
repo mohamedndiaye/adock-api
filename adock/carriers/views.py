@@ -391,6 +391,15 @@ def _certificate_sign(request, carrier):
     if response:
         return response
 
+    # Email is required so another check could be confirmed_at
+    if not carrier.editable.email:
+        return JsonResponse(
+            {
+                "message": "Vous devez d'abord confirmer la fiche transporteur avant de générer l'attestation."
+            },
+            status=400,
+        )
+
     kind = serializer.validated_data.pop("kind")
     certificate = models.CarrierCertificate.objects.create(
         carrier=carrier,

@@ -140,6 +140,24 @@ class SignCarrierCertificateTestCase(AuthTestCase):
         data = json.loads(response.content.decode("utf-8"))
         self.assertIn("last_name", data["errors"])
 
+    def test_sign_with_unconfirmed_carrier(self):
+        self.carrier.editable.email = ""
+        self.carrier.editable.save()
+
+        data = copy.copy(CERTIFICATE_DATA)
+        data["kind"] = models.CERTIFICATE_NO_WORKERS
+        response = self.client.post(
+            self.detail_url,
+            data,
+            content_type="application/json",
+            HTTP_AUTHORIZATION=self.http_authorization,
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json()["message"],
+            "Vous devez d'abord confirmer la fiche transporteur avant de générer l'attestation.",
+        )
+
 
 @skipIf(settings.USE_CIRCLECI, "Image not ready for CircleCI")
 class GetCarrierCertificateTestCase(TestCase):
