@@ -521,9 +521,9 @@ components:
     inline_response_200_2:
       type: object
       properties:
-        confirmation_email_sent:
-          type: boolean
-          description: indique si un courriel pour confirmer l'adresse électronique a été envoyé
+        confirmation_sent_to:
+          type: string
+          description: indique l'adresse électronique utilisée si une confirmation a été envoyé
     inline_response_200_3:
       type: object
       properties:

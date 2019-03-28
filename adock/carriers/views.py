@@ -342,7 +342,9 @@ def carrier_detail(request, carrier_siret):
                 changed_fields, carrier.editable, new_carrier_editable
             )
 
-        data_json["confirmation_email_sent"] = new_editable_to_create
+        data_json["confirmation_sent_to"] = (
+            new_carrier_editable.email if new_editable_to_create else ""
+        )
 
     carrier_json = get_carrier_as_json(carrier)
     carrier_json["other_facilities"] = get_other_facilities_as_json(carrier)

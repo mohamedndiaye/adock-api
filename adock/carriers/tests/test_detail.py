@@ -27,7 +27,7 @@ class CarrierDetailTestCase(test.CarrierTestCaseMixin):
         response = self.client.get(self.detail_url)
         data = response.json()
         carrier_data = data["carrier"]
-        self.assertNotIn("confirmation_email_sent", data)
+        self.assertNotIn("confirmation_sent_to", data)
 
         self.assertEqual(carrier_data["siret"], test.VALID_SIRET)
         self.assertEqual(carrier_data["raison_sociale"], self.carrier.raison_sociale)
@@ -277,7 +277,7 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
             },
             200,
         )
-        self.assertFalse(data["confirmation_email_sent"])
+        self.assertFalse(data["confirmation_sent_to"])
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(models.CarrierEditable.objects.count(), 1)
 
@@ -287,7 +287,7 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
         data = self.post_carrier_logged(
             {"email": EMAIL, "telephone": PHONE, "website": WEBSITE}, 200
         )
-        self.assertTrue(data["confirmation_email_sent"])
+        self.assertEqual(data["confirmation_sent_to"], EMAIL)
 
         # Change not applied yet
         self.assertEqual(data["carrier"]["website"], self.carrier.editable.website)
