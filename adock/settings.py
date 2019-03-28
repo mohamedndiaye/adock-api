@@ -163,7 +163,7 @@ AUTHENTICATION_DISABLED = False
 JWT_EXPIRATION_DELTA = datetime.timedelta(seconds=3600)
 JWT_PAYLOAD_HANDLER = "adock.accounts.jwt.jwt_payload_handler"
 
-# https://partenaires.franceconnect.gouv.fr/monprojet/
+# https://partenaires.franceconnect.gouv.fr/
 FRANCE_CONNECT_URL_ROOT = "https://app.franceconnect.gouv.fr/api/v1/"
 FRANCE_CONNECT_CLIENT_ID = ""
 FRANCE_CONNECT_CLIENT_SECRET = ""
