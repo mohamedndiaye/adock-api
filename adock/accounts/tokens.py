@@ -12,11 +12,7 @@ class TokenGenerator(PasswordResetTokenGenerator):
         # login_timestamp to be sure token will be invalid if the the is_active
         # boolean is False again.
         return (
-            str(user.pk)
-            + user.password
-            + str(login_timestamp)
-            + str(timestamp)
-            + str(user.is_active)
+            str(user.pk) + str(login_timestamp) + str(timestamp) + str(user.is_active)
         )
 
 
