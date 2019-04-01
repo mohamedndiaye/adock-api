@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.urls import path
 from jwt_auth import views as jwt_auth_views
 
