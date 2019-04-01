@@ -6,10 +6,11 @@ from django.conf import settings
 from django.core import signing
 from django.db import IntegrityError
 from django.db.models import Q
+from django.contrib.auth import password_validation
 from django.http import HttpResponseRedirect, JsonResponse
 from django.utils import crypto, timezone
-from django.views.decorators.http import require_POST
 from django.utils.http import urlencode
+from django.views.decorators.http import require_POST
 import requests
 import sentry_sdk
 from jwt_auth import views as jwt_auth_views
@@ -75,6 +76,79 @@ def account_activate(request, user_id, token):
     json_data = jwt_auth_views.jwt_get_json_with_token(token)
     json_data["message"] = "Le compte utilisateur est activé."
     return JsonResponse(json_data)
+
+
+@require_POST
+def account_recover_password(request):
+    payload, response = core_views.request_load(request)
+    if response:
+        return response
+
+    if not payload.get("email"):
+        return JsonResponse(
+            {"message": "La requête ne contient pas le paramètre « email »."},
+            status=400,
+        )
+
+    # Filter on A_DOCK accounts
+    try:
+        user = accounts_models.User.objects.get(
+            email=payload["email"],
+            provider=accounts_models.PROVIDER_A_DOCK,
+            is_active=True,
+        )
+    except accounts_models.User.DoesNotExist:
+        return JsonResponse(
+            {"message": "L'adresse électronique est introuvable."}, status=400
+        )
+
+    token = accounts_tokens.account_activation_token.make_token(user)
+    accounts_mails.mail_user_to_recover_password(user, token)
+    return JsonResponse(
+        {
+            "message": "Un courriel de récupération de mot de passe vous a été envoyé à « %s »."
+            % user.email
+        }
+    )
+
+
+@require_POST
+def account_reset_password(request):
+    payload, response = core_views.request_load(request)
+    if response:
+        return response
+
+    if (
+        not payload.get("email")
+        or not payload.get("token")
+        or not payload.get("password")
+    ):
+        return JsonResponse(
+            {"message": "La requête ne contient pas les paramètres requis."}, status=400
+        )
+
+    email = payload["email"]
+    try:
+        user = accounts_models.User.objects.get(
+            email=email, provider=accounts_models.PROVIDER_A_DOCK, is_active=True
+        )
+    except accounts_models.User.DoesNotExist:
+        return JsonResponse({"message": "L'utilisateur n'existe pas."}, status=400)
+
+    if not accounts_tokens.account_activation_token.check_token(user, payload["token"]):
+        return JsonResponse(
+            {"message": "Le jeton d'activation n'est pas valide."}, status=400
+        )
+
+    try:
+        password_validation.validate_password(payload["password"])
+    except password_validation.ValidationError as e:
+        return JsonResponse({"errors": {"password": e.messages}}, status=400)
+
+    user.set_password(payload["password"])
+    user.save()
+
+    return JsonResponse({"message": "Le mot de passe a été modifié avec succès."})
 
 
 def account_profile(request, extended=False):

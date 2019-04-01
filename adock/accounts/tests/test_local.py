@@ -114,3 +114,31 @@ class ActivateUserTestCase(TestCase):
         self.assertEqual(
             response.json()["message"], "Le compte utilisateur est activé."
         )
+
+
+class RecoverPasswordTestCase(TestCase):
+    def setUp(self):
+        self.url = reverse("accounts_recover_password")
+
+    def test_no_email(self):
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 400)
+
+    def test_not_active_user(self):
+        user = accounts_factories.UserFactory(is_active=False)
+        response = self.client.post(
+            self.url, {"email": user.email}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_wrong_provider(self):
+        user = accounts_factories.UserFactory(
+            is_active=True, provider=accounts_models.PROVIDER_FRANCE_CONNECT
+        )
+        response = self.client.post(
+            self.url, {"email": user.email}, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json()["message"], "L'adresse électronique est introuvable."
+        )

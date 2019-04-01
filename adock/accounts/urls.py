@@ -19,6 +19,14 @@ urlpatterns = [
         kwargs={"extended": True},
     ),
     path(
+        "password/recover/",
+        views.account_recover_password,
+        name="accounts_recover_password",
+    ),
+    path(
+        "password/reset/", views.account_reset_password, name="accounts_reset_password"
+    ),
+    path(
         "fc/authorize/", views.france_connect_authorize, name="france_connect_authorize"
     ),
     path("fc/callback/", views.france_connect_callback, name="france_connect_callback"),

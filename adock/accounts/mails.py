@@ -26,6 +26,27 @@ L'équipe A Dock
     )
 
 
+def mail_user_to_recover_password(user, token):
+    subject = "%sRécupération de mot de passe"
+    message = """
+Vous avez demander la récupération du mot de passe de votre compte A Dock, si vous n'êtes pas à l'origine
+de la demande vous pouvez ignorer ce message sinon vous pouvez cliquer sur le lien :
+
+{http_client_url}utilisateur/{email}/reinitialiser/{token}/
+
+Cordialement,
+L'équipe A Dock
+""".format(
+        http_client_url=settings.HTTP_CLIENT_URL, email=user.email, token=token
+    )
+    user.email_user(
+        subject=subject,
+        message=message,
+        from_email=settings.SERVER_EMAIL,
+        fail_silently=settings.DEBUG,
+    )
+
+
 def mail_managers_new_account(user):
     subject = "Nouveau compte utilisateur %s" % user.email
     message = """
