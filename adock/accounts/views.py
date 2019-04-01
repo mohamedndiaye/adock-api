@@ -308,7 +308,6 @@ def france_connect_callback(request):
         "client_secret": settings.FRANCE_CONNECT_CLIENT_SECRET,
         "code": code,
         "grant_type": "authorization_code",
-        # FIXME To remove?
         "redirect_uri": redirect_uri,
     }
     response = requests.post(settings.FRANCE_CONNECT_URLS["token"], data=data)
