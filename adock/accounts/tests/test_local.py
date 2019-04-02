@@ -53,7 +53,7 @@ class CreateUserTestCase(TestCase):
     def test_failure(self):
         response = self.client.post(
             self.url,
-            {"email": "bar.wrong", "first_name": "", "password": "short"},
+            {"email": "bar.wrong", "first_name": "", "password": "123456789"},
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 400)
@@ -63,7 +63,10 @@ class CreateUserTestCase(TestCase):
         self.assertEqual(errors["last_name"], ["Ce champ est obligatoire."])
         self.assertEqual(
             errors["password"],
-            ["Assurez-vous que ce champ comporte au moins 8 caractères."],
+            [
+                "Ce mot de passe est trop courant.",
+                "Ce mot de passe est entièrement numérique.",
+            ],
         )
 
 

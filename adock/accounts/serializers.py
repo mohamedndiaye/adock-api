@@ -1,10 +1,13 @@
 # pylint: disable=W0223
 from rest_framework import serializers
+from django.contrib.auth import password_validation
 
 from . import models as accounts_models
 
 
 class CreateAccountSerializer(serializers.Serializer):
+    """Don't use ModelSerializer to require some fields not required in model."""
+
     email = serializers.EmailField(max_length=255)
     first_name = serializers.CharField(max_length=30)
     last_name = serializers.CharField(max_length=150)
@@ -15,6 +18,10 @@ class CreateAccountSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 "Un compte utilisateur existe déjà avec cette adresse."
             )
+        return value
+
+    def validate_password(self, value):
+        password_validation.validate_password(value)
         return value
 
 
