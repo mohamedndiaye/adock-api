@@ -114,38 +114,14 @@ def account_recover_password(request):
 
 @require_POST
 def account_reset_password(request):
-    payload, response = core_views.request_load(request)
+    serializer, response = core_views.request_validate(
+        request, accounts_serializers.ResetPasswordSerializer
+    )
     if response:
         return response
 
-    if (
-        not payload.get("email")
-        or not payload.get("token")
-        or not payload.get("password")
-    ):
-        return JsonResponse(
-            {"message": "La requête ne contient pas les paramètres requis."}, status=400
-        )
-
-    email = payload["email"]
-    try:
-        user = accounts_models.User.objects.get(
-            email=email, provider=accounts_models.PROVIDER_A_DOCK, is_active=True
-        )
-    except accounts_models.User.DoesNotExist:
-        return JsonResponse({"message": "L'utilisateur n'existe pas."}, status=400)
-
-    if not accounts_tokens.account_activation_token.check_token(user, payload["token"]):
-        return JsonResponse(
-            {"message": "Le jeton d'activation n'est pas valide."}, status=400
-        )
-
-    try:
-        password_validation.validate_password(payload["password"])
-    except password_validation.ValidationError as e:
-        return JsonResponse({"errors": {"password": e.messages}}, status=400)
-
-    user.set_password(payload["password"])
+    user = serializer.validated_data["user"]
+    user.set_password(serializer.validated_data["password"])
     user.save()
 
     return JsonResponse({"message": "Le mot de passe a été modifié avec succès."})
