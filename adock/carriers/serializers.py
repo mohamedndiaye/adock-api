@@ -1,5 +1,4 @@
 # pylint: disable=W0223
-from phonenumber_field import phonenumber
 from rest_framework import serializers
 
 from . import models as carriers_models
