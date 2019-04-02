@@ -6,7 +6,6 @@ from django.conf import settings
 from django.core import signing
 from django.db import IntegrityError
 from django.db.models import Q
-from django.contrib.auth import password_validation
 from django.http import HttpResponseRedirect, JsonResponse
 from django.utils import crypto, timezone
 from django.utils.http import urlencode
