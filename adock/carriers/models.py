@@ -132,9 +132,7 @@ class Carrier(models.Model):
     # To store computed vat_number (computed by PostgreSQL on import)
     numero_tva = models.CharField(max_length=13, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    # The field is updated when the form is submitted by the user.
-    # It means a user has validated the information.
-    validated_at = models.DateTimeField(blank=True, null=True)
+    # See editable FK for confirmation of the carrier by the user.
     # Level of completeness of the carrier profile in percent
     completeness = models.PositiveSmallIntegerField(default=COMPLETENESS_PERCENT_MIN)
     deleted_at = models.DateTimeField(
