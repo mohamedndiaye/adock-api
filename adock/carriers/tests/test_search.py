@@ -97,7 +97,7 @@ class CarrierSearchQueryTestCase(CarrierSearchTestCase):
         t3 = factories.CarrierFactory(enseigne="T3")
         t4 = factories.CarrierFactory(enseigne="T4", with_editable=True)
         t2 = factories.CarrierFactory(enseigne="T2")
-        t1 = factories.CarrierFactory(enseigne="T1")
+        t1 = factories.CarrierFactory(enseigne="1T")
 
         carriers = self.get_carriers({"q": "t"})
         self.assertEqual(len(carriers), 4)
