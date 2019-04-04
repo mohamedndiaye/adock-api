@@ -15,4 +15,4 @@ openpyxl
 beautifulsoup4
 qrcode[pil]==6.1
 # Password hasher
-argon2
+django[argon2]
