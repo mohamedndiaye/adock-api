@@ -2,6 +2,7 @@
 # Take care to download the stock file of Sirene (https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/)
 # and to have the CSV files of GRECO
 ../manage.py migrate &&
+../manage.py import_sirene_naf ../datafiles/int_courts_naf_rev_2.xlsx
 psql -d adock -f import-sirene.sql &&
 ../manage.py download_sirene &&
 ../manage.py update_sirene &&
