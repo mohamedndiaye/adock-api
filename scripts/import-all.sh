@@ -11,5 +11,5 @@ psql -d adock -f import-sirene.sql &&
 ../manage.py import_registre &&
 psql -d adock -f update-carrier.sql &&
 #psql  -d adock -f update-carrier-from-greco.sql &&
-wget http://www.objectifco2.fr/docs/upload/107/2017-12-20%20Entreprises%20labellisees%20Objectif%20CO2.xlsx -O ../datafiles/objectif-co2-labellisees.xlsx &&
+wget http://www.objectifco2.fr/docs/upload/107/2019-04-03%20Entreprises%20labellisees%20Objectif%20CO2.xlsx -O ../datafiles/objectif-co2-labellisees.xlsx &&
 ../manage.py import_objectif_co2 ../datafiles/objectif-co2-labellisees.xlsx
