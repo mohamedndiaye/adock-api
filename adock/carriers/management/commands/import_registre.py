@@ -14,7 +14,7 @@ from adock.carriers import models as carriers_models
 
 
 class Command(BaseCommand):
-    help = "Import the latest downloaded CSV file of the registre."
+    help = "Import the latest downloaded CSV file of registre."
 
     def handle(self, *args, **options):
         # Only the latest file is used (each file contains the full list)
@@ -44,7 +44,7 @@ class Command(BaseCommand):
 
             # Get the uncompressed file
             filename = filenames[0]
-            self.stdout.write(filename)
+            self.stdout.write("Uncompressed file: %s" % filename)
 
             # Exception for inferior OS (aka MacOS)
             system = platform.system()
@@ -100,6 +100,7 @@ class Command(BaseCommand):
             )
             # Allow sed_ps to receive a SIGPIPE if p2 exits.
             sed_ps.stdout.close()
+
             try:
                 # Max 60k records should be fast (1 mn max)
                 output_data, stderr_data = psql_ps.communicate(
@@ -122,7 +123,7 @@ class Command(BaseCommand):
                 self.stderr.write(self.style.ERROR(stderr_data))
                 sys.exit(1)
 
-            queryset.update(applied_at=timezone.now())
-            self.stdout.write(
-                self.style.SUCCESS("Filename '%s' imported with success." % filename)
-            )
+        queryset.update(applied_at=timezone.now())
+        self.stdout.write(
+            self.style.SUCCESS("Registre '%s' imported with success." % filename)
+        )

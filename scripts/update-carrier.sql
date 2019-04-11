@@ -20,35 +20,36 @@ insert into carrier
      numero_tva,
      created_at,
      deleted_at,
-     sirene_deleted_at,
+     sirene_exists,
+     sirene_closed_at,
      objectif_co2,
      longitude,
      latitude)
     select r.siret,
            r.raison_sociale,
-           coalesce(nullif(s.enseigne, ''), r.raison_sociale) as enseigne,
-           unaccent(coalesce(nullif(s.enseigne, ''), r.raison_sociale)) as enseigne_unaccent,
+           coalesce(nullif(s.enseigne1Etablissement, ''), r.raison_sociale) as enseigne,
+           unaccent(coalesce(nullif(s.enseigne1Etablissement, ''), r.raison_sociale)) as enseigne_unaccent,
            r.categorie_juridique,
-           coalesce(s.siege = '1', r.is_siege) as is_siege,
+           coalesce(s.etablissementSiege = '1', r.is_siege) as is_siege,
            coalesce(
-            s.numvoie ||
-            case s.indrep
+            s.numeroVoieEtablissement ||
+            case s.indiceRepetitionEtablissement
               when 'B' then ' bis'
               when 'T' then ' ter'
               when 'Q' then ' quater'
               when 'C' then ' quinquies'
               else ''
-            end || ' ' || s.typvoie || ' ' || s.libvoie,
+            end || ' ' || stv.label || ' ' || s.libelleVoieEtablissement,
             '') as adresse,
-           coalesce(s.codpos, r.code_postal) as code_postal,
-           coalesce(s.libcom, r.commune) as ville,
+           coalesce(s.codePostalEtablissement, r.code_postal) as code_postal,
+           coalesce(s.libelleCommuneEtablissement, r.commune) as ville,
            -- Departement is used for ranking
            r.code_departement as departement,
            '' as telephone, '' as email,
-           case s.dcret when '' then null else to_date(s.dcret, 'YYYYMMDD') end as date_creation,
-           case s.ddebact when '' then null else to_date(s.ddebact, 'YYYYMMDD') end as debut_activite,
-           coalesce(s.apen700, '') as code_ape,
-           coalesce(s.libapen, '') as libelle_ape,
+           case s.dateCreationEtablissement when '' then null else to_date(s.dateCreationEtablissement, 'YYYY-MM-DD') end as date_creation,
+           case s.dateDebut when '' then null else to_date(s.dateDebut, 'YYYY-MM-DD') end as debut_activite,
+           coalesce(s.activitePrincipaleEtablissement, '') as code_ape,
+           sn.label as libelle_ape,
            r.gestionnaire_de_transport as gestionnaire,
            r.numero_lti as lti_numero,
            r.date_debut_validite_lti as lti_date_debut,
@@ -67,14 +68,20 @@ insert into carrier
            now() as created_at,
            -- Deleted from registre
            null as deleted_at,
-           -- Deleted from Sirene
-           case when s.apen700 is not null then null else now() end as sirene_deleted_at,
+           -- Present in Sirene
+           s.siret is not null as sirene_exists,
+           -- Closed in Sirene
+           case when s.etatAdministratifEtablissement = 'F' then s.dateDernierTraitementEtablissement else null end as sirene_closed_at,
            '' as objectif_co2,
            s.longitude,
            s.latitude
     from registre as r
     left join sirene as s
-       on s.siret = r.siret
+      on s.siret = r.siret
+    inner join sirene_type_voie stv
+      on stv.code = s.typeVoieEtablissement
+    inner join sirene_naf sn
+      on sn.code = s.activitePrincipaleEtablissement
 on conflict (siret) do update
 set
   raison_sociale = excluded.raison_sociale,
@@ -99,12 +106,8 @@ set
   lc_date_fin = excluded.lc_date_fin,
   lc_nombre = excluded.lc_nombre,
   deleted_at = null,
-  sirene_deleted_at =
-    case when excluded.sirene_deleted_at is null
-     then null
-     -- Keep the existing date if any
-     else coalesce(carrier.sirene_deleted_at, excluded.sirene_deleted_at)
-    end,
+  sirene_exists = excluded.sirene_exists,
+  sirene_closed_at = excluded.sirene_closed_at,
   longitude = excluded.longitude,
   latitude = excluded.latitude;
 
@@ -147,7 +150,7 @@ with new_carrier_editable AS (
 
 -- Update meta stats
 with json_data as (
-  select json_build_object('count', count(*), 'date', current_date) from carrier where deleted_at is null and sirene_deleted_at is null
+  select json_build_object('count', count(*), 'date', current_date) from carrier where deleted_at is null and sirene_closed_at is null
 )
 insert into meta (name, data)
     values (

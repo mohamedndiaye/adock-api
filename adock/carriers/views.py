@@ -52,7 +52,8 @@ CARRIER_DETAIL_FIELDS = (
     "objectif_co2_begin",
     "objectif_co2_end",
     "deleted_at",
-    "sirene_deleted_at",
+    "sirene_exists",
+    "sirene_closed_at",
     "longitude",
     "latitude",
     # is_locked boolean is added to indicate if editable is present
@@ -76,7 +77,7 @@ OTHER_FACILITIES_LIST_FIELDS = (
     "deleted_at",
     "enseigne",
     "is_siege",
-    "sirene_deleted_at",
+    "sirene_closed_at",
     "siret",
     "ville",
 )
@@ -141,7 +142,7 @@ def carrier_search(request):
        - partial enseigne or SIRET
        - type of the license (LC heavy or LTI light)
     """
-    carriers = models.Carrier.objects.filter(deleted_at=None, sirene_deleted_at=None)
+    carriers = models.Carrier.objects.filter(deleted_at=None, sirene_closed_at=None)
     q = request.GET.get("q")
     if q:
         # Filtering on enseigne or SIRET

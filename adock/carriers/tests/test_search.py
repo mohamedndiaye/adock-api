@@ -120,10 +120,10 @@ class CarrierSearchQueryTestCase(CarrierSearchTestCase):
         self.assertEqual(len(carriers), 1)
         self.assertEqual(carriers[0]["raison_sociale"], "ACTIVE")
 
-    def test_sirene_deleted(self):
+    def test_sirene_closed(self):
         factories.CarrierFactory(raison_sociale="ACTIVE")
         factories.CarrierFactory(
-            raison_sociale="DELETED", sirene_deleted_at=timezone.now()
+            raison_sociale="CLOSED", sirene_closed_at=timezone.now()
         )
         carriers = self.get_carriers()
         self.assertEqual(len(carriers), 1)

@@ -410,9 +410,9 @@ components:
         deleted_at:
           type: boolean
           description: date de la supression de l'établissement du registre des transports
-        sirene_deleted_at:
+        sirene_closed_at:
           type: boolean
-          description: date de la suppression de l'établissement de la base Sirène
+          description: date de fermeture de l'établissement dans la base Sirène
         is_locked:
           type: boolean
           description: indique que la fiche est verrouillée

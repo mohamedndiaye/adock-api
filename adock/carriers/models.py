@@ -81,7 +81,7 @@ class Carrier(models.Model):
         db_index=True,
         editable=False,
     )
-    # nomen_long from Sirene (raison_sociale in Registre)
+    # raison_sociale in Registre
     # Always in uppercase
     raison_sociale = models.CharField(max_length=131)
     # Business name (filled with raison_sociale when undefined)
@@ -94,27 +94,26 @@ class Carrier(models.Model):
     categorie_juridique = models.TextField()
     # This company is the siege social
     is_siege = models.BooleanField(default=False)
-    # numvoie, typvoie, libvoie from Sirene
+    # number, type and street name
     adresse = models.CharField(max_length=126)
-    # codpos from Sirene (code_postal in Registre)
+    # from Sirene with fallback on Registre
     code_postal = models.CharField(max_length=5)
-    # libcom from Sirene (commune in Registre)
-    ville = models.CharField(max_length=32)
+    # from Sirene with fallback on Registre
+    ville = models.CharField(max_length=100)
     # code_departement from Registre
     departement = models.CharField(max_length=3, blank=True, null=False, default="")
     # telephone from GRECO used as default (changed) but required in form
     telephone = PhoneNumberField(blank=True, default="")
     # mail from GRECO used as default (changed) but required in form
     email = models.EmailField(blank=True, default="")
-    # dcret from Sirene (inscription_activite from GRECO).
-    # Can be null (not present in Sirene)
+    # from Sirene (can be null)
     date_creation = models.DateField(blank=True, null=True)
-    # ddebact from Sirene
+    # from Sirene
     debut_activite = models.DateField(blank=True, null=True)
-    # apen700 from Sirene
-    code_ape = models.CharField(max_length=5)
-    # libapen from Sirene
-    libelle_ape = models.CharField(max_length=65)
+    # from Sirene
+    code_ape = models.CharField(max_length=6)
+    # from Sirene (max from sirene_naf)
+    libelle_ape = models.CharField(max_length=129)
     # Name of the transport manager
     gestionnaire = models.CharField(max_length=131)
     # LTI Licence de transport intérieur => - de 3,5 tonnes
@@ -140,10 +139,16 @@ class Carrier(models.Model):
         null=True,
         help_text="Date de la supression de l'établissement du registre des transports.",
     )
-    sirene_deleted_at = models.DateTimeField(
+    sirene_exists = models.BooleanField(
+        blank=False,
+        null=False,
+        default=True,
+        help_text="Le transporteur est présent dans la base Sirene.",
+    )
+    sirene_closed_at = models.DateTimeField(
         blank=True,
         null=True,
-        help_text="Date de la suppression de l'établissement de la base Sirene.",
+        help_text="Date de fermeture de l'établissement dans la base Sirene.",
     )
     objectif_co2 = models.CharField(
         max_length=8, choices=OBJECTIF_CO2_CHOICES, blank=True, null=False, default=""
@@ -151,6 +156,7 @@ class Carrier(models.Model):
     objectif_co2_begin = models.DateField(blank=True, null=True)
     # Usually begin plus 3 years
     objectif_co2_end = models.DateField(blank=True, null=True)
+    # From cquest data
     longitude = models.FloatField(blank=True, null=True)
     latitude = models.FloatField(blank=True, null=True)
     editable = models.ForeignKey(
