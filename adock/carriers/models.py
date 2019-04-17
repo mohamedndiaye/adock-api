@@ -102,9 +102,11 @@ class Carrier(models.Model):
     ville = models.CharField(max_length=100)
     # code_departement from Registre
     departement = models.CharField(max_length=3, blank=True, null=False, default="")
-    # telephone from GRECO used as default (changed) but required in form
+    # telephone from GRECO but not imported anymore so kept for compatibility
+    # (will be removed)
     telephone = PhoneNumberField(blank=True, default="")
-    # mail from GRECO used as default (changed) but required in form
+    # mail from GRECO but not imported anymore so kept for compatibility (will
+    # be removed)
     email = models.EmailField(blank=True, default="")
     # from Sirene (can be null)
     date_creation = models.DateField(blank=True, null=True)
@@ -117,7 +119,6 @@ class Carrier(models.Model):
     # Name of the transport manager
     gestionnaire = models.CharField(max_length=131)
     # LTI Licence de transport intérieur => - de 3,5 tonnes
-    # LTIM and LCM in GRECO
     # LTI 'YYYY RR NNNNNNNN', YYYY year, RR region, number starting to one of current year
     lti_numero = models.CharField(max_length=16, blank=True, default="")
     lti_date_debut = models.DateField(blank=True, null=True)
@@ -280,7 +281,7 @@ class CarrierEditable(models.Model):
 
 
 class CarrierFeed(models.Model):
-    """The table Carrier is fed by various sources (Sirene, Registre ou GRECO)"""
+    """The table Carrier is fed by various sources (Sirene, Registre)"""
 
     source = models.CharField(max_length=32)
     title = models.CharField(max_length=126)

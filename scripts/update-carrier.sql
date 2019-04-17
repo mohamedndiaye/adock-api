@@ -10,7 +10,7 @@ insert into carrier
      adresse,
      code_postal, ville,
      departement,
-     -- Was used to import GRECO information but not published
+     -- Was used to import GRECO information but not published (will be removed)
      telephone, email,
      date_creation, debut_activite, code_ape, libelle_ape,
      gestionnaire,

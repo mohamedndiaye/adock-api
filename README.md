@@ -25,9 +25,6 @@ inscrites au registre des transports français.
 Ces données sont complétées à l'insertion dans la base de données du projet A
 Dock par celles issues du projet [Sirene](https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/).
 
-Seules les informations de téléphone et adresse électronique sont extraites dans
-un second temps (mise à jour SQL) depuis la base de données GRECO.
-
 Les données sont aussi complétées avec l'import des entreprises labellisées par
 la charte [Objectif CO2](http://www.objectifco2.fr/index/documents#categ-6).
 
@@ -53,13 +50,8 @@ des commandes Django :
 - `import-all.sh` créé la base de données initiale, l'ensemble des tables et
   effectue tous les imports et les mises à jour. Ce script est uniquement utile
   pour créer une base vierge pour le développement. Il nécessite d'avoir au
-  préalable téléchargé le dernier fichier _stock_ Sirene et de disposer du
-  fichier CSV de la base de données GRECO.
-
-- `import-greco.sql` importe le fichier `greco.csv` contenant tous les exports
-  CSV de la base de données GRECO dans une table spécifique pour l'extraction des
-  téléphones et les adresses électroniques que contient cette base (avec un bémol
-  sur la qualité de la source).
+  préalable téléchargé le dernier fichier _stock_ Sirene des établissements
+  (version géo).
 
 - `import-sirene.sql` importe les 11 millions d'enregistrements de la base
   Sirene (toutes les entreprises françaises), la table est uniquement utile pour
@@ -73,9 +65,6 @@ des commandes Django :
 
 - `update_sirene` (Django) met à jour la base de données Sirene en appliquant les
   mises à jour quotidiennes qui n'ont pas encore été appliquées.
-
-- `import-greco.sql` (Django) importe la table à partir de la concaténation de l'ensemble
-  des fichiers CSV de chaque région et un nettoyage préalable.
 
 - `download_registre` (Django) télécharge la dernière version du registre des transports
   de marchandise et créé une entrée en base de données.
@@ -93,9 +82,7 @@ des commandes Django :
   socle de l'application A Dock. Elle est l'agrégation des tables `registre` et
   `sirene` et permet aux utilisateurs d'y ajouter des informations
   complémentaires (téléphone, adresse électronique, aire de travail,
-  départements couverts, etc) avec les numéros de téléphone et les adresses
-  électroniques issues de GRECO uniquement s'ils n'ont pas été renseignés sur A
-  Dock par l'utilisateur.
+  départements couverts, etc).
 
 - `import_objectif_co2` (Django) reçoit en argument le fichier Excel de la liste
   des entreprises **labellisées** de le section Transport de marchandises de la
