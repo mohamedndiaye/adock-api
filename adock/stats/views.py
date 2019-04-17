@@ -1,11 +1,9 @@
 from django.db import connection
 from django.http import JsonResponse
 
-from adock.accounts.decorators import user_is_staff
 from adock.carriers import models as carriers_models
 
-# Create your views here.
-@user_is_staff()
+
 def stats(request):
     # Counters (total)
     modified_carriers = carriers_models.Carrier.objects.filter(

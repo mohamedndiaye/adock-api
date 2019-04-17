@@ -9,34 +9,12 @@ from django.utils import timezone
 
 from adock.carriers import factories as carriers_factories
 from adock.accounts.test import AuthTestCase
-from adock.accounts import factories as accounts_factories
 
 
 class StatsTestCase(AuthTestCase):
     def setUp(self):
         super().setUp()
         self.url = reverse("stats")
-
-    @skipIf(settings.AUTHENTICATION_DISABLED, "Authentication is disabled")
-    def test_no_logged(self):
-        response = self.client.get(self.url, content_type="application/json")
-        self.assertEqual(response.status_code, 401)
-
-    @skipIf(settings.AUTHENTICATION_DISABLED, "Authentication is disabled")
-    def test_staff_only(self):
-        user = accounts_factories.UserFactory(
-            email="courriel@example.com", is_staff=False
-        )
-        user.set_password("password")
-        user.save()
-
-        http_authorization = self.log_in(user.email, "password")
-        response = self.client.get(
-            self.url,
-            content_type="application/json",
-            HTTP_AUTHORIZATION=http_authorization,
-        )
-        self.assertEqual(response.status_code, 403)
 
     def test_stats(self):
         STATS_NB_MONTHS = 6
