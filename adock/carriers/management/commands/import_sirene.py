@@ -56,7 +56,7 @@ class Command(BaseCommand):
             )
             sys.exit(1)
 
-        if stderr_data:
+        if psql_ps.returncode < 0:
             self.stderr.write(
                 self.style.ERROR(
                     "Unable to 'psql' the file '%s' with 'import-sirene.sql'."
