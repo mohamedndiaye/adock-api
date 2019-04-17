@@ -31,16 +31,18 @@ insert into carrier
            unaccent(coalesce(nullif(s.enseigne1Etablissement, ''), r.raison_sociale)) as enseigne_unaccent,
            r.categorie_juridique,
            coalesce(s.etablissementSiege = '1', r.is_siege) as is_siege,
-           coalesce(
-            s.numeroVoieEtablissement ||
-            case s.indiceRepetitionEtablissement
-              when 'B' then ' bis'
-              when 'T' then ' ter'
-              when 'Q' then ' quater'
-              when 'C' then ' quinquies'
-              else ''
-            end || ' ' || stv.label || ' ' || s.libelleVoieEtablissement,
-            '') as adresse,
+           coalesce(s.numeroVoieEtablissement, '')
+            || case s.indiceRepetitionEtablissement
+                when 'B' then ' bis'
+                when 'T' then ' ter'
+                when 'Q' then ' quater'
+                when 'C' then ' quinquies'
+                else ''
+              end
+            || ' '
+            || coalesce(stv.label, s.typeVoieEtablissement)
+            || ' '
+            || s.libelleVoieEtablissement as adresse,
            coalesce(s.codePostalEtablissement, r.code_postal) as code_postal,
            coalesce(s.libelleCommuneEtablissement, r.commune) as ville,
            -- Departement is used for ranking
