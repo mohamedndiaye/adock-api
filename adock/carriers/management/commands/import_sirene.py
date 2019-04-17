@@ -47,8 +47,8 @@ class Command(BaseCommand):
         )
 
         try:
-            # Max 10 mn
-            _, stderr_data = psql_ps.communicate(timeout=600)
+            # Max 20 mn
+            _, stderr_data = psql_ps.communicate(timeout=1200)
         except subprocess.TimeoutExpired:
             psql_ps.kill()
             self.stderr.write(
