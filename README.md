@@ -63,8 +63,8 @@ des commandes Django :
 - `download_sirene` (Django) analyse le site Sirene et télécharge les mises à jour
   quotidiennes qui ne l'ont pas encore été.
 
-- `update_sirene` (Django) met à jour la base de données Sirene en appliquant les
-  mises à jour quotidiennes qui n'ont pas encore été appliquées.
+- `import_sirene` (Django) importe tous les établissements de la base Sirene
+  après avoir supprimé l'ancienne table.
 
 - `download_registre` (Django) télécharge la dernière version du registre des transports
   de marchandise et créé une entrée en base de données.
