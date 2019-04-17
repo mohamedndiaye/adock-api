@@ -40,9 +40,9 @@ insert into carrier
                 else ''
               end
             || ' '
-            || coalesce(stv.label, s.typeVoieEtablissement)
+            || coalesce(stv.label, s.typeVoieEtablissement, '')
             || ' '
-            || s.libelleVoieEtablissement as adresse,
+            || coalesce(s.libelleVoieEtablissement, '') as adresse,
            coalesce(s.codePostalEtablissement, r.code_postal) as code_postal,
            coalesce(s.libelleCommuneEtablissement, r.commune) as ville,
            -- Departement is used for ranking
@@ -51,7 +51,7 @@ insert into carrier
            case s.dateCreationEtablissement when '' then null else to_date(s.dateCreationEtablissement, 'YYYY-MM-DD') end as date_creation,
            case s.dateDebut when '' then null else to_date(s.dateDebut, 'YYYY-MM-DD') end as debut_activite,
            coalesce(s.activitePrincipaleEtablissement, '') as code_ape,
-           sn.label as libelle_ape,
+           coalesce(sn.label, '') as libelle_ape,
            r.gestionnaire_de_transport as gestionnaire,
            r.numero_lti as lti_numero,
            r.date_debut_validite_lti as lti_date_debut,
@@ -80,9 +80,10 @@ insert into carrier
     from registre as r
     left join sirene as s
       on s.siret = r.siret
-    inner join sirene_type_voie stv
+    left join sirene_type_voie stv
       on stv.code = s.typeVoieEtablissement
-    inner join sirene_naf sn
+    -- Sirene DB contains invalid codes...
+    left join sirene_naf sn
       on sn.code = s.activitePrincipaleEtablissement
 on conflict (siret) do update
 set
