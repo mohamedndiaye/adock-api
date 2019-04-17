@@ -29,7 +29,7 @@ class Command(BaseCommand):
         gzip_filename = os.path.join(settings.DATAFILES_ROOT, feed.filename.name)
         self.stdout.write("File to decompress: %s" % gzip_filename)
         with gzip.open(gzip_filename, "rb") as f_in:
-            filename = Path(gzip_filename).with_suffix("")
+            filename = str(Path(gzip_filename).with_suffix(""))
             with open(filename, "wb") as f_out:
                 shutil.copyfileobj(f_in, f_out)
 
