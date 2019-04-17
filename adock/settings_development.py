@@ -20,8 +20,6 @@ MANAGERS = ADMINS
 # Speed up tests
 PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
 
-AUTHENTICATION_DISABLED = False
-
 # https://partenaires.franceconnect.gouv.fr/
 FRANCE_CONNECT_URL_ROOT = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
 FRANCE_CONNECT_CLIENT_ID = ""

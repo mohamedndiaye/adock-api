@@ -5,7 +5,7 @@ from django.http.response import JsonResponse
 def user_is_staff():
     def decorated(view_func):
         def _wrapped_view(request, *args, **kwargs):
-            if settings.AUTHENTICATION_DISABLED or request.user.is_staff:
+            if request.user.is_staff:
                 return view_func(request, *args, **kwargs)
 
             if request.user.is_anonymous:
@@ -23,7 +23,7 @@ def user_is_staff():
 def user_required():
     def decorated(view_func):
         def _wrapped_view(request, *args, **kwargs):
-            if settings.AUTHENTICATION_DISABLED or not request.user.is_anonymous:
+            if not request.user.is_anonymous:
                 return view_func(request, *args, **kwargs)
             return JsonResponse({"message": "Unauthorized"}, status=401)
 

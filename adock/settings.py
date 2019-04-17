@@ -165,8 +165,6 @@ USE_CIRCLECI = False
 
 SENTRY_DSN = ""
 
-AUTHENTICATION_DISABLED = False
-
 JWT_EXPIRATION_DELTA = datetime.timedelta(seconds=3600)
 JWT_PAYLOAD_HANDLER = "adock.accounts.jwt.jwt_payload_handler"
 
