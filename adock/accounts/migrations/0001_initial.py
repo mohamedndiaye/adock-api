@@ -9,40 +9,121 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('password', models.CharField(max_length=128, verbose_name='password')),
-                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('username', models.CharField(editable=False, max_length=255, unique=True, verbose_name='username')),
-                ('email', models.EmailField(blank=True, default='', max_length=255, verbose_name='email address')),
-                ('first_name', models.CharField(blank=True, default='', max_length=30, verbose_name='first name')),
-                ('last_name', models.CharField(blank=True, default='', max_length=150, verbose_name='last name')),
-                ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
-                ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
-                ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
-                ('provider', models.CharField(choices=[('AD', 'A Dock'), ('FC', 'FranceConnect')], default='AD', max_length=2, verbose_name='provider')),
-                ('provider_data', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),
-                ('has_accepted_cgu', models.BooleanField(default=False, help_text="Chaque fois que les CGU sont modifiées, ce drapeau est remis à faux pour l'ensemble des utilisateurs.", verbose_name='A accepté les dernières CGU')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("password", models.CharField(max_length=128, verbose_name="password")),
+                (
+                    "last_login",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="last login"
+                    ),
+                ),
+                (
+                    "username",
+                    models.CharField(
+                        editable=False,
+                        max_length=255,
+                        unique=True,
+                        verbose_name="username",
+                    ),
+                ),
+                (
+                    "email",
+                    models.EmailField(
+                        blank=True,
+                        default="",
+                        max_length=255,
+                        verbose_name="email address",
+                    ),
+                ),
+                (
+                    "first_name",
+                    models.CharField(
+                        blank=True, default="", max_length=30, verbose_name="first name"
+                    ),
+                ),
+                (
+                    "last_name",
+                    models.CharField(
+                        blank=True, default="", max_length=150, verbose_name="last name"
+                    ),
+                ),
+                (
+                    "is_staff",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates whether the user can log into this admin site.",
+                        verbose_name="staff status",
+                    ),
+                ),
+                (
+                    "is_active",
+                    models.BooleanField(
+                        default=True,
+                        help_text="Designates whether this user should be treated as active. Unselect this instead of deleting accounts.",
+                        verbose_name="active",
+                    ),
+                ),
+                (
+                    "date_joined",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="date joined"
+                    ),
+                ),
+                (
+                    "provider",
+                    models.CharField(
+                        choices=[("AD", "A Dock"), ("FC", "FranceConnect")],
+                        default="AD",
+                        max_length=2,
+                        verbose_name="provider",
+                    ),
+                ),
+                (
+                    "provider_data",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True, null=True
+                    ),
+                ),
+                (
+                    "has_accepted_cgu",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Chaque fois que les CGU sont modifiées, ce drapeau est remis à faux pour l'ensemble des utilisateurs.",
+                        verbose_name="A accepté les dernières CGU",
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.CreateModel(
-            name='FranceConnectState',
+            name="FranceConnectState",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('csrf_string', models.CharField(max_length=12)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("csrf_string", models.CharField(max_length=12)),
             ],
-            options={
-                'db_table': 'france_connect_state',
-            },
+            options={"db_table": "france_connect_state"},
         ),
     ]

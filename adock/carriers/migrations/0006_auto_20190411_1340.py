@@ -5,38 +5,36 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('carriers', '0005_remove_carrier_validated_at'),
-    ]
+    dependencies = [("carriers", "0005_remove_carrier_validated_at")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='carrier',
-            name='sirene_deleted_at',
+        migrations.RemoveField(model_name="carrier", name="sirene_deleted_at"),
+        migrations.AddField(
+            model_name="carrier",
+            name="sirene_closed_at",
+            field=models.DateTimeField(
+                blank=True,
+                help_text="Date de fermeture de l'établissement dans la base Sirene.",
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='carrier',
-            name='sirene_closed_at',
-            field=models.DateTimeField(blank=True, help_text="Date de fermeture de l'établissement dans la base Sirene.", null=True),
-        ),
-        migrations.AddField(
-            model_name='carrier',
-            name='sirene_exists',
-            field=models.BooleanField(default=True, help_text='Le transporteur est présent dans la base Sirene.'),
+            model_name="carrier",
+            name="sirene_exists",
+            field=models.BooleanField(
+                default=True,
+                help_text="Le transporteur est présent dans la base Sirene.",
+            ),
         ),
         migrations.AlterField(
-            model_name='carrier',
-            name='code_ape',
-            field=models.CharField(max_length=6),
+            model_name="carrier", name="code_ape", field=models.CharField(max_length=6)
         ),
         migrations.AlterField(
-            model_name='carrier',
-            name='libelle_ape',
+            model_name="carrier",
+            name="libelle_ape",
             field=models.CharField(max_length=129),
         ),
         migrations.AlterField(
-            model_name='carrier',
-            name='ville',
-            field=models.CharField(max_length=100),
+            model_name="carrier", name="ville", field=models.CharField(max_length=100)
         ),
     ]
