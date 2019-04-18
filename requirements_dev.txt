@@ -1,7 +1,6 @@
 -r requirements_test.txt
 black
 bumpversion
-datedelta
 django-extensions
 ipdb
 isort

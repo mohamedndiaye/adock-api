@@ -1,4 +1,5 @@
 -r requirements.txt
+datedelta
 coverage
 factory_boy
 faker
