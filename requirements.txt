@@ -1,16 +1,16 @@
 pip>=18.1
-Django[argon2]==2.1.7
-djangorestframework==3.9.0
-psycopg2-binary==2.7.6.1
+Django[argon2]==2.2
+djangorestframework==3.9.2
+psycopg2-binary==2.8.2
 jinja2
-django-cors-headers==2.4
+django-cors-headers==2.5.2
 phonenumbers==8.10.1
 django-phonenumber-field==2.1.0
-sentry_sdk==0.6.6
+sentry_sdk==0.7.10
 requests==2.20.1
 webstack-django-jwt-auth==1.1.2
 # To import labelled carriers of Objectif CO2
-openpyxl
+openpyxl==2.6.2
 # To parse Sirene page
 beautifulsoup4
 qrcode[pil]==6.1
