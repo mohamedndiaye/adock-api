@@ -1,4 +1,5 @@
 from django.contrib.postgres.fields import ArrayField, JSONField
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.db.models import Lookup
 from django.db.models.fields import Field
@@ -170,6 +171,13 @@ class Carrier(models.Model):
 
     class Meta:
         db_table = "carrier"
+        indexes = [
+            GinIndex(
+                name="carrier_trgm_enseigne_unaccent",
+                fields=["enseigne_unaccent"],
+                opclasses=["gin_trgm_ops"],
+            )
+        ]
         # Take care to create manual index because GinIndex is not able to
         # handle it. One solution is to inherit and adapt the code for that but
         # it's not trivial so the index is created in a raw SQL migration and
