@@ -7,7 +7,8 @@ django-cors-headers==2.5.2
 phonenumbers==8.10.1
 django-phonenumber-field==2.1.0
 sentry_sdk==0.7.10
-requests==2.20.1
+requests==2.21.0
+urllib3==1.24.2
 webstack-django-jwt-auth==1.1.2
 # To import labelled carriers of Objectif CO2
 openpyxl==2.6.2
