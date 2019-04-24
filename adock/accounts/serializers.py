@@ -27,18 +27,25 @@ class CreateAccountSerializer(serializers.Serializer):
 
 
 class EditUserSerializer(serializers.ModelSerializer):
+    """The serializer accepts partial fields so it's possible to use it to subscribe to newsletter only for example."""
+
     class Meta:
         model = accounts_models.User
-        fields = ("has_accepted_cgu",)
+        fields = ("has_accepted_cgu", "has_subscribed_newsletter")
 
     def validate_has_accepted_cgu(self, value):
-        if not value:
-            raise serializers.ValidationError("L'acceptation des CGU est irréversible.")
+        if value is False:
+            raise serializers.ValidationError(
+                "Vous devez accepter les Conditions Générales d'Utilisation pour utiliser le service."
+            )
         return value
 
     def update(self, instance, validated_data):
-        instance.has_accepted_cgu = validated_data["has_accepted_cgu"]
-        instance.save(update_fields=["has_accepted_cgu"])
+        # Only keys for provided data restricted to list of fields
+        fields = validated_data.keys()
+        for field in fields:
+            setattr(instance, field, validated_data[field])
+        instance.save(update_fields=fields)
         return instance
 
 

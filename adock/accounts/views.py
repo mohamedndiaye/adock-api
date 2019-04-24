@@ -153,6 +153,7 @@ def account_profile(request, extended=False):
         "provider_data": request.user.provider_data,
         "is_staff": request.user.is_staff,
         "has_accepted_cgu": request.user.has_accepted_cgu,
+        "has_subscribed_newsletter": request.user.has_subscribed_newsletter,
     }
 
     if extended:

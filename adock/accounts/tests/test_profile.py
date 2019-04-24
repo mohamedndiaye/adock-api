@@ -41,7 +41,7 @@ class ProfileTestCase(AuthTestCase):
         data = response.json()
         self.assertEqual(carrier.siret, data["user"]["carriers"][0]["siret"])
 
-    def test_patch_profile(self):
+    def test_accept_cgu(self):
         self.user.has_accepted_cgu = False
         self.user.save()
 
@@ -58,6 +58,9 @@ class ProfileTestCase(AuthTestCase):
         data = response.json()
         self.assertTrue(data["user"]["has_accepted_cgu"])
 
+    def test_refuse_cgu(self):
+        http_authorization = self.log_in()
+
         # Try to revoke CGU
         response = self.client.patch(
             self.url,
@@ -68,3 +71,32 @@ class ProfileTestCase(AuthTestCase):
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertIn("has_accepted_cgu", data["errors"])
+
+    def test_subscribe_newsletter(self):
+        http_authorization = self.log_in()
+
+        response = self.client.patch(
+            self.url,
+            {"has_subscribed_newsletter": True},
+            content_type="application/json",
+            HTTP_AUTHORIZATION=http_authorization,
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["user"]["has_subscribed_newsletter"])
+
+    def test_subscribe_newsletter_wo_cgu(self):
+        self.user.has_accepted_cgu = False
+        self.user.save()
+
+        http_authorization = self.log_in()
+
+        response = self.client.patch(
+            self.url,
+            {"has_subscribed_newsletter": False},
+            content_type="application/json",
+            HTTP_AUTHORIZATION=http_authorization,
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertFalse(data["user"]["has_subscribed_newsletter"])
