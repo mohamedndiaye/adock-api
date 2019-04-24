@@ -81,6 +81,13 @@ class User(AbstractBaseUser):
             "faux pour l'ensemble des utilisateurs."
         ),
     )
+    has_subscribed_newsletter = models.BooleanField(
+        "Est abonné à la lettre d'information",
+        default=False,
+        help_text=(
+            "Indique si l'utilisateur souhaite recevoir la lettre d'information."
+        ),
+    )
 
     objects = UserManager()
 
