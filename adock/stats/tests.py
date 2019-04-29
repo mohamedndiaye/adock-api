@@ -7,6 +7,7 @@ from django.utils import timezone
 import pytz
 
 from adock.carriers import factories as carriers_factories
+from adock.carriers import models as carriers_models
 from adock.accounts.test import AuthTestCase
 
 
@@ -43,6 +44,13 @@ class StatsTestCase(AuthTestCase):
             with_editable={"confirmed_at": start - datetime.timedelta(days=42)}
         )
 
+        # Two certificates with only one confirmed
+        carriers = carriers_models.Carrier.objects.all()[:2]
+        carriers_factories.CarrierCertificateFactory(
+            carrier=carriers[0], confirmed_at=None
+        )
+        carriers_factories.CarrierCertificateFactory(carrier=carriers[1])
+
         http_authorization = self.log_in()
         response = self.client.get(
             self.url,
@@ -54,6 +62,7 @@ class StatsTestCase(AuthTestCase):
 
         # Total (outside last n months included)
         self.assertEqual(stats["modified_carriers"], 4)
+        self.assertEqual(stats["certificates"], 1)
 
         # 6 months
         modified_carriers_per_month = stats["modified_carriers_per_month"]

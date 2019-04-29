@@ -9,6 +9,9 @@ def stats(request):
     modified_carriers = carriers_models.Carrier.objects.filter(
         editable__confirmed_at__isnull=False
     ).count()
+    certificates = carriers_models.CarrierCertificate.objects.filter(
+        confirmed_at__isnull=False
+    ).count()
 
     modified_carriers_per_month = []
     with connection.cursor() as cursor:
@@ -40,6 +43,7 @@ def stats(request):
     return JsonResponse(
         {
             # Total
+            "certificates": certificates,
             "modified_carriers": modified_carriers,
             # Only for the recent period (6 months)
             "modified_carriers_per_month": modified_carriers_per_month,
