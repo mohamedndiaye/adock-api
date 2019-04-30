@@ -2,6 +2,7 @@ from django.db import connection
 from django.http import JsonResponse
 
 from adock.carriers import models as carriers_models
+from adock.meta import models as meta_models
 
 
 def stats(request):
@@ -12,6 +13,10 @@ def stats(request):
     certificates = carriers_models.CarrierCertificate.objects.filter(
         confirmed_at__isnull=False
     ).count()
+    try:
+        nginx_stats = meta_models.Meta.objects.get(name="nginx")
+    except meta_models.Meta.DoesNotExist:
+        nginx_stats = None
 
     modified_carriers_per_month = []
     with connection.cursor() as cursor:
@@ -40,12 +45,17 @@ def stats(request):
         for row in cursor.fetchall():
             modified_carriers_per_month.append({"month": row[0], "count": row[1]})
 
-    return JsonResponse(
-        {
-            # Total
-            "certificates": certificates,
-            "modified_carriers": modified_carriers,
-            # Only for the recent period (6 months)
-            "modified_carriers_per_month": modified_carriers_per_month,
-        }
-    )
+    data = {
+        # Total
+        "certificates": certificates,
+        "modified_carriers": modified_carriers,
+        # Only for the recent period (6 months)
+        "modified_carriers_per_month": modified_carriers_per_month,
+    }
+
+    if nginx_stats:
+        data["carrier_views"] = nginx_stats.data["carriers"]
+        data["certificate_views"] = nginx_stats.data["certificates"]
+        data["search_views"] = nginx_stats.data["searches"]
+
+    return JsonResponse(data)
