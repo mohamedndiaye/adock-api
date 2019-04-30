@@ -31,3 +31,5 @@ SENTRY_DSN = "https://URL-TO-PASTE-FROM-SENTRY-IO"
 FRANCE_CONNECT_URL_ROOT = "https://fcp.integ01.dev-franceconnect.fr/api/v1/"
 FRANCE_CONNECT_CLIENT_ID = ""
 FRANCE_CONNECT_CLIENT_SECRET = ""
+
+NGINX_ACCESS_LOG = "/var/log/adock.webstack.fr/access.log"

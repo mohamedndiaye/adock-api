@@ -119,7 +119,8 @@ DATAFILES_ROOT = os.path.join(BASE_DIR, "datafiles")
 
 HOSTNAME = "adock.beta.gouv.fr"
 HTTP_CLIENT_URL = "https://" + HOSTNAME + "/"
-HTTP_SERVER_URL = "https://" + HOSTNAME + "/api/"
+HTTP_SERVER_URL_ENDPOINT = "/api/"
+HTTP_SERVER_URL = "https://" + HOSTNAME + HTTP_SERVER_URL_ENDPOINT
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = False
@@ -160,6 +161,8 @@ JWT_PAYLOAD_HANDLER = "adock.accounts.jwt.jwt_payload_handler"
 FRANCE_CONNECT_URL_ROOT = "https://app.franceconnect.gouv.fr/api/v1/"
 FRANCE_CONNECT_CLIENT_ID = ""
 FRANCE_CONNECT_CLIENT_SECRET = ""
+
+NGINX_ACCESS_LOG = "/var/log/adock.beta.gouv.fr/access.log"
 
 try:
     from .settings_local import *  # pylint: disable=W0401
