@@ -363,6 +363,7 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
         )
         data = {"siret": carrier_editable.carrier_id}
     else:
+        # Production
         carrier_editable = get_object_or_404(
             models.CarrierEditable.objects.select_related("carrier"),
             pk=carrier_editable_id,
