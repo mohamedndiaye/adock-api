@@ -35,4 +35,4 @@ class SelftestTestCase(AuthTestCase):
             url, content_type="application/json", HTTP_AUTHORIZATION=http_authorization
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Selftest page")
+        self.assertIn("actions", response.json())

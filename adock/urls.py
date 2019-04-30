@@ -23,6 +23,6 @@ urlpatterns = [
     path("accounts/", include("adock.accounts.urls")),
     path("carriers/", include("adock.carriers.urls")),
     path("meta/", meta_views.meta_index, name="meta"),
-    path("selftest", selftest_views.selftest_index, name="selftest"),
+    path("selftest/", selftest_views.selftest_index, name="selftest"),
     path("stats/", stats_views.stats, name="stats"),
 ]
