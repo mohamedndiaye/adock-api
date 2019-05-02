@@ -17,6 +17,7 @@ META_SPECIALITY_CHOICES = collections.OrderedDict(carriers_models.SPECIALITY_CHO
 META_OBJECTIF_CO2_CHOICES = collections.OrderedDict(
     carriers_models.OBJECTIF_CO2_CHOICES
 )
+META_CERTIFICATES_CHOICES = collections.OrderedDict(carriers_models.CERTIFICATE_CHOICES)
 
 
 @cache_page(3600)
@@ -24,9 +25,10 @@ def meta_index(request):
     metas = meta_models.Meta.objects.all()
     data = {
         "choices": {
-            "WORKING_AREA_CHOICES": META_WORKING_AREA_CHOICES,
-            "SPECIALITY_CHOICES": META_SPECIALITY_CHOICES,
+            "CERTIFICATE_CHOICES": META_CERTIFICATES_CHOICES,
             "OBJECTIF_CO2_CHOICES": META_OBJECTIF_CO2_CHOICES,
+            "SPECIALITY_CHOICES": META_SPECIALITY_CHOICES,
+            "WORKING_AREA_CHOICES": META_WORKING_AREA_CHOICES,
         },
         "version": settings.VERSION,
     }

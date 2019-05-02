@@ -302,8 +302,8 @@ class CarrierFeed(models.Model):
         db_table = "carrier_feed"
 
 
-CERTIFICATE_NO_WORKERS = "no-workers"
-CERTIFICATE_WORKERS = "workers"
+CERTIFICATE_NO_WORKERS = "NO_WORKERS"
+CERTIFICATE_WORKERS = "WORKERS"
 CERTIFICATE_CHOICES = (
     (CERTIFICATE_NO_WORKERS, "Attestation de non emploi de travailleurs étrangers"),
     (CERTIFICATE_WORKERS, "Attestation d'emploi de travailleurs étrangers"),
