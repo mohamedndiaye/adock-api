@@ -1,5 +1,5 @@
 pip>=18.1
-Django[argon2]==2.2
+Django[argon2]==2.2.1
 djangorestframework==3.9.2
 psycopg2-binary==2.8.2
 jinja2
