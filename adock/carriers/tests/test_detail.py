@@ -295,6 +295,13 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
         latest_editable = models.CarrierEditable.objects.latest()
         self.assertEqual(latest_editable.website, WEBSITE)
 
+    def test_post_website_wo_prefix(self):
+        WEBSITE = "www.example.com"
+        self.assertNotEqual(self.carrier.editable.website, WEBSITE)
+        self.post_carrier_logged(
+            {"email": EMAIL, "telephone": PHONE, "website": "http://" + WEBSITE}, 200
+        )
+
     def test_post_invalid_mimetype(self):
         response = self.client.post(
             self.detail_url, {"foo": "foo"}, HTTP_AUTHORIZATION=self.http_authorization

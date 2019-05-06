@@ -1,5 +1,6 @@
 import re
 
+from django.core import validators
 from django.core.exceptions import ValidationError
 
 SIREN_LENGTH = 9
@@ -39,3 +40,11 @@ def validate_french_departement(departements):
                 "« %(value)s » n'est pas un département français valide.",
                 params={"value": departement},
             )
+
+
+class LooseURLValidator(validators.URLValidator):
+    def __call__(self, value):
+        if not value.startswith("http://") and not value.startswith("https://"):
+            value = "http://" + value
+
+        return super().__call__(value)

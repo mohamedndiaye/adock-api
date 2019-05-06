@@ -32,6 +32,12 @@ class CarrierEditableSerializer(serializers.ModelSerializer):
         # Unique and sorted
         return sorted(set(formated_departements))
 
+    def validate_website(self, value):
+        # Tied to LooseURLValidator
+        if not value.startswith("http://") and not value.startswith("https://"):
+            value = "http://" + value
+        return value
+
     def validate(self, attrs):
         if attrs.get(
             "working_area"

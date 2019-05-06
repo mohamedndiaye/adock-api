@@ -276,7 +276,11 @@ class CarrierEditable(models.Model):
         blank=True,
         null=True,
     )
-    website = models.URLField(blank=True)
+    website = models.CharField(
+        max_length=200,
+        blank=True,
+        validators=[carriers_validators.LooseURLValidator(schemes=["http", "https"])],
+    )
     # Filled by the user to describe his activity
     description = models.TextField(blank=True, default="")
 
