@@ -88,6 +88,11 @@ des commandes Django :
   des entreprises **labellisées** de le section Transport de marchandises de la
   page http://www.objectifco2.fr/index/documents#categ-6.
 
+- `parse_nginx_log` (Django) analyse les logs nginx pour extraires des
+  statistiques sur l'utilisation de l'application (nombre de fiches consultées,
+  attestations téléchargées, etc). Ces statistiques sont stockées en base de
+  données et publiées via l'API à l'interface graphique des statistiques.
+
 ## Dépendances
 
 - [Django][django] v2
