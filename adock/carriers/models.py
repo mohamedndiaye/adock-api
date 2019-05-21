@@ -55,6 +55,7 @@ SPECIALITY_CHOICES = (
     ("DEMENAGEMENT", "Déménagement"),
     ("LOCATION", "Location"),
     ("LOT", "Lots"),
+    ("MATIERE_DANGEREUSE", "Matière dangereuse"),
     ("MESSAGERIE", "Messagerie express"),
     ("MULTIMODAL", "Multimodal"),
     ("PALETTE", "Palettes / Messagerie palettisée"),
