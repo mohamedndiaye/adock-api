@@ -25,28 +25,34 @@ def get_qr_code(data=None, border=2, box_size=7):
 
 
 def pdf_response(response, pdf_filename):
-    (_, html_filename) = tempfile.mkstemp(
-        prefix=pdf_filename.replace(".pdf", ""), suffix=".html"
+    (temp_html_fd, temp_html_path) = tempfile.mkstemp(
+        prefix=pdf_filename.replace(".pdf", ""), suffix=".html", text=True
     )
-    with open(html_filename, "w+") as f:
+    with open(temp_html_path, "w") as f:
         content = response.content.decode("utf-8")
         f.write(content)
 
+    (temp_pdf_fd, temp_pdf_path) = tempfile.mkstemp(
+        prefix=pdf_filename.replace(".pdf", ""), suffix=".pdf"
+    )
     ps = subprocess.Popen(
         [
             "node",
             os.path.join(settings.BASE_DIR, "htmltopdf.js"),
-            html_filename,
-            pdf_filename,
+            temp_html_path,
+            temp_pdf_path,
         ]
     )
     ps.wait()
 
-    os.remove(html_filename)
+    os.close(temp_html_fd)
+    os.remove(temp_html_path)
 
-    with open(pdf_filename, "rb") as f:
+    with open(temp_pdf_path, "rb") as f:
         response = HttpResponse(f.read(), content_type="application/pdf")
         response["Content-Disposition"] = 'attachment; filename="%s"' % (pdf_filename)
 
-    os.remove(pdf_filename)
+    os.close(temp_pdf_fd)
+    os.remove(temp_pdf_path)
+
     return response
