@@ -12,10 +12,10 @@ const puppeteer = require("puppeteer");
     ]
   });
   const page = await browser.newPage();
-  page.on("console", (...args) => logger.info("PAGE LOG:", ...args));
+  page.on("console", (...args) => console.info("PAGE LOG:", ...args));
   page.on("error", err => {
-    logger.error(`Error event emitted: ${err}`);
-    logger.error(err.stack);
+    console.error(`Error event emitted: ${err}`);
+    console.error(err.stack);
   });
   await page.emulateMedia("screen");
   await page.goto("file://" + htmlFilename, { waitUntil: "networkidle0" });
