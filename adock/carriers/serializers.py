@@ -1,6 +1,7 @@
 # pylint: disable=W0223
 from rest_framework import serializers
 
+from . import validators as carriers_validators
 from . import models as carriers_models
 
 
@@ -33,10 +34,7 @@ class CarrierEditableSerializer(serializers.ModelSerializer):
         return sorted(set(formated_departements))
 
     def validate_website(self, value):
-        # Tied to LooseURLValidator
-        if not value.startswith("http://") and not value.startswith("https://"):
-            value = "http://" + value
-        return value
+        return carriers_validators.validate_scheme(value)
 
     def validate(self, attrs):
         if attrs.get(

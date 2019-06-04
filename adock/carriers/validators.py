@@ -42,9 +42,14 @@ def validate_french_departement(departements):
             )
 
 
+def validate_scheme(value):
+    if value and not value.startswith("http://") and not value.startswith("https://"):
+        return "http://" + value
+
+    return value
+
+
 class LooseURLValidator(validators.URLValidator):
     def __call__(self, value):
-        if not value.startswith("http://") and not value.startswith("https://"):
-            value = "http://" + value
-
-        return super().__call__(value)
+        validate_scheme(value)
+        return super().__call__(validate_scheme(value))
