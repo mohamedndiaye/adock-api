@@ -24,13 +24,12 @@ def get_qr_code(data=None, border=2, box_size=7):
     return content
 
 
-def pdf_response(response, pdf_filename):
+def pdf_response(html_content, pdf_filename):
     (temp_html_fd, temp_html_path) = tempfile.mkstemp(
         prefix=pdf_filename.replace(".pdf", ""), suffix=".html", text=True
     )
     with open(temp_html_path, "w") as f:
-        content = response.content.decode("utf-8")
-        f.write(content)
+        f.write(html_content)
 
     (temp_pdf_fd, temp_pdf_path) = tempfile.mkstemp(
         prefix=pdf_filename.replace(".pdf", ""), suffix=".pdf"

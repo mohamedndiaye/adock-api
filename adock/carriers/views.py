@@ -446,7 +446,8 @@ def _certificate_get(request, carrier, as_pdf=True):
 
     if as_pdf:
         return core_pdf.pdf_response(
-            response, "adock-%s-attestation-%s.pdf" % (carrier.siret, certificate.pk)
+            response.content.decode("utf-8"),
+            "adock-%s-attestation-%s.pdf" % (carrier.siret, certificate.pk),
         )
 
     return response
