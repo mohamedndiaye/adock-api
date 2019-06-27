@@ -346,3 +346,23 @@ class CarrierUser(models.Model):
     class Meta:
         db_table = "carrier_user"
         unique_together = ("carrier", "user")
+
+
+class CarrierRenewLicense(models.Model):
+    carrier = models.ForeignKey(Carrier, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(
+        accounts_models.User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="carrier_renew_licenses",
+    )
+    confirmed_at = models.DateTimeField(blank=True, null=True)
+    lti_nombre = models.PositiveSmallIntegerField(default=0)
+    lc_nombre = models.PositiveSmallIntegerField(default=0)
+
+    def __str__(self):
+        return "%s: %s" % (self.carrier.siret, self.created_at)
+
+    class Meta:
+        db_table = "carrier_renew_license"
