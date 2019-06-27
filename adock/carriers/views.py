@@ -29,6 +29,7 @@ CARRIER_LIST_FIELDS = (
 
 CARRIER_DETAIL_FIELDS = (
     "siret",
+    # get_siren is added too
     "raison_sociale",
     "enseigne",
     "gestionnaire",
@@ -96,6 +97,7 @@ def get_carrier_as_json(carrier):
 
     for field in CARRIER_DETAIL_FIELDS:
         carrier_json[field] = getattr(carrier, field)
+    carrier_json["siren"] = carrier.get_siren()
 
     editable = carrier.editable
     carrier_json["is_locked"] = bool(editable.confirmed_at)
