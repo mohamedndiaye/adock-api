@@ -72,3 +72,18 @@ class CertificateSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
         if self.initial_data["kind"] == carriers_models.CERTIFICATE_WORKERS:
             self.fields["workers"].required = True
+
+
+class LicenseRenewalSerializer(serializers.Serializer):
+    # 0 or None are ignored
+    lti_nombre = serializers.IntegerField(min_value=0, default=0, required=False)
+    lc_nombre = serializers.IntegerField(min_value=0, default=0, required=False)
+
+    def validate(self, attrs):
+        if not attrs.get("lti_nombre") and not attrs.get("lc_nombre"):
+            raise serializers.ValidationError(
+                {
+                    "__all__": "Au moins, un nombre de license LTI ou LC doit être renseigné."
+                }
+            )
+        return attrs

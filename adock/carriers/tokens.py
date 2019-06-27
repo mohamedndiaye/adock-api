@@ -30,3 +30,21 @@ class CertificateTokenGenerator(PasswordResetTokenGenerator):
 
 
 certificate_token = CertificateTokenGenerator()
+
+
+class LicenseRenewalTokenGenerator(PasswordResetTokenGenerator):
+    def _make_hash_value(self, license_renewal, timestamp):  # pylint: disable=W0221
+        # Ensure not others have been confirmed in the meantime
+        current_license_renewal = license_renewal.carrier.get_latest_certificate()
+        current_certificate_pk = (
+            current_license_renewal.pk if current_license_renewal else None
+        )
+        return "%s%s%s%s" % (
+            current_certificate_pk,
+            license_renewal.pk,
+            license_renewal.confirmed_at or "",
+            timestamp,
+        )
+
+
+license_renewal_token = LicenseRenewalTokenGenerator()

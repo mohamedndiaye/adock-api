@@ -214,3 +214,137 @@ Données :
         user=certificate.created_by,
     )
     mail_managers(subject, message, fail_silently=True)
+
+
+def mail_carrier_license_renewal_to_confirm(carrier, license_renewal):
+    token = tokens.license_renewal_token.make_token(license_renewal)
+    subject = (
+        "%sEn attente de confirmation d'une demande de renouvellement de license"
+        % settings.EMAIL_SUBJECT_PREFIX
+    )
+    message = """
+Merci d'avoir effectué une demande de renouvellement de license sur A Dock,
+l'application qui facilite la relation chargeur et transporteur.
+
+Pour la confirmer, cliquez sur ce lien :
+
+{http_client_url}transporteur/renouvellement/{license_renewal_id}/confirmer/{token}/
+
+Cordialement,
+L'équipe A Dock
+    """.format(
+        http_client_url=settings.HTTP_CLIENT_URL,
+        license_renewal_id=license_renewal.id,
+        token=token,
+    )
+    recipient_list = get_recipient_list_from_env(carrier.editable.email)
+    send_mail(
+        subject,
+        message,
+        settings.SERVER_EMAIL,
+        recipient_list,
+        fail_silently=settings.DEBUG,
+    )
+
+
+def mail_managers_new_license_renewal(license_renewal):
+    carrier = license_renewal.carrier
+    subject = "Demande de renouvellement de licence %s pour le transporteur %s" % (
+        license_renewal.pk,
+        carrier.siret,
+    )
+    message = """
+Transporteur : {enseigne}
+Utilisateur : {user}
+Nombre de LTI : {lti_nombre}
+Nombre de LC : {lc_nombre}
+
+{http_client_url}transporteur/{siret}
+""".format(
+        enseigne=carrier.enseigne,
+        user=license_renewal.created_by,
+        lti_nombre=license_renewal.lti_nombre,
+        lc_nombre=license_renewal.lc_nombre,
+        http_client_url=settings.HTTP_CLIENT_URL,
+        siret=carrier.siret,
+    )
+    mail_managers(subject, message, fail_silently=True)
+
+
+def get_license_message(label, numero, date_fin, new_nombre):
+    return "- license {label} n°{numero} expirant le {date_fin} avec {new_nombre} de copies conformes\n".format(
+        label=label, numero=numero, date_fin=date_fin, new_nombre=new_nombre
+    )
+
+
+def mail_dreal_license_renewal(license_renewal):
+    carrier = license_renewal.carrier
+    subject = "%sDemande de renouvellement de licence de %s n° SIREN %s" % (
+        settings.EMAIL_SUBJECT_PREFIX,
+        carrier.raison_sociale,
+        carrier.get_siren(),
+    )
+
+    message = """
+Bonjour DREAL Bretagne,
+
+L'entreprise {raison_sociale} n° SIREN {siren} a fait, par l'intermédiaire de
+{first_name} {last_name} une demande de renouvellement de :
+"""
+    if license_renewal.lti_nombre:
+        message += get_license_message(
+            label="LTI",
+            numero=carrier.lti_numero,
+            date_fin=carrier.lti_date_fin,
+            new_nombre=license_renewal.lti_nombre,
+        )
+
+    if license_renewal.lc_nombre:
+        message += get_license_message(
+            label="LC",
+            numero=carrier.lc_numero,
+            date_fin=carrier.lc_date_fin,
+            new_nombre=license_renewal.lc_nombre,
+        )
+
+    message += (
+        """
+Merci de bien vouloir instruire cette demande et, le cas échéant, de demander les
+pièces justificatives à l’adresse %s.
+Cordialement,
+
+L’équipe A Dock"""
+        % license_renewal.carrier.editable.email
+    )
+    recipient_list = get_recipient_list_from_env(settings.DREAL_EMAIL)
+    send_mail(
+        subject,
+        message,
+        settings.SERVER_EMAIL,
+        recipient_list,
+        fail_silently=settings.DEBUG,
+    )
+
+
+def mail_managers_license_renewal_confirmed(license_renewal):
+    carrier = license_renewal.carrier
+    subject = "Demande de renouvellement de licence %s du transporteur %s confirmée" % (
+        license_renewal.pk,
+        carrier.siret,
+    )
+    message = """
+Transporteur : {enseigne}
+Utilisateur : {user}
+Nombre de LTI : {lti_nombre}
+Nombre de LC : {lc_nombre}
+
+{http_client_url}transporteur/{siret}
+    """.format(
+        enseigne=carrier.enseigne,
+        user=license_renewal.created_by,
+        lti_nombre=license_renewal.lti_nombre,
+        lc_nombre=license_renewal.lc_nombre,
+        http_client_url=settings.HTTP_CLIENT_URL,
+        siret=carrier.siret,
+    )
+    mail_managers(subject, message, fail_silently=True)

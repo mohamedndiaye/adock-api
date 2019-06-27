@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.utils.formats import date_format
+from django.views.decorators.http import require_POST
 
 from adock.core import pdf as core_pdf
 from adock.core import views as core_views
@@ -494,4 +495,54 @@ def certificate_confirm(request, certificate_id, token):
     mails.mail_managers_certificate_confirmed(certificate)
     return JsonResponse(
         {"siret": certificate.carrier_id, "message": "L'attestation est confirmée"}
+    )
+
+
+@require_POST
+def license_renewal_ask(request, carrier_siret):
+    carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
+    allowed, response = check_user_is_allowed(request.user)
+    if not allowed:
+        return response
+
+    serializer, response = core_views.request_validate(
+        request, carriers_serializers.LicenseRenewalSerializer
+    )
+    if response:
+        return response
+
+    license_renewal = models.CarrierLicenseRenewal.objects.create(
+        carrier=carrier,
+        created_by=request.user,
+        lti_nombre=serializer.validated_data["lti_nombre"],
+        lc_nombre=serializer.validated_data["lc_nombre"],
+    )
+    mails.mail_carrier_license_renewal_to_confirm(carrier, license_renewal)
+    mails.mail_managers_new_license_renewal(license_renewal)
+    return JsonResponse({"carrier": get_carrier_as_json(carrier)})
+
+
+def license_renewal_confirm(request, license_renewal_id, token):
+    license_renewal = get_object_or_404(
+        models.CarrierLicenseRenewal.objects.select_related("carrier"),
+        pk=license_renewal_id,
+    )
+    if not tokens.license_renewal_token.check_token(license_renewal, token):
+        return JsonResponse(
+            {
+                "siret": license_renewal.carrier_id,
+                "message": "Impossible de confirmer la demande de renouvellement de license.",
+            },
+            status=400,
+        )
+
+    license_renewal.confirmed_at = timezone.now()
+    license_renewal.save()
+    mails.mail_dreal_license_renewal(license_renewal)
+    mails.mail_managers_license_renewal_confirmed(license_renewal)
+    return JsonResponse(
+        {
+            "siret": license_renewal.carrier_id,
+            "message": "La demande de renouvellement de license est renouvellée.",
+        }
     )

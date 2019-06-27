@@ -229,6 +229,14 @@ class Carrier(models.Model):
         except CarrierCertificate.DoesNotExist:
             return None
 
+    def get_latest_license_renewal(self):
+        try:
+            return self.license_renewals.exclude(confirmed_at__isnull=True).latest(
+                "created_at"
+            )
+        except CarrierLicenseRenewal.DoesNotExist:
+            return None
+
     def save(self, *args, **kwargs):  # pylint: disable=W0221
         self.completeness = self.compute_completeness()
         if "update_fields" in kwargs:
@@ -348,14 +356,14 @@ class CarrierUser(models.Model):
         unique_together = ("carrier", "user")
 
 
-class CarrierRenewLicense(models.Model):
+class CarrierLicenseRenewal(models.Model):
     carrier = models.ForeignKey(Carrier, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         accounts_models.User,
         on_delete=models.SET_NULL,
         null=True,
-        related_name="carrier_renew_licenses",
+        related_name="carrier_license_renewals",
     )
     confirmed_at = models.DateTimeField(blank=True, null=True)
     lti_nombre = models.PositiveSmallIntegerField(default=0)
@@ -365,4 +373,4 @@ class CarrierRenewLicense(models.Model):
         return "%s: %s" % (self.carrier.siret, self.created_at)
 
     class Meta:
-        db_table = "carrier_renew_license"
+        db_table = "carrier_license_renewal"

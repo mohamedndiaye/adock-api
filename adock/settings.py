@@ -185,6 +185,7 @@ if not ALLOWED_HOSTS:
     ALLOWED_HOSTS = [HOSTNAME]
 
 SERVER_EMAIL = "contact@" + HOSTNAME
+DREAL_EMAIL = "registre-transports.bretagne@developpement-durable.gouv.fr"
 
 LOGGING = {
     "version": 1,

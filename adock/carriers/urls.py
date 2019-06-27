@@ -28,4 +28,14 @@ urlpatterns = [
         views.certificate_confirm,
         name="carriers_certificate_confirm",
     ),
+    path(
+        "<str:carrier_siret>/license_renewal/",
+        views.license_renewal_ask,
+        name="carriers_license_renewal",
+    ),
+    path(
+        "license_renewal/<int:license_renewal_id>/confirm/<str:token>/",
+        views.license_renewal_confirm,
+        name="carriers_license_renewal_confirm",
+    ),
 ]
