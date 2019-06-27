@@ -9,6 +9,7 @@ import unidecode
 from faker import Faker
 from django.utils import timezone
 
+from ..accounts import factories as accounts_factories
 from . import models, validators
 
 faker = Faker("fr_FR")
@@ -94,3 +95,10 @@ class CarrierCertificateFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.CarrierCertificate
+
+
+class CarrierLicenseRenewal(factory.DjangoModelFactory):
+    carrier = factory.SubFactory(CarrierFactory)
+    created_by = factory.SubFactory(accounts_factories.AccountFactory)
+    lti_nombre = fuzzy.FuzzyInteger(1, 20)
+    lc_nombre = fuzzy.FuzzyInteger(1, 20)
