@@ -501,6 +501,14 @@ def certificate_confirm(request, certificate_id, token):
 @require_POST
 def license_renewal_ask(request, carrier_siret):
     carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
+
+    # Only possible if the email is set
+    if not carrier.editable.email:
+        return JsonResponse(
+            {"message": "La fiche transporteur ne contient d'adresse électronique."},
+            status=401,
+        )
+
     allowed, response = check_user_is_allowed(request.user)
     if not allowed:
         return response

@@ -137,8 +137,7 @@ class SignCarrierCertificateTestCase(AuthTestCase):
             HTTP_AUTHORIZATION=self.http_authorization,
         )
         self.assertEqual(response.status_code, 400)
-        data = json.loads(response.content.decode("utf-8"))
-        self.assertIn("last_name", data["errors"])
+        self.assertIn("last_name", response.json()["errors"])
 
     def test_sign_with_unconfirmed_carrier(self):
         self.carrier.editable.email = ""

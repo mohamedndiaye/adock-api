@@ -26,5 +26,4 @@ class AuthTestCase(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 200)
-        content = json.loads(response.content.decode("utf-8"))
-        return "Bearer " + content["token"]
+        return "Bearer " + response.json()["token"]

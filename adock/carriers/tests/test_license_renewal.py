@@ -10,7 +10,32 @@ from adock.accounts.test import AuthTestCase
 from .. import factories, models
 
 
-class SignCarrierCertificateTestCase(AuthTestCase):
+class NotAllowedLicenseRenewalTestCase(AuthTestCase):
+    def setUp(self):
+        super().setUp()
+        self.carrier = factories.CarrierFactory(with_editable=True)
+        self.carrier.editable.email = ""
+        self.carrier.editable.save()
+        self.license_renewal_url = reverse(
+            "carriers_license_renewal", kwargs={"carrier_siret": self.carrier.siret}
+        )
+        self.http_authorization = self.log_in()
+
+    def test_not_allowed(self):
+        # Carrier without editable
+        response = self.client.post(
+            self.license_renewal_url,
+            content_type="application/json",
+            HTTP_AUTHORIZATION=self.http_authorization,
+        )
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(
+            response.json()["message"],
+            "La fiche transporteur ne contient d'adresse électronique.",
+        )
+
+
+class LicenseRenewalTestCase(AuthTestCase):
     def setUp(self):
         super().setUp()
         self.carrier = factories.CarrierFactory(with_editable=True)
@@ -82,7 +107,7 @@ class SignCarrierCertificateTestCase(AuthTestCase):
             HTTP_AUTHORIZATION=self.http_authorization,
         )
         self.assertEqual(response.status_code, 400)
-        data = json.loads(response.content.decode("utf-8"))
+        data = response.json()
         self.assertIn("lti_nombre", data["errors"])
         self.assertNotIn("lc_nombre", data["errors"])
 
@@ -94,9 +119,9 @@ class SignCarrierCertificateTestCase(AuthTestCase):
             HTTP_AUTHORIZATION=self.http_authorization,
         )
         self.assertEqual(response.status_code, 400)
-        data = json.loads(response.content.decode("utf-8"))
-        self.assertIn("non_field_errors", data["errors"])
+        data = response.json()
+        self.assertIn("__all__", data["errors"])
         self.assertEqual(
-            data["errors"]["non_field_errors"][0],
-            "Au moins, un nombre de license doit être renseigné.",
+            data["errors"]["__all__"][0],
+            "Au moins, un nombre de license LTI ou LC doit être renseigné.",
         )
