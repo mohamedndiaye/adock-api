@@ -413,9 +413,9 @@ components:
         sirene_closed_at:
           type: boolean
           description: date de fermeture de l'établissement dans la base Sirène
-        is_locked:
+        is_confirmed:
           type: boolean
-          description: indique que la fiche est verrouillée
+          description: indique que la fiche est confirmée
         other_facilities:
           type: array
           items:

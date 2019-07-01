@@ -58,7 +58,7 @@ class CarrierDetailTestCase(test.CarrierTestCaseMixin):
         carrier_data = response.json()["carrier"]
         self.assertEqual(carrier_data["debut_activite"], None)
         self.assertEqual(carrier_data["specialities"], None)
-        self.assertEqual(carrier_data["is_locked"], False)
+        self.assertEqual(carrier_data["is_confirmed"], False)
         self.assertEqual(carrier_data["other_facilities"], [])
         self.assertEqual(carrier_data["latest_certificate"], None)
 

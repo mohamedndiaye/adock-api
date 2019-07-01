@@ -58,7 +58,7 @@ CARRIER_DETAIL_FIELDS = (
     "sirene_closed_at",
     "longitude",
     "latitude",
-    # is_locked boolean is added to indicate if editable is present
+    # is_confirmed boolean is added to indicate if editable is present
 )
 
 # From CarrierEditable
@@ -101,7 +101,7 @@ def get_carrier_as_json(carrier):
     carrier_json["siren"] = carrier.get_siren()
 
     editable = carrier.editable
-    carrier_json["is_locked"] = bool(editable.confirmed_at)
+    carrier_json["is_confirmed"] = bool(editable.confirmed_at)
     carrier_json["telephone"] = format_telephone(editable.telephone)
 
     for field in CARRIER_DETAIL_EDITABLE_FIELDS:
