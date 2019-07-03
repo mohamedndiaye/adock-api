@@ -150,7 +150,7 @@ def carrier_search(request):
     if q:
         # Filtering on enseigne or SIRET
         q = q.upper()
-        criteria_list = q.split(",")
+        criteria_list = q.split(" ")
         for criteria in criteria_list:
             criteria = criteria.strip()
             if validators.RE_NOT_DIGIT_ONLY.search(criteria):

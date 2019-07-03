@@ -47,13 +47,13 @@ class CarrierSearchQueryTestCase(CarrierSearchTestCase):
         carriers = self.get_carriers({"q": "35 "})
         self.assertEqual(len(carriers), 1)
 
-        carriers = self.get_carriers({"q": " " + test.VALID_SIRET[0:6] + ", 35"})
+        carriers = self.get_carriers({"q": " " + test.VALID_SIRET[0:6] + " 35"})
         self.assertEqual(len(carriers), 1)
 
-        carriers = self.get_carriers({"q": " " + test.VALID_SIRET[0:6] + ", 37"})
+        carriers = self.get_carriers({"q": " " + test.VALID_SIRET[0:6] + " 37"})
         self.assertEqual(len(carriers), 0)
 
-        carriers = self.get_carriers({"q": " 1" + test.VALID_SIRET[0:6] + ", 35"})
+        carriers = self.get_carriers({"q": " 1" + test.VALID_SIRET[0:6] + " 35"})
         self.assertEqual(len(carriers), 0)
 
     def test_search_on_enseigne(self):
@@ -62,6 +62,14 @@ class CarrierSearchQueryTestCase(CarrierSearchTestCase):
         self.assertEqual(len(carriers), 1)
 
         carriers = self.get_carriers({"q": "rg"})
+        self.assertEqual(len(carriers), 0)
+
+        # Swapped ordering
+        carriers = self.get_carriers({"q": "Roger super"})
+        self.assertEqual(len(carriers), 1)
+
+        # Typo
+        carriers = self.get_carriers({"q": "Roger souper"})
         self.assertEqual(len(carriers), 0)
 
     def test_search_on_short_enseigne(self):
@@ -86,10 +94,10 @@ class CarrierSearchQueryTestCase(CarrierSearchTestCase):
 
     def test_search_on_code_postal(self):
         factories.CarrierFactory(enseigne="XPO BOIS DISTRIBUTION", code_postal="49000")
-        carriers = self.get_carriers({"q": "xpo, DIS, 49"})
+        carriers = self.get_carriers({"q": "xpo DIS 49"})
         self.assertEqual(len(carriers), 1)
 
-        carriers = self.get_carriers({"q": "xpo DIS, 49"})
+        carriers = self.get_carriers({"q": "xpo DIS 56"})
         self.assertEqual(len(carriers), 0)
 
     def test_search_ordering_on_enseigne(self):
