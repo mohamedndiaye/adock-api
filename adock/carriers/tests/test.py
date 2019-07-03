@@ -1,6 +1,7 @@
 from django.test import TestCase
 
 VALID_SIRET = "12345678912345"
+VALID_SIRET_WITH_SPACES = "123 456 789 12345"
 
 
 class CarrierTestCaseMixin(TestCase):

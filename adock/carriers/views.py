@@ -140,6 +140,54 @@ def get_latest_certificate_as_json(carrier):
     }
 
 
+def carrier_search_q(carriers, q):
+    # Filtering on enseigne, SIREN/SIRET, zip code
+    q = q.upper()
+    if validators.RE_ONLY_DIGITS_AND_SPACES.match(q):
+        # Zip code or SIREN/SIRET number so we remove useless spaces
+        q = q.replace(" ", "")
+        if len(q) > 5:
+            # SIREN/SIRET
+            return carriers.filter(siret__startswith=q)
+
+        # Comment #1
+        # Zip code are shorter than 5 digits but could be a digit in
+        # the company name too (limited to 5). Criteria contains
+        # only digits so the filtering will return same results
+        # against enseigne and enseigne_unaccent, however it's
+        # better to compare against enseigne_unaccent to reduce the
+        # number of DB indexes.
+        return carriers.filter(
+            Q(code_postal__startswith=q) | Q(enseigne_unaccent__contains=q)
+        )
+
+    # Spaces are used to split q as a list of criterion
+    criterion_list = q.split(" ")
+    for criterion in criterion_list:
+        criterion = criterion.strip()
+        if not criterion:
+            continue
+
+        if validators.RE_ONLY_DIGITS.match(criterion):
+            # criterion contains only digits
+            if len(criterion) > 5:
+                # SIREN is longer than 5
+                carriers = carriers.filter(siret__startswith=criterion)
+            else:
+                # Idem as comment #1
+                carriers = carriers.filter(
+                    Q(code_postal__startswith=criterion)
+                    | Q(enseigne_unaccent__contains=criterion)
+                )
+        else:
+            # Dynamic unaccent is too slow (237x slower!) so we created a dedicated field
+            # in DB and use raw SQL too avoid useless replaces added by the ORM.
+            # The search criterion contains at least one not digit character so search on name
+            carriers = carriers.filter(enseigne_unaccent__ucontains=criterion)
+
+    return carriers
+
+
 def carrier_search(request):
     """The search allows to filter on:
        - partial enseigne or SIRET
@@ -148,32 +196,7 @@ def carrier_search(request):
     carriers = models.Carrier.objects.filter(deleted_at=None, sirene_closed_at=None)
     q = request.GET.get("q")
     if q:
-        # Filtering on enseigne or SIRET
-        q = q.upper()
-        criteria_list = q.split(" ")
-        for criteria in criteria_list:
-            criteria = criteria.strip()
-            if validators.RE_NOT_DIGIT_ONLY.search(criteria):
-                # Dynamic unaccent is too slow (237x slower!) so we created a dedicated field
-                # in DB and use raw SQL too avoid useless replaces added by the ORM.
-                # The search criteria contains at least one not digit character so search on name
-                carriers = carriers.filter(enseigne_unaccent__ucontains=criteria)
-            else:
-                # criteria contains only digits
-                if len(criteria) > 5:
-                    # SIREN is longer than 5
-                    carriers = carriers.filter(siret__startswith=criteria)
-                else:
-                    # Zip code are shorter than 5 digits, could be a digit in
-                    # the company name too (limited to 5). Criteria contains
-                    # only digits so the filtering will return same results
-                    # against enseigne and enseigne_unaccent, however it's
-                    # better to compare against enseigne_unaccent to reduce the
-                    # number of DB indexes.
-                    carriers = carriers.filter(
-                        Q(code_postal__startswith=criteria)
-                        | Q(enseigne_unaccent__contains=criteria)
-                    )
+        carriers = carrier_search_q(carriers, q)
 
     # Filtering on type of license
     license_types = request.GET.getlist("licence-types[]")

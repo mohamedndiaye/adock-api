@@ -38,22 +38,25 @@ class CarrierSearchQueryTestCase(CarrierSearchTestCase):
         self.assertEqual(len(carriers), 1)
         self.assertEqual(carriers[0]["siret"], test.VALID_SIRET)
 
+        carriers = self.get_carriers({"q": test.VALID_SIRET_WITH_SPACES})
+        self.assertEqual(len(carriers), 1)
+
     def test_search_on_siret_and_code_postal(self):
         # Search on SIRET with spaces
         factories.CarrierFactory(siret=test.VALID_SIRET, code_postal="35000")
         carriers = self.get_carriers({"q": " " + test.VALID_SIRET[0:6]})
         self.assertEqual(len(carriers), 1)
 
+        # Search only on zip code (short)
         carriers = self.get_carriers({"q": "35 "})
         self.assertEqual(len(carriers), 1)
 
+        # Search only on SIRET (but removes spaces)
         carriers = self.get_carriers({"q": " " + test.VALID_SIRET[0:6] + " 35"})
-        self.assertEqual(len(carriers), 1)
-
-        carriers = self.get_carriers({"q": " " + test.VALID_SIRET[0:6] + " 37"})
         self.assertEqual(len(carriers), 0)
 
-        carriers = self.get_carriers({"q": " 1" + test.VALID_SIRET[0:6] + " 35"})
+        # Too short to search in SIRET
+        carriers = self.get_carriers({"q": test.VALID_SIRET[0:5] + " "})
         self.assertEqual(len(carriers), 0)
 
     def test_search_on_enseigne(self):

@@ -7,7 +7,9 @@ SIREN_LENGTH = 9
 NIC_LENGTH = 5
 SIRET_LENGTH = SIREN_LENGTH + NIC_LENGTH
 
-RE_NOT_DIGIT_ONLY = re.compile(r"\D")
+
+RE_ONLY_DIGITS_AND_SPACES = re.compile(r"[\d ]")
+RE_ONLY_DIGITS = re.compile(r"\d")
 
 
 def is_french_departement(departement):
