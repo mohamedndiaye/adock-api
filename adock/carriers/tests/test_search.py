@@ -75,6 +75,28 @@ class CarrierSearchQueryTestCase(CarrierSearchTestCase):
         carriers = self.get_carriers({"q": "Roger souper"})
         self.assertEqual(len(carriers), 0)
 
+    def test_search_on_enseigne_with_dot(self):
+        factories.CarrierFactory(
+            enseigne="S.M.T.",
+            # Done by PostgreSQL in update-carrierl.sql
+            enseigne_unaccent="SMT",
+            code_postal="44117",
+        )
+        carriers = self.get_carriers({"q": "SMT"})
+        self.assertEqual(len(carriers), 1)
+
+        carriers = self.get_carriers({"q": "S.M.T."})
+        self.assertEqual(len(carriers), 1)
+
+        carriers = self.get_carriers({"q": "SM.T."})
+        self.assertEqual(len(carriers), 1)
+
+        carriers = self.get_carriers({"q": "S.M.T. 44"})
+        self.assertEqual(len(carriers), 1)
+
+        carriers = self.get_carriers({"q": "S.M.T. 45"})
+        self.assertEqual(len(carriers), 0)
+
     def test_search_on_short_enseigne(self):
         factories.CarrierFactory(enseigne="123GO")
         carriers = self.get_carriers({"q": "3GO"})

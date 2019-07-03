@@ -141,8 +141,10 @@ def get_latest_certificate_as_json(carrier):
 
 
 def carrier_search_q(carriers, q):
-    # Filtering on enseigne, SIREN/SIRET, zip code
-    q = q.upper()
+    """Filtering on enseigne, SIREN/SIRET, zip code"""
+    # Remove ignored characters
+    q = q.translate(validators.SEARCH_Q_TRANS_TABLE).upper()
+
     if validators.RE_ONLY_DIGITS_AND_SPACES.match(q):
         # Zip code or SIREN/SIRET number so we remove useless spaces
         q = q.replace(" ", "")

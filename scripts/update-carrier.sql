@@ -28,7 +28,7 @@ insert into carrier
     select r.siret,
            r.raison_sociale,
            coalesce(nullif(s.enseigne1Etablissement, ''), r.raison_sociale) as enseigne,
-           unaccent(coalesce(nullif(s.enseigne1Etablissement, ''), r.raison_sociale)) as enseigne_unaccent,
+           unaccent(translate(coalesce(nullif(s.enseigne1Etablissement, ''), r.raison_sociale), ',.', '')) as enseigne_unaccent,
            r.categorie_juridique,
            coalesce(s.etablissementSiege = '1', r.is_siege) as is_siege,
            coalesce(s.numeroVoieEtablissement, '')
