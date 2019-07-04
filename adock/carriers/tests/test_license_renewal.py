@@ -1,4 +1,3 @@
-import json
 import re
 
 from django.conf import settings
@@ -93,6 +92,8 @@ class LicenseRenewalTestCase(AuthTestCase):
             self.carrier.get_siren(),
         )
         self.assertEqual(mail.outbox[0].subject, message)
+        self.assertIn(self.carrier.get_siren(), mail.outbox[0].body)
+
         message = (
             "[A Dock] Demande de renouvellement de licence %s du transporteur %s confirmée"
             % (renewal.pk, self.carrier.siret)

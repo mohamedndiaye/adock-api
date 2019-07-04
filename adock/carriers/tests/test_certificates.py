@@ -1,6 +1,5 @@
 from unittest import skipIf
 import copy
-import json
 import re
 
 from django.conf import settings

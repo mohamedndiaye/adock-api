@@ -290,7 +290,12 @@ Bonjour DREAL Bretagne,
 
 L'entreprise {raison_sociale} n° SIREN {siren} a fait, par l'intermédiaire de
 {first_name} {last_name} une demande de renouvellement de :
-"""
+""".format(
+        raison_sociale=carrier.raison_sociale,
+        siren=carrier.get_siren(),
+        first_name=license_renewal.created_by.first_name,
+        last_name=license_renewal.created_by.last_name,
+    )
     if license_renewal.lti_nombre:
         message += get_license_message(
             label="LTI",
