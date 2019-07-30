@@ -147,7 +147,7 @@ def account_profile(request, extended=False):
         "last_name": request.user.last_name,
         "email": request.user.email,
         "last_login": request.user.last_login,
-        "date_joined": request.user.date_joined,
+        "date_joined": request.user.date_joined.isoformat(),
         "provider": request.user.provider,
         "provider_display": request.user.get_provider_display(),
         "provider_data": request.user.provider_data,
