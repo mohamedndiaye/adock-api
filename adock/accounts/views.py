@@ -286,7 +286,12 @@ def france_connect_callback(request):
         "grant_type": "authorization_code",
         "redirect_uri": redirect_uri,
     }
-    response = requests.post(settings.FRANCE_CONNECT_URLS["token"], data=data)
+
+    # Exceptions catched by Sentry
+    response = requests.post(
+        settings.FRANCE_CONNECT_URLS["token"], data=data, timeout=60
+    )
+
     if response.status_code != 200:
         message = "Impossible d'obtenir le jeton de FranceConnect."
         sentry_sdk.capture_message("%s\n%s" % (message, response.content))
@@ -301,6 +306,7 @@ def france_connect_callback(request):
         settings.FRANCE_CONNECT_URLS["userinfo"],
         params={"schema": "openid"},
         headers={"Authorization": "Bearer " + token_data["access_token"]},
+        timeout=60,
     )
     if response.status_code != 200:
         message = "Impossible d'obtenir les informations utilisateur de FranceConnect."
