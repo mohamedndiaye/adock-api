@@ -3,7 +3,7 @@ Django[argon2]>=2.2.3
 djangorestframework==3.10.2
 psycopg2-binary==2.8.3
 jinja2
-django-cors-headers==2.5.2
+django-cors-headers==3.0.2
 phonenumbers==8.10.15
 django-phonenumber-field==2.1.0
 sentry_sdk==0.10.2
