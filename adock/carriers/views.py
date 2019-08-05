@@ -110,12 +110,16 @@ def get_carrier_as_json(carrier):
     return carrier_json
 
 
-def get_carriers_as_json(carriers, order_by_list):
-    return list(
+def get_carriers_as_json(carriers, order_by_list, limit=None):
+    carriers = (
         carriers.order_by(*order_by_list)
         .values(*CARRIER_LIST_FIELDS)
-        .annotate(working_area=F("editable__working_area"))[: settings.CARRIERS_LIMIT]
+        .annotate(working_area=F("editable__working_area"))
     )
+    if limit:
+        return list(carriers[:limit])
+    else:
+        return list(carriers)
 
 
 def get_other_facilities_as_json(carrier):
@@ -188,6 +192,36 @@ def carrier_search_q(carriers, q):
             carriers = carriers.filter(enseigne_unaccent__ucontains=criterion)
 
     return carriers
+
+
+class SearchException(Exception):
+    def __init__(self, message, status_code=400):
+        self.message = message
+        self.status_code = status_code
+        super().__init__(self)
+
+
+def carrier_search_get_limit(request):
+    limit = request.GET.get("limit")
+    if limit:
+        try:
+            limit = int(limit)
+        except ValueError:
+            raise SearchException(
+                message="La limite du nombre de résultats « %s » n'est pas un nombre valide."
+                % limit
+            )
+
+        if limit <= 0:
+            raise SearchException(
+                message="La limite ne peut pas être un nombre négatif « %d »." % limit
+            )
+
+        limit = min(limit, settings.CARRIERS_LIMIT)
+    else:
+        limit = settings.CARRIERS_LIMIT
+
+    return limit
 
 
 def carrier_search(request):
@@ -269,10 +303,15 @@ def carrier_search(request):
 
     # By completeness and enseigne
     order_by_list.extend(("-completeness", "enseigne"))
-    payload = {"carriers": get_carriers_as_json(carriers, order_by_list)}
 
-    if len(payload["carriers"]) == settings.CARRIERS_LIMIT:
-        payload["limit"] = settings.CARRIERS_LIMIT
+    try:
+        limit = carrier_search_get_limit(request)
+    except SearchException as e:
+        return JsonResponse({"message": e.message}, status=e.status_code)
+    payload = {"carriers": get_carriers_as_json(carriers, order_by_list, limit)}
+
+    if len(payload["carriers"]) == limit:
+        payload["limit"] = limit
 
     return JsonResponse(payload)
 

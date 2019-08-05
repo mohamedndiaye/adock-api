@@ -146,6 +146,32 @@ class CarrierSearchQueryTestCase(CarrierSearchTestCase):
         self.assertEqual(data["limit"], 2)
         self.assertEqual(len(data["carriers"]), 2)
 
+    def test_search_with_limit(self):
+        factories.CarrierFactory.create_batch(3, enseigne="FOO")
+        response = self.client.get(self.search_url, {"q": "Foo", "limit": 1})
+        data = response.json()
+        self.assertEqual(data["limit"], 1)
+        self.assertEqual(len(data["carriers"]), 1)
+
+    def test_search_with_invalid_limit(self):
+        factories.CarrierFactory.create_batch(3, enseigne="FOO")
+        response = self.client.get(self.search_url, {"q": "Foo", "limit": "A"})
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertEqual(
+            data["message"],
+            "La limite du nombre de résultats « A » n'est pas un nombre valide.",
+        )
+
+    def test_search_with_negative_limit(self):
+        factories.CarrierFactory.create_batch(3, enseigne="FOO")
+        response = self.client.get(self.search_url, {"q": "Foo", "limit": "-3"})
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertEqual(
+            data["message"], "La limite ne peut pas être un nombre négatif « -3 »."
+        )
+
     def test_deleted(self):
         factories.CarrierFactory(raison_sociale="ACTIVE")
         factories.CarrierFactory(raison_sociale="DELETED", deleted_at=timezone.now())
