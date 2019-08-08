@@ -47,20 +47,27 @@ L'équipe A Dock
     )
 
 
-def mail_managers_new_account(user):
+def mail_managers_new_account(user, send_activation_link=False):
     subject = "Nouveau compte utilisateur %s" % user.email
+    message_activation_link_sent = (
+        "Un courriel d'activation a été envoyé au moment de la création."
+    )
     message = """
 Le nouveau compte utilisateur est :
 - {username}
 - {email}
 - {first_name} {last_name}
 
-Créé via {provider_display}
+Créé via {provider_display}.
+{message_activation_link}
 """.format(
         username=user.username,
         email=user.email,
         first_name=user.first_name,
         last_name=user.last_name,
         provider_display=user.get_provider_display(),
+        message_activation_link=message_activation_link_sent
+        if send_activation_link
+        else "",
     )
     mail_managers(subject, message, fail_silently=True)

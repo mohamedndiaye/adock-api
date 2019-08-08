@@ -13,6 +13,7 @@ class CreateAccountSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=30)
     last_name = serializers.CharField(max_length=150)
     password = serializers.CharField(min_length=8)
+    send_activation_link = serializers.BooleanField(required=False, default=True)
 
     def validate_email(self, value):
         if accounts_models.User.objects.filter(username=value).exists():
