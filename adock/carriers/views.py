@@ -110,7 +110,7 @@ def get_carrier_as_json(carrier):
     return carrier_json
 
 
-def get_carriers_as_json(carriers, order_by_list, limit=None):
+def get_carriers_as_json(carriers, order_by_list, limit=None, with_details=False):
     carriers = (
         carriers.order_by(*order_by_list)
         .values(*CARRIER_LIST_FIELDS)
@@ -359,7 +359,48 @@ def check_user_is_allowed(user):
     return True, None
 
 
+def carrier_detail_apply_changes(user, carrier, editable_serialized):
+    notification_email_to_send = False
+
+    # Do we need to create editable? Only if changes are detected.
+    if carrier.editable:
+        # 1. Compare values
+        changed_fields = []
+
+        validated_data = editable_serialized.validated_data
+        for field in validated_data:
+            if getattr(carrier.editable, field) != validated_data[field]:
+                changed_fields.append(field)
+
+        new_editable_to_create = bool(changed_fields)
+        # 2. Previous email for notification
+        if "email" in changed_fields and carrier.editable.email:
+            notification_email_to_send = True
+    else:
+        new_editable_to_create = True
+
+    # Changes detected.
+    if new_editable_to_create:
+        new_carrier_editable = editable_serialized.save(
+            carrier=carrier, created_by=user
+        )
+
+        if notification_email_to_send:
+            mails.mail_carrier_to_old_email(
+                changed_fields, carrier.editable, new_carrier_editable
+            )
+        mails.mail_carrier_editable_to_confirm(
+            changed_fields, carrier.editable, new_carrier_editable
+        )
+        mails.mail_managers_carrier_changes(
+            changed_fields, carrier.editable, new_carrier_editable
+        )
+
+    return new_carrier_editable.email if new_editable_to_create else ""
+
+
 def carrier_detail(request, carrier_siret):
+    # Response will include a carrier attribute
     data_json = {}
     # Access to deleted carriers is allowed.
     # Get existing carrier if any
@@ -371,48 +412,14 @@ def carrier_detail(request, carrier_siret):
         if not allowed:
             return response
 
-        notification_email_to_send = False
-        new_serializer, response = core_views.request_validate(
+        editable_serialized, response = core_views.request_validate(
             request, carriers_serializers.CarrierEditableSerializer
         )
         if response:
             return response
 
-        if carrier.editable:
-            # 1. Compare values
-            changed_fields = []
-
-            validated_data = new_serializer.validated_data
-            for field in validated_data:
-                if getattr(carrier.editable, field) != validated_data[field]:
-                    changed_fields.append(field)
-
-            new_editable_to_create = bool(changed_fields)
-            # 2. Previous email for notification
-            if "email" in changed_fields and carrier.editable.email:
-                notification_email_to_send = True
-        else:
-            new_editable_to_create = True
-
-        if new_editable_to_create:
-            new_carrier_editable = new_serializer.save(
-                carrier=carrier, created_by=request.user
-            )
-
-            if notification_email_to_send:
-                mails.mail_carrier_to_old_email(
-                    changed_fields, carrier.editable, new_carrier_editable
-                )
-            mails.mail_carrier_editable_to_confirm(
-                changed_fields, carrier.editable, new_carrier_editable
-            )
-            mails.mail_managers_carrier_changes(
-                changed_fields, carrier.editable, new_carrier_editable
-            )
-
-        data_json["confirmation_sent_to"] = (
-            new_carrier_editable.email if new_editable_to_create else ""
-        )
+        confirmation_sent_to = carrier_detail_apply_changes(request.user, carrier, editable_serialized)
+        data_json["confirmation_sent_to"] = confirmation_sent_to
 
     carrier_json = get_carrier_as_json(carrier)
     carrier_json["other_facilities"] = get_other_facilities_as_json(carrier)
