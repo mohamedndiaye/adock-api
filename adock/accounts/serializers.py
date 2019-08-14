@@ -6,6 +6,14 @@ from . import models as accounts_models
 from . import tokens as accounts_tokens
 
 
+def _validate_has_accepted_cgu(value):
+    if not value:
+        raise serializers.ValidationError(
+            "Vous devez accepter les Conditions Générales d'Utilisation pour utiliser le service."
+        )
+    return value
+
+
 class CreateAccountSerializer(serializers.Serializer):
     """Don't use ModelSerializer to require some fields not required in model."""
 
@@ -13,7 +21,12 @@ class CreateAccountSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=30)
     last_name = serializers.CharField(max_length=150)
     password = serializers.CharField(min_length=8)
+    has_accepted_cgu = serializers.BooleanField(default=False)
+
     send_activation_link = serializers.BooleanField(required=False, default=True)
+
+    def validate_has_accepted_cgu(self, value):
+        return _validate_has_accepted_cgu(value)
 
     def validate_email(self, value):
         if accounts_models.User.objects.filter(username=value).exists():
@@ -35,11 +48,7 @@ class EditUserSerializer(serializers.ModelSerializer):
         fields = ("has_accepted_cgu", "has_subscribed_newsletter")
 
     def validate_has_accepted_cgu(self, value):
-        if value is False:
-            raise serializers.ValidationError(
-                "Vous devez accepter les Conditions Générales d'Utilisation pour utiliser le service."
-            )
-        return value
+        return _validate_has_accepted_cgu(value)
 
     def update(self, instance, validated_data):
         # Only keys for provided data restricted to list of fields

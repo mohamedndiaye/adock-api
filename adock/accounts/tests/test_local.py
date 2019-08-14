@@ -36,6 +36,7 @@ class CreateUserTestCase(TestCase):
                 "first_name": "Claude",
                 "last_name": "Martin",
                 "password": "secret1234",
+                "has_accepted_cgu": True,
             },
             content_type="application/json",
         )
@@ -49,6 +50,8 @@ class CreateUserTestCase(TestCase):
             mail.outbox[1].subject,
             "[A Dock] Nouveau compte utilisateur %s" % user.email,
         )
+        self.assertEqual(user.email, EMAIL)
+        self.assertEqual(user.has_accepted_cgu, True)
 
     def test_failure(self):
         response = self.client.post(
@@ -61,6 +64,12 @@ class CreateUserTestCase(TestCase):
         self.assertEqual(errors["email"], ["Saisissez une adresse email valable."])
         self.assertEqual(errors["first_name"], ["Ce champ ne peut être vide."])
         self.assertEqual(errors["last_name"], ["Ce champ est obligatoire."])
+        self.assertEqual(
+            errors["has_accepted_cgu"],
+            [
+                "Vous devez accepter les Conditions Générales d'Utilisation pour utiliser le service."
+            ],
+        )
         self.assertEqual(
             errors["password"],
             [

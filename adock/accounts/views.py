@@ -39,6 +39,7 @@ def account_create(request):
         password=serializer.validated_data["password"],
         first_name=serializer.validated_data["first_name"],
         last_name=serializer.validated_data["last_name"],
+        has_accepted_cgu=serializer.validated_data["has_accepted_cgu"],
         is_active=False,
     )
     token = accounts_tokens.account_activation_token.make_token(user)
