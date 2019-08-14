@@ -45,12 +45,15 @@ def account_create(request):
     token = accounts_tokens.account_activation_token.make_token(user)
 
     send_activation_link = serializer.validated_data["send_activation_link"]
+    accounts_mails.mail_managers_new_account(user, send_activation_link)
     if send_activation_link:
         accounts_mails.mail_user_to_activate(user, token)
+        return JsonResponse(
+            {"message": "Un email vous a été envoyé à « %s »." % user.email}
+        )
 
-    accounts_mails.mail_managers_new_account(user, send_activation_link)
     return JsonResponse(
-        {"message": "Un email vous a été envoyé à « %s »." % user.email}
+        {"message": "Le compte utilisateur « %s » a été créé." % user.email}
     )
 
 
