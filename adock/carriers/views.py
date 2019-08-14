@@ -333,31 +333,22 @@ def get_carrier_changes(carrier, cleaned_payload):
 RE_MANY_COMMAS = re.compile(r",+")
 
 
-def check_user_is_allowed(user):
-    if user.is_anonymous:
-        return (
-            False,
-            JsonResponse(
-                {
-                    "message": "Vous devez être connecté pour modifier une fiche transporteur."
-                },
-                status=401,
-            ),
+def check_user_is_anonmyous(user):
+    if not user or user.is_anonymous:
+        return JsonResponse(
+            {
+                "message": "Vous devez être connecté pour modifier une fiche transporteur."
+            },
+            status=401,
         )
 
-    if not user.has_accepted_cgu:
-        return (
-            False,
-            JsonResponse(
-                {
-                    "message": "Vous devez accepter les Conditions Générales d'Utilisation."
-                },
-                status=401,
-            ),
+
+def check_user_has_accepted_cgu(user):
+    if not user or not user.has_accepted_cgu:
+        return JsonResponse(
+            {"message": "Vous devez accepter les Conditions Générales d'Utilisation."},
+            status=401,
         )
-
-    return True, None
-
 
 def carrier_detail_apply_changes(user, carrier, editable_serialized):
     notification_email_to_send = False
@@ -369,6 +360,10 @@ def carrier_detail_apply_changes(user, carrier, editable_serialized):
 
         validated_data = editable_serialized.validated_data
         for field in validated_data:
+            if field == "created_by":
+                # Ignore
+                continue
+
             if getattr(carrier.editable, field) != validated_data[field]:
                 changed_fields.append(field)
 
@@ -407,18 +402,32 @@ def carrier_detail(request, carrier_siret):
     carrier = get_object_or_404(
         models.Carrier.objects.select_related("editable"), siret=carrier_siret
     )
-    if request.method == "POST":
-        allowed, response = check_user_is_allowed(request.user)
-        if not allowed:
-            return response
 
+    if request.method == "POST":
         editable_serialized, response = core_views.request_validate(
             request, carriers_serializers.CarrierEditableSerializer
         )
         if response:
             return response
 
-        confirmation_sent_to = carrier_detail_apply_changes(request.user, carrier, editable_serialized)
+        # The UI doesn't allow to go here
+        response = check_user_is_anonmyous(request.user)
+        if response:
+            # Extract user from POST
+            user = editable_serialized.validated_data.get("created_by")
+            response = check_user_is_anonmyous(user)
+            if response:
+                return response
+        else:
+            user = request.user
+
+        response = check_user_has_accepted_cgu(user)
+        if response:
+            return response
+
+        confirmation_sent_to = carrier_detail_apply_changes(
+            user, carrier, editable_serialized
+        )
         data_json["confirmation_sent_to"] = confirmation_sent_to
 
     carrier_json = get_carrier_as_json(carrier)
@@ -531,8 +540,10 @@ def certificate_detail(request, carrier_siret, as_pdf=True):
     carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
 
     if request.method == "POST":
-        allowed, response = check_user_is_allowed(request.user)
-        if not allowed:
+        response = check_user_is_anonmyous(request.user) or check_user_has_accepted_cgu(
+            request.user
+        )
+        if response:
             return response
 
         return _certificate_sign(request, carrier)
@@ -580,8 +591,8 @@ def license_renewal_ask(request, carrier_siret):
             status=401,
         )
 
-    allowed, response = check_user_is_allowed(request.user)
-    if not allowed:
+    response = check_user_is_anonmyous(request.user) or check_user_has_accepted_cgu(request.user)
+    if response:
         return response
 
     serializer, response = core_views.request_validate(

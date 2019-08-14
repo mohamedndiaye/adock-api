@@ -9,13 +9,14 @@ class CarrierEditableSerializer(serializers.ModelSerializer):
     class Meta:
         model = carriers_models.CarrierEditable
         fields = (
-            "telephone",
-            "email",
-            "working_area",
-            "working_area_departements",
-            "specialities",
-            "website",
+            "created_by",
             "description",
+            "email",
+            "specialities",
+            "telephone",
+            "website",
+            "working_area_departements",
+            "working_area",
         )
 
     def validate_telephone(self, value):
