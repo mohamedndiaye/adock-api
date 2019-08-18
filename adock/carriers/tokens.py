@@ -13,7 +13,7 @@ class CarrierEditableTokenGenerator(PasswordResetTokenGenerator):
         )
 
 
-carrier_editable_token = CarrierEditableTokenGenerator()
+carrier_editable_token_generator = CarrierEditableTokenGenerator()
 
 
 class CertificateTokenGenerator(PasswordResetTokenGenerator):
@@ -29,7 +29,7 @@ class CertificateTokenGenerator(PasswordResetTokenGenerator):
         )
 
 
-certificate_token = CertificateTokenGenerator()
+certificate_token_generator = CertificateTokenGenerator()
 
 
 class LicenseRenewalTokenGenerator(PasswordResetTokenGenerator):
@@ -47,4 +47,4 @@ class LicenseRenewalTokenGenerator(PasswordResetTokenGenerator):
         )
 
 
-license_renewal_token = LicenseRenewalTokenGenerator()
+license_renewal_token_generator = LicenseRenewalTokenGenerator()

@@ -118,7 +118,7 @@ class ActivateUserTestCase(TestCase):
             "accounts_activate",
             kwargs={
                 "user_id": self.user.pk,
-                "token": accounts_tokens.account_activation_token.make_token(self.user),
+                "token": accounts_tokens.account_token_generator.make_token(self.user),
             },
         )
         response = self.client.get(url)

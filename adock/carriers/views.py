@@ -395,12 +395,15 @@ def carrier_detail_apply_changes(user, carrier, editable_serialized):
         )
 
     if editable_serialized.created_by:
-        token = accounts_tokens.account_activation_token.make_token(user)
+        # Send a unique mail for user account and carrier changes even if any.
+        user_token = accounts_tokens.account_token_generator.make_token(user)
+        carrier_editable_token = tokens.carrier_editable_token_generator.make_token(user)
         accounts_mails.mail_user_to_activate(user, token)
 
         # Send one grouped email for account creation and (no) changes
 
     elif new_editable_to_create:
+        # Send only an email for carrier changes
         mails.mail_carrier_editable_to_confirm(
             changed_fields, carrier.editable, new_carrier_editable
         )
@@ -465,7 +468,7 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
             pk=carrier_editable_id,
         )
         data = {"siret": carrier_editable.carrier_id}
-        if not tokens.carrier_editable_token.check_token(carrier_editable, token):
+        if not tokens.carrier_editable_token_generator.check_token(carrier_editable, token):
             data[
                 "message"
             ] = "Impossible de confirmer les modifications de la fiche transporteur."
@@ -576,7 +579,7 @@ def certificate_confirm(request, certificate_id, token):
             models.CarrierCertificate.objects.select_related("carrier"),
             pk=certificate_id,
         )
-        if not tokens.certificate_token.check_token(certificate, token):
+        if not tokens.certificate_token_generator.check_token(certificate, token):
             return JsonResponse(
                 {
                     "siret": certificate.carrier_id,
@@ -632,7 +635,7 @@ def license_renewal_confirm(request, license_renewal_id, token):
         models.CarrierLicenseRenewal.objects.select_related("carrier"),
         pk=license_renewal_id,
     )
-    if not tokens.license_renewal_token.check_token(license_renewal, token):
+    if not tokens.license_renewal_token_generator.check_token(license_renewal, token):
         return JsonResponse(
             {
                 "siret": license_renewal.carrier_id,

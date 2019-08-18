@@ -33,7 +33,6 @@ def account_create(request):
     if response:
         return response
 
-    print(serializer.validated_data)
     user = accounts_models.User.objects.create_user(
         username=serializer.validated_data["email"],
         email=serializer.validated_data["email"],
@@ -43,7 +42,7 @@ def account_create(request):
         has_accepted_cgu=serializer.validated_data["has_accepted_cgu"],
         is_active=False,
     )
-    token = accounts_tokens.account_activation_token.make_token(user)
+    token = accounts_tokens.account_token_generator.make_token(user)
 
     send_activation_link = serializer.validated_data["send_activation_link"]
     accounts_mails.mail_managers_new_account(user, send_activation_link)
@@ -72,7 +71,7 @@ def account_activate(request, user_id, token):
         if user.is_active:
             return JsonResponse({"message": "Le compte utilisateur est déjà actif."})
 
-        if not accounts_tokens.account_activation_token.check_token(user, token):
+        if not accounts_tokens.account_token_generator.check_token(user, token):
             return JsonResponse(
                 {"message": "Le jeton d'activation n'est pas valide."}, status=400
             )
@@ -110,7 +109,7 @@ def account_recover_password(request):
             {"message": "L'adresse électronique est introuvable."}, status=400
         )
 
-    token = accounts_tokens.account_activation_token.make_token(user)
+    token = accounts_tokens.account_token_generator.make_token(user)
     accounts_mails.mail_user_to_recover_password(user, token)
     return JsonResponse(
         {

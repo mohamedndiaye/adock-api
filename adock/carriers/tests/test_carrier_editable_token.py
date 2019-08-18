@@ -13,26 +13,26 @@ class CarrierEmailConfirmationTestCase(test.CarrierTestCaseMixin):
         )
 
     def test_idempotent(self):
-        token = tokens.carrier_editable_token.make_token(self.carrier.editable)
+        token = tokens.carrier_editable_token_generator.make_token(self.carrier.editable)
         self.assertIsNotNone(token)
         self.assertNotEqual(token, "")
-        same_token = tokens.carrier_editable_token.make_token(self.carrier.editable)
+        same_token = tokens.carrier_editable_token_generator.make_token(self.carrier.editable)
         self.assertEqual(token, same_token)
 
     def test_another_applied_editable(self):
-        old_token = tokens.carrier_editable_token.make_token(self.carrier.editable)
+        old_token = tokens.carrier_editable_token_generator.make_token(self.carrier.editable)
         self.carrier.editable.pk += 1
-        new_token = tokens.carrier_editable_token.make_token(self.carrier.editable)
+        new_token = tokens.carrier_editable_token_generator.make_token(self.carrier.editable)
         self.assertNotEqual(old_token, new_token)
 
     def test_already_confirmed(self):
-        old_token = tokens.carrier_editable_token.make_token(self.carrier.editable)
+        old_token = tokens.carrier_editable_token_generator.make_token(self.carrier.editable)
         self.carrier.editable.confirmed_at = timezone.now()
-        new_token = tokens.carrier_editable_token.make_token(self.carrier.editable)
+        new_token = tokens.carrier_editable_token_generator.make_token(self.carrier.editable)
         self.assertNotEqual(old_token, new_token)
 
     def test_altered_token(self):
-        token = tokens.carrier_editable_token.make_token(self.carrier.editable)
+        token = tokens.carrier_editable_token_generator.make_token(self.carrier.editable)
         url = reverse(
             "carriers_carrier_editable_confirm",
             kwargs={

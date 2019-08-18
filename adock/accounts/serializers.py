@@ -79,7 +79,7 @@ class ResetPasswordSerializer(serializers.Serializer):
         except accounts_models.User.DoesNotExist:
             return serializers.ValidationError("L'utilisateur n'existe pas.")
 
-        if not accounts_tokens.account_activation_token.check_token(
+        if not accounts_tokens.account_token_generator.check_token(
             attrs["user"], attrs["token"]
         ):
             return serializers.ValidationError(

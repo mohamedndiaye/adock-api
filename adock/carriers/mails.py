@@ -60,7 +60,7 @@ L'équipe A Dock""".format(
 def mail_carrier_editable_to_confirm(
     changed_fields, current_carrier_editable, new_carrier_editable
 ):
-    token = tokens.carrier_editable_token.make_token(new_carrier_editable)
+    token = tokens.carrier_editable_token_generator.make_token(new_carrier_editable)
     subject = (
         "%sEn attente de confirmation de votre fiche transporteur"
         % settings.EMAIL_SUBJECT_PREFIX
@@ -137,7 +137,7 @@ def mail_managers_carrier_confirmed(carrier_editable):
 
 
 def mail_carrier_certificate_to_confirm(carrier, certificate):
-    token = tokens.certificate_token.make_token(certificate)
+    token = tokens.certificate_token_generator.make_token(certificate)
     subject = (
         "%sEn attente de confirmation d'une attestation" % settings.EMAIL_SUBJECT_PREFIX
     )
@@ -217,7 +217,7 @@ Données :
 
 
 def mail_carrier_license_renewal_to_confirm(carrier, license_renewal):
-    token = tokens.license_renewal_token.make_token(license_renewal)
+    token = tokens.license_renewal_token_generator.make_token(license_renewal)
     subject = (
         "%sEn attente de confirmation d'une demande de renouvellement de license"
         % settings.EMAIL_SUBJECT_PREFIX
