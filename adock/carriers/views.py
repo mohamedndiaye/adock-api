@@ -10,8 +10,10 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from django.views.decorators.http import require_POST
 
-from adock.core import pdf as core_pdf
-from adock.core import views as core_views
+from ..core import pdf as core_pdf
+from ..core import views as core_views
+from ..accounts import tokens as accounts_tokens
+from ..accounts import mails as accounts_mails
 
 from . import mails, models, tokens, validators
 from . import serializers as carriers_serializers
@@ -350,8 +352,10 @@ def check_user_has_accepted_cgu(user):
             status=401,
         )
 
+
 def carrier_detail_apply_changes(user, carrier, editable_serialized):
-    notification_email_to_send = False
+    """Returns True if changes detected"""
+    should_notify_old_email = False
 
     # Do we need to create editable? Only if changes are detected.
     if carrier.editable:
@@ -359,8 +363,9 @@ def carrier_detail_apply_changes(user, carrier, editable_serialized):
         changed_fields = []
 
         validated_data = editable_serialized.validated_data
+        # TODO Define a list?
         for field in validated_data:
-            if field == "created_by":
+            if field == "created_by_email":
                 # Ignore
                 continue
 
@@ -370,7 +375,7 @@ def carrier_detail_apply_changes(user, carrier, editable_serialized):
         new_editable_to_create = bool(changed_fields)
         # 2. Previous email for notification
         if "email" in changed_fields and carrier.editable.email:
-            notification_email_to_send = True
+            should_notify_old_email = True
     else:
         new_editable_to_create = True
 
@@ -380,14 +385,23 @@ def carrier_detail_apply_changes(user, carrier, editable_serialized):
             carrier=carrier, created_by=user
         )
 
-        if notification_email_to_send:
+        if should_notify_old_email:
             mails.mail_carrier_to_old_email(
                 changed_fields, carrier.editable, new_carrier_editable
             )
-        mails.mail_carrier_editable_to_confirm(
+
+        mails.mail_managers_carrier_changes(
             changed_fields, carrier.editable, new_carrier_editable
         )
-        mails.mail_managers_carrier_changes(
+
+    if editable_serialized.created_by:
+        token = accounts_tokens.account_activation_token.make_token(user)
+        accounts_mails.mail_user_to_activate(user, token)
+
+        # Send one grouped email for account creation and (no) changes
+
+    elif new_editable_to_create:
+        mails.mail_carrier_editable_to_confirm(
             changed_fields, carrier.editable, new_carrier_editable
         )
 
@@ -411,15 +425,14 @@ def carrier_detail(request, carrier_siret):
             return response
 
         # The UI doesn't allow to go here
-        response = check_user_is_anonmyous(request.user)
+        user = (
+            editable_serialized.created_by
+            if request.user.is_anonymous
+            else request.user
+        )
+        response = check_user_is_anonmyous(user)
         if response:
-            # Extract user from POST
-            user = editable_serialized.validated_data.get("created_by")
-            response = check_user_is_anonmyous(user)
-            if response:
-                return response
-        else:
-            user = request.user
+            return response
 
         response = check_user_has_accepted_cgu(user)
         if response:
@@ -591,7 +604,9 @@ def license_renewal_ask(request, carrier_siret):
             status=401,
         )
 
-    response = check_user_is_anonmyous(request.user) or check_user_has_accepted_cgu(request.user)
+    response = check_user_is_anonmyous(request.user) or check_user_has_accepted_cgu(
+        request.user
+    )
     if response:
         return response
 

@@ -33,6 +33,7 @@ def account_create(request):
     if response:
         return response
 
+    print(serializer.validated_data)
     user = accounts_models.User.objects.create_user(
         username=serializer.validated_data["email"],
         email=serializer.validated_data["email"],

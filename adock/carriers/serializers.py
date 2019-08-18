@@ -1,15 +1,20 @@
 # pylint: disable=W0223
 from rest_framework import serializers
 
+from ..accounts import models as accounts_models
 from . import validators as carriers_validators
 from . import models as carriers_models
 
 
 class CarrierEditableSerializer(serializers.ModelSerializer):
+    created_by_email = serializers.EmailField(
+        max_length=255, allow_blank=True, required=False
+    )
+
     class Meta:
         model = carriers_models.CarrierEditable
         fields = (
-            "created_by",
+            "created_by_email",
             "description",
             "email",
             "specialities",
@@ -18,6 +23,24 @@ class CarrierEditableSerializer(serializers.ModelSerializer):
             "working_area_departements",
             "working_area",
         )
+
+    def __init__(self, *args, **kwargs):
+        self.created_by = None
+        super().__init__(*args, **kwargs)
+
+    def validate_created_by_email(self, value):
+        if value:
+            try:
+                # Only possible for inactive accounts
+                self.created_by = accounts_models.User.objects.get(
+                    email=value, is_active=False
+                )
+            except accounts_models.User.DoesNotExist:
+                raise serializers.ValidationError(
+                    "L'adresse électronique n'est pas valide."
+                )
+
+        return value
 
     def validate_telephone(self, value):
         # Validated by phonenumber before
