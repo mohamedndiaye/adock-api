@@ -152,7 +152,6 @@ def carrier_search_q(carriers, q):
     """Filtering on enseigne, SIREN/SIRET, zip code"""
     # Remove ignored characters
     q = q.translate(carriers_validators.SEARCH_Q_TRANS_TABLE).upper()
-
     if carriers_validators.RE_ONLY_DIGITS_AND_SPACES.match(q):
         # Zip code or SIREN/SIRET number so we remove useless spaces
         q = q.replace(" ", "")
@@ -357,33 +356,31 @@ def check_user_has_accepted_cgu(user):
         )
 
 
-def carrier_detail_apply_changes(user, carrier, editable_serialized):
+def carrier_detail_apply_changes(
+    user, carrier, editable_serialized, created_by_email_serialized
+):
     """Returns True if changes detected"""
     should_notify_old_email = False
 
-    # Do we need to create editable? Only if changes are detected.
-    if carrier.editable:
-        # 1. Compare values
-        changed_fields = []
+    validated_data = editable_serialized.validated_data
 
-        validated_data = editable_serialized.validated_data
-        # TODO Define a list?
-        for field in validated_data:
-            if field == "created_by_email":
-                # Ignore
-                continue
+    # DB inconsistency
+    assert carrier.editable
 
-            if getattr(carrier.editable, field) != validated_data[field]:
-                changed_fields.append(field)
+    # Do we need to create a new editable? Only if changes are detected.
+    # 1. Compare values
+    changed_fields = []
+    for field in validated_data:
+        if getattr(carrier.editable, field) != validated_data[field]:
+            changed_fields.append(field)
 
-        new_editable_to_create = bool(changed_fields)
-        # 2. Previous email for notification
-        if "email" in changed_fields and carrier.editable.email:
-            should_notify_old_email = True
-    else:
-        new_editable_to_create = True
+    new_editable_to_create = bool(changed_fields)
+    # 2. Previous email for notification
+    if "email" in changed_fields and carrier.editable.email:
+        should_notify_old_email = True
 
-    should_mail_user = True if editable_serialized.created_by else False
+    # Not done on account creation so we should do that now
+    should_mail_user = bool(created_by_email_serialized)
 
     # Changes detected.
     if new_editable_to_create:
@@ -396,7 +393,7 @@ def carrier_detail_apply_changes(user, carrier, editable_serialized):
                 changed_fields, carrier.editable, new_carrier_editable
             )
 
-        if should_mail_user and editable_serialized.email == user.email:
+        if should_mail_user and new_carrier_editable.email == user.email:
             # Send a common mail for user account and carrier changes
             accounts_mails.mail_user_to_activate_with_carrier_editable(
                 user, changed_fields, carrier.editable, new_carrier_editable
@@ -422,7 +419,6 @@ def carrier_detail(request, carrier_siret):
     # Response will include a carrier attribute
     data_json = {}
     # Access to deleted carriers is allowed.
-    # Get existing carrier if any
     carrier = get_object_or_404(
         carriers_models.Carrier.objects.select_related("editable"), siret=carrier_siret
     )
@@ -434,12 +430,23 @@ def carrier_detail(request, carrier_siret):
         if response:
             return response
 
-        # The UI doesn't allow to go here
-        user = (
-            editable_serialized.created_by
-            if request.user.is_anonymous
-            else request.user
-        )
+        # The request user is used if not anonymous
+        user = request.user
+        created_by_email_serialized = None
+        if user.is_anonymous:
+            payload, response = core_views.request_load(request)
+            if response:
+                return response
+
+            if "created_by_email" in payload:
+                # Only not enabled users are accepted
+                created_by_email_serialized, response = core_views.request_validate(
+                    request, carriers_serializers.CreatedByEmailSerializer
+                )
+                if response:
+                    return response
+                user = created_by_email_serialized.created_by
+
         response = check_user_is_anonmyous(user)
         if response:
             return response
@@ -449,7 +456,7 @@ def carrier_detail(request, carrier_siret):
             return response
 
         confirmation_sent_to = carrier_detail_apply_changes(
-            user, carrier, editable_serialized
+            user, carrier, editable_serialized, created_by_email_serialized
         )
         data_json["confirmation_sent_to"] = confirmation_sent_to
 
@@ -458,6 +465,14 @@ def carrier_detail(request, carrier_siret):
     carrier_json["latest_certificate"] = get_latest_certificate_as_json(carrier)
     data_json["carrier"] = carrier_json
     return JsonResponse(data_json)
+
+
+def carrier_editable_save(carrier_editable):
+    with transaction.atomic(savepoint=False):
+        carrier_editable.confirmed_at = timezone.now()
+        carrier_editable.save()
+        carrier_editable.carrier.editable = carrier_editable
+        carrier_editable.carrier.save()
 
 
 def carrier_editable_confirm(request, carrier_editable_id, token):
@@ -484,12 +499,7 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
                 status=400,
             )
 
-    with transaction.atomic(savepoint=False):
-        carrier_editable.confirmed_at = timezone.now()
-        carrier_editable.save()
-        carrier_editable.carrier.editable = carrier_editable
-        carrier_editable.carrier.save()
-
+    carrier_editable_save(carrier_editable)
     carriers_mails.mail_managers_carrier_confirmed(carrier_editable)
     data = {
         "siret": carrier_editable.carrier_id,

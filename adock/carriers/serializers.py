@@ -6,23 +6,10 @@ from . import validators as carriers_validators
 from . import models as carriers_models
 
 
-class CarrierEditableSerializer(serializers.ModelSerializer):
+class CreatedByEmailSerializer(serializers.Serializer):
     created_by_email = serializers.EmailField(
         max_length=255, allow_blank=True, required=False
     )
-
-    class Meta:
-        model = carriers_models.CarrierEditable
-        fields = (
-            "created_by_email",
-            "description",
-            "email",
-            "specialities",
-            "telephone",
-            "website",
-            "working_area_departements",
-            "working_area",
-        )
 
     def __init__(self, *args, **kwargs):
         self.created_by = None
@@ -41,6 +28,20 @@ class CarrierEditableSerializer(serializers.ModelSerializer):
                 )
 
         return value
+
+
+class CarrierEditableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = carriers_models.CarrierEditable
+        fields = (
+            "description",
+            "email",
+            "specialities",
+            "telephone",
+            "website",
+            "working_area_departements",
+            "working_area",
+        )
 
     def validate_telephone(self, value):
         # Validated by phonenumber before

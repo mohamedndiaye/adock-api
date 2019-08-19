@@ -14,9 +14,10 @@ import requests
 import sentry_sdk
 from jwt_auth import views as jwt_auth_views
 
-from adock.core import views as core_views
-from adock.carriers import models as carriers_models
-from adock.carriers import views as carriers_views
+from ..carriers import models as carriers_models
+from ..carriers import tokens as carriers_tokens
+from ..carriers import views as carriers_views
+from ..core import views as core_views
 
 from . import mails as accounts_mails
 from . import models as accounts_models
@@ -77,16 +78,34 @@ def account_activate(
                 {"message": "Le jeton d'activation n'est pas valide."}, status=400
             )
 
-        # Confirm linked carrier editable if provided
-        if carrier_editable_id and carrier_editable_token:
-            pass
-
     user.is_active = True
     user.save()
 
+    message = "Le compte utilisateur est activé."
+
+    # Confirm linked carrier editable if provided
+    if carrier_editable_id and carrier_editable_token:
+        try:
+            carrier_editable = carriers_models.CarrierEditable.objects.select_related(
+                "carrier"
+            ).get(pk=carrier_editable_id)
+        except carriers_models.CarrierEditable.DoesNotExist:
+            carrier_editable = None
+
+        if not carriers_tokens.carrier_editable_token_generator.check_token(
+            carrier_editable, carrier_editable_token
+        ):
+            carrier_editable = None
+
+        if not carrier_editable:
+            # Unable to confirm the carrier changes
+            message += " Les changements associés de la fiche transporteur n'ont pas pu être appliqués."
+        else:
+            carriers_views.carrier_editable_save(carrier_editable)
+
     json_web_token = jwt_auth_views.jwt_encode_token(user)
     json_data = jwt_auth_views.jwt_get_json_with_token(json_web_token)
-    json_data["message"] = "Le compte utilisateur est activé."
+    json_data["message"] = message
     return JsonResponse(json_data)
 
 
