@@ -394,7 +394,7 @@ def carrier_detail_apply_changes(user, carrier, editable_serialized):
 
         if should_mail_user and editable_serialized.email == user.email:
             # Send a common mail for user account and carrier changes
-            mails.mail_user_carrier_editable_to_confirm(
+            accounts_mails.mail_user_to_activate_with_carrier_editable(
                 user, changed_fields, carrier.editable, new_carrier_editable
             )
             should_mail_user = False

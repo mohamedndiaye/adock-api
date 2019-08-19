@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.mail import mail_managers
 
 from . import tokens as accounts_tokens
+from ..carriers import tokens as carriers_tokens
 
 
 def mail_user_to_activate(user):
@@ -24,6 +25,40 @@ L'équipe A Dock
         http_client_url=settings.HTTP_CLIENT_URL, user_id=user.pk, token=token
     )
 
+    user.email_user(
+        subject=subject,
+        message=message,
+        from_email=settings.SERVER_EMAIL,
+        fail_silently=settings.DEBUG,
+    )
+
+
+def mail_user_to_activate_with_carrier_editable(
+    user, changed_fields, current_carrier_editable, new_carrier_editable
+):
+    user_token = accounts_tokens.account_token_generator.make_token(user)
+    carrier_editable_token = carriers_tokens.carrier_editable_token_generator.make_token(
+        new_carrier_editable
+    )
+    subject = (
+        "%sEn attente de confirmation de votre compte et vos modifications"
+        % settings.EMAIL_SUBJECT_PREFIX
+    )
+    message = """
+Merci d'avoir créé votre compte utilisateur et renseigné votre fiche transporteur sur A Dock,
+il suffit maintenant de cliquer sur ce lien pour les activer :
+
+{http_client_url}utilisateur/{user_id}/activer/{user_token}/transporteur/changement/{new_carrier_editable_id}/confirmer/{carrier_editable_token}/
+
+Cordialement,
+L'équipe A Dock
+""".format(
+        http_client_url=settings.HTTP_CLIENT_URL,
+        user_id=user.pk,
+        user_token=user_token,
+        new_carrier_editable_id=new_carrier_editable.id,
+        carrier_editable_token=carrier_editable_token,
+    )
     user.email_user(
         subject=subject,
         message=message,

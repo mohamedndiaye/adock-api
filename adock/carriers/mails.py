@@ -2,7 +2,6 @@ from django.conf import settings
 from django.core.mail import mail_managers, send_mail
 
 from . import tokens as carriers_tokens
-from ..accounts import tokens as accounts_tokens
 
 
 def get_recipient_list_from_env(email):
@@ -54,40 +53,6 @@ L'équipe A Dock""".format(
         message,
         settings.SERVER_EMAIL,
         recipient_list,
-        fail_silently=settings.DEBUG,
-    )
-
-
-def mail_user_carrier_editable_to_confirm(
-    user, changed_fields, current_carrier_editable, new_carrier_editable
-):
-    user_token = accounts_tokens.account_token_generator.make_token(user)
-    carrier_editable_token = carriers_tokens.carrier_editable_token_generator.make_token(
-        new_carrier_editable
-    )
-    subject = (
-        "%sEn attente de confirmation de votre compte et vos modifications"
-        % settings.EMAIL_SUBJECT_PREFIX
-    )
-    message = """
-Merci d'avoir créé votre compte utilisateur et renseigné votre fiche transporteur sur A Dock,
-il suffit maintenant de cliquer sur ce lien pour les activer :
-
-{http_client_url}transporteur/changement/{new_carrier_editable_id}/confirmer/{carrier_editable_token}/utilisateur/{user_id}/confirmer/{user_token}/
-
-Cordialement,
-L'équipe A Dock
-""".format(
-        http_client_url=settings.HTTP_CLIENT_URL,
-        user_id=user.pk,
-        user_token=user_token,
-        new_carrier_editable_id=new_carrier_editable.id,
-        carrier_editable_token=carrier_editable_token,
-    )
-    user.email_user(
-        subject=subject,
-        message=message,
-        from_email=settings.SERVER_EMAIL,
         fail_silently=settings.DEBUG,
     )
 
