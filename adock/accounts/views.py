@@ -23,6 +23,7 @@ from . import models as accounts_models
 from . import serializers as accounts_serializers
 from . import tokens as accounts_tokens
 
+
 @require_POST
 def account_create(request):
     """Create an A Dock user account (email as username)"""

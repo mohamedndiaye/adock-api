@@ -47,9 +47,13 @@ class CreateUserTestCase(TestCase):
         user = accounts_models.User.objects.get()
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
-            mail.outbox[1].subject,
+            mail.outbox[0].subject,
             "[A Dock] Nouveau compte utilisateur %s" % user.email,
         )
+        self.assertEqual(
+            mail.outbox[1].subject, "%sConfirmation de votre adresse électronique"
+        )
+
         self.assertEqual(user.email, EMAIL)
         self.assertEqual(user.has_accepted_cgu, True)
 
