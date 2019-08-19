@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.core.mail import mail_managers, send_mail
 
-from . import tokens
+from . import tokens as carriers_tokens
+from ..accounts import tokens as accounts_tokens
 
 
 def get_recipient_list_from_env(email):
@@ -57,10 +58,46 @@ L'équipe A Dock""".format(
     )
 
 
+def mail_user_carrier_editable_to_confirm(
+    user, changed_fields, current_carrier_editable, new_carrier_editable
+):
+    user_token = accounts_tokens.account_token_generator.make_token(user)
+    carrier_editable_token = carriers_tokens.carrier_editable_token_generator.make_token(
+        new_carrier_editable
+    )
+    subject = (
+        "%sEn attente de confirmation de votre compte et vos modifications"
+        % settings.EMAIL_SUBJECT_PREFIX
+    )
+    message = """
+Merci d'avoir créé votre compte utilisateur et renseigné votre fiche transporteur sur A Dock,
+il suffit maintenant de cliquer sur ce lien pour les activer :
+
+{http_client_url}transporteur/changement/{new_carrier_editable_id}/confirmer/{carrier_editable_token}/utilisateur/{user_id}/confirmer/{user_token}/
+
+Cordialement,
+L'équipe A Dock
+""".format(
+        http_client_url=settings.HTTP_CLIENT_URL,
+        user_id=user.pk,
+        user_token=user_token,
+        new_carrier_editable_id=new_carrier_editable.id,
+        carrier_editable_token=carrier_editable_token,
+    )
+    user.email_user(
+        subject=subject,
+        message=message,
+        from_email=settings.SERVER_EMAIL,
+        fail_silently=settings.DEBUG,
+    )
+
+
 def mail_carrier_editable_to_confirm(
     changed_fields, current_carrier_editable, new_carrier_editable
 ):
-    token = tokens.carrier_editable_token_generator.make_token(new_carrier_editable)
+    token = carriers_tokens.carrier_editable_token_generator.make_token(
+        new_carrier_editable
+    )
     subject = (
         "%sEn attente de confirmation de votre fiche transporteur"
         % settings.EMAIL_SUBJECT_PREFIX
@@ -137,7 +174,7 @@ def mail_managers_carrier_confirmed(carrier_editable):
 
 
 def mail_carrier_certificate_to_confirm(carrier, certificate):
-    token = tokens.certificate_token_generator.make_token(certificate)
+    token = carriers_tokens.certificate_token_generator.make_token(certificate)
     subject = (
         "%sEn attente de confirmation d'une attestation" % settings.EMAIL_SUBJECT_PREFIX
     )
@@ -217,7 +254,7 @@ Données :
 
 
 def mail_carrier_license_renewal_to_confirm(carrier, license_renewal):
-    token = tokens.license_renewal_token_generator.make_token(license_renewal)
+    token = carriers_tokens.license_renewal_token_generator.make_token(license_renewal)
     subject = (
         "%sEn attente de confirmation d'une demande de renouvellement de license"
         % settings.EMAIL_SUBJECT_PREFIX

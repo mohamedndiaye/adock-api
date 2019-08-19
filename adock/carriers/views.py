@@ -379,6 +379,8 @@ def carrier_detail_apply_changes(user, carrier, editable_serialized):
     else:
         new_editable_to_create = True
 
+    should_mail_user = True if editable_serialized.created_by else False
+
     # Changes detected.
     if new_editable_to_create:
         new_carrier_editable = editable_serialized.save(
@@ -390,23 +392,24 @@ def carrier_detail_apply_changes(user, carrier, editable_serialized):
                 changed_fields, carrier.editable, new_carrier_editable
             )
 
+        if should_mail_user and editable_serialized.email == user.email:
+            # Send a common mail for user account and carrier changes
+            mails.mail_user_carrier_editable_to_confirm(
+                user, changed_fields, carrier.editable, new_carrier_editable
+            )
+            should_mail_user = False
+        else:
+            # Send only an email for carrier changes
+            mails.mail_carrier_editable_to_confirm(
+                changed_fields, carrier.editable, new_carrier_editable
+            )
+
         mails.mail_managers_carrier_changes(
             changed_fields, carrier.editable, new_carrier_editable
         )
 
-    if editable_serialized.created_by:
-        # Send a unique mail for user account and carrier changes even if any.
-        user_token = accounts_tokens.account_token_generator.make_token(user)
-        carrier_editable_token = tokens.carrier_editable_token_generator.make_token(user)
-        accounts_mails.mail_user_to_activate(user, token)
-
-        # Send one grouped email for account creation and (no) changes
-
-    elif new_editable_to_create:
-        # Send only an email for carrier changes
-        mails.mail_carrier_editable_to_confirm(
-            changed_fields, carrier.editable, new_carrier_editable
-        )
+    if should_mail_user:
+        accounts_mails.mail_user_to_activate(user)
 
     return new_carrier_editable.email if new_editable_to_create else ""
 
@@ -468,7 +471,9 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
             pk=carrier_editable_id,
         )
         data = {"siret": carrier_editable.carrier_id}
-        if not tokens.carrier_editable_token_generator.check_token(carrier_editable, token):
+        if not tokens.carrier_editable_token_generator.check_token(
+            carrier_editable, token
+        ):
             data[
                 "message"
             ] = "Impossible de confirmer les modifications de la fiche transporteur."
