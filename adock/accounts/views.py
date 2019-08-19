@@ -23,7 +23,6 @@ from . import models as accounts_models
 from . import serializers as accounts_serializers
 from . import tokens as accounts_tokens
 
-
 @require_POST
 def account_create(request):
     """Create an A Dock user account (email as username)"""
@@ -42,12 +41,11 @@ def account_create(request):
         has_accepted_cgu=serializer.validated_data["has_accepted_cgu"],
         is_active=False,
     )
-    token = accounts_tokens.account_token_generator.make_token(user)
 
     send_activation_link = serializer.validated_data["send_activation_link"]
     accounts_mails.mail_managers_new_account(user, send_activation_link)
     if send_activation_link:
-        accounts_mails.mail_user_to_activate(user, token)
+        accounts_mails.mail_user_to_activate(user)
         return JsonResponse(
             {"message": "Un email vous a été envoyé à « %s »." % user.email}
         )

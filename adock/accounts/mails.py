@@ -1,10 +1,14 @@
 from django.conf import settings
 from django.core.mail import mail_managers
 
+from . import tokens as accounts_tokens
 
-def mail_user_to_activate(user, token):
+
+def mail_user_to_activate(user):
     # The link triggers the UI that requests the backend to provide feedback to
     # the user.
+    token = accounts_tokens.account_token_generator.make_token(user)
+
     subject = "%sConfirmation de votre adresse électronique"
     message = """
 Vous venez de créer un compte utilisateur sur A Dock, il suffit maintenant de cliquer sur ce lien
