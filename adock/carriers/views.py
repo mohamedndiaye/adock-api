@@ -463,21 +463,19 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
             .filter(carrier__pk="80005226884728")
             .latest()
         )
-        data = {"siret": carrier_editable.carrier_id}
     else:
         # Production
         carrier_editable = get_object_or_404(
             models.CarrierEditable.objects.select_related("carrier"),
             pk=carrier_editable_id,
         )
-        data = {"siret": carrier_editable.carrier_id}
         if not tokens.carrier_editable_token_generator.check_token(
             carrier_editable, token
         ):
-            data[
-                "message"
-            ] = "Impossible de confirmer les modifications de la fiche transporteur."
-            return JsonResponse(data, status=400)
+            return JsonResponse({
+                "siret": carrier_editable.carrier_id,
+                "message": "Impossible de confirmer les modifications de la fiche transporteur."
+            }, status=400)
 
     with transaction.atomic(savepoint=False):
         carrier_editable.confirmed_at = timezone.now()
@@ -486,7 +484,10 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
         carrier_editable.carrier.save()
 
     mails.mail_managers_carrier_confirmed(carrier_editable)
-    data["message"] = "Les modifications de la fiche sont confirmées."
+    data = {
+        "siret": carrier_editable.carrier_id,
+        "message": "Les modifications de la fiche sont confirmées."
+    }
     return JsonResponse(data)
 
 

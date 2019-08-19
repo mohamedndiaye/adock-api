@@ -6,9 +6,14 @@ from . import views
 urlpatterns = [
     path("create/", views.account_create, name="accounts_create"),
     path(
-        "<int:user_id>/activate/<str:token>/",
+        "<int:user_id>/activate/<str:user_token>/",
         views.account_activate,
         name="accounts_activate",
+    ),
+    path(
+        "<int:user_id>/activate/<str:user_token>/transporteur/changement/<int:carrier_editable_id>/confirmer/<str:carrier_editable_token>/",
+        views.account_activate,
+        name="accounts_activate_with_carrier_editable",
     ),
     path("login/", jwt_auth_views.jwt_token, name="accounts_log_in"),
     path("profile/", views.account_profile, name="accounts_profile"),

@@ -56,7 +56,9 @@ def account_create(request):
     )
 
 
-def account_activate(request, user_id, token):
+def account_activate(
+    request, user_id, user_token, carrier_editable_id=None, carrier_editable_token=None
+):
     if settings.ENVIRONMENT == "E2E":
         # Used only by E2E tests to confirm account
         user = accounts_models.User.objects.get(email="joemartin@example.com")
@@ -70,16 +72,20 @@ def account_activate(request, user_id, token):
         if user.is_active:
             return JsonResponse({"message": "Le compte utilisateur est déjà actif."})
 
-        if not accounts_tokens.account_token_generator.check_token(user, token):
+        if not accounts_tokens.account_token_generator.check_token(user, user_token):
             return JsonResponse(
                 {"message": "Le jeton d'activation n'est pas valide."}, status=400
             )
 
+        # Confirm linked carrier editable if provided
+        if carrier_editable_id and carrier_editable_token:
+            pass
+
     user.is_active = True
     user.save()
 
-    token = jwt_auth_views.jwt_encode_token(user)
-    json_data = jwt_auth_views.jwt_get_json_with_token(token)
+    json_web_token = jwt_auth_views.jwt_encode_token(user)
+    json_data = jwt_auth_views.jwt_get_json_with_token(json_web_token)
     json_data["message"] = "Le compte utilisateur est activé."
     return JsonResponse(json_data)
 

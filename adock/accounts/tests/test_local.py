@@ -90,7 +90,8 @@ class ActivateUserTestCase(TestCase):
 
     def test_no_user(self):
         url = reverse(
-            "accounts_activate", kwargs={"user_id": self.user.pk + 1, "token": "foo"}
+            "accounts_activate",
+            kwargs={"user_id": self.user.pk + 1, "user_token": "foo"},
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
@@ -100,7 +101,7 @@ class ActivateUserTestCase(TestCase):
         self.user.is_active = True
         self.user.save()
         url = reverse(
-            "accounts_activate", kwargs={"user_id": self.user.pk, "token": "foo"}
+            "accounts_activate", kwargs={"user_id": self.user.pk, "user_token": "foo"}
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -110,7 +111,7 @@ class ActivateUserTestCase(TestCase):
 
     def test_invalid_token(self):
         url = reverse(
-            "accounts_activate", kwargs={"user_id": self.user.pk, "token": "foo"}
+            "accounts_activate", kwargs={"user_id": self.user.pk, "user_token": "foo"}
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
@@ -123,7 +124,9 @@ class ActivateUserTestCase(TestCase):
             "accounts_activate",
             kwargs={
                 "user_id": self.user.pk,
-                "token": accounts_tokens.account_token_generator.make_token(self.user),
+                "user_token": accounts_tokens.account_token_generator.make_token(
+                    self.user
+                ),
             },
         )
         response = self.client.get(url)
