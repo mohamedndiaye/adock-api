@@ -9,7 +9,9 @@ def mail_user_to_activate(user):
     # the user.
     token = accounts_tokens.account_token_generator.make_token(user)
 
-    subject = "%sConfirmation de votre adresse électronique"
+    subject = (
+        "%sConfirmation de votre adresse électronique" % settings.EMAIL_SUBJECT_PREFIX
+    )
     message = """
 Vous venez de créer un compte utilisateur sur A Dock, il suffit maintenant de cliquer sur ce lien
 pour l'activer :
@@ -31,7 +33,7 @@ L'équipe A Dock
 
 
 def mail_user_to_recover_password(user, token):
-    subject = "%sRécupération de mot de passe"
+    subject = "%sRécupération de mot de passe" % settings.EMAIL_SUBJECT_PREFIX
     message = """
 Vous avez demander la récupération du mot de passe de votre compte A Dock, si vous n'êtes pas à l'origine
 de la demande vous pouvez ignorer ce message sinon vous pouvez cliquer sur le lien :
