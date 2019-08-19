@@ -12,10 +12,12 @@ from django.views.decorators.http import require_POST
 
 from ..core import pdf as core_pdf
 from ..core import views as core_views
-from ..accounts import tokens as accounts_tokens
 from ..accounts import mails as accounts_mails
 
-from . import mails, models, tokens, validators
+from . import mails as carriers_mails
+from . import models as carriers_models
+from . import tokens as carriers_tokens
+from . import validators as carriers_validators
 from . import serializers as carriers_serializers
 
 CARRIER_LIST_FIELDS = (
@@ -126,8 +128,8 @@ def get_carriers_as_json(carriers, order_by_list, limit=None, with_details=False
 
 def get_other_facilities_as_json(carrier):
     other_facilities = (
-        models.Carrier.objects.filter(
-            siret__startswith=carrier.siret[: validators.SIREN_LENGTH]
+        carriers_models.Carrier.objects.filter(
+            siret__startswith=carrier.siret[: carriers_validators.SIREN_LENGTH]
         )
         .exclude(pk=carrier.pk)
         .values(*OTHER_FACILITIES_LIST_FIELDS)
@@ -149,9 +151,9 @@ def get_latest_certificate_as_json(carrier):
 def carrier_search_q(carriers, q):
     """Filtering on enseigne, SIREN/SIRET, zip code"""
     # Remove ignored characters
-    q = q.translate(validators.SEARCH_Q_TRANS_TABLE).upper()
+    q = q.translate(carriers_validators.SEARCH_Q_TRANS_TABLE).upper()
 
-    if validators.RE_ONLY_DIGITS_AND_SPACES.match(q):
+    if carriers_validators.RE_ONLY_DIGITS_AND_SPACES.match(q):
         # Zip code or SIREN/SIRET number so we remove useless spaces
         q = q.replace(" ", "")
         if len(q) > 5:
@@ -176,7 +178,7 @@ def carrier_search_q(carriers, q):
         if not criterion:
             continue
 
-        if validators.RE_ONLY_DIGITS.match(criterion):
+        if carriers_validators.RE_ONLY_DIGITS.match(criterion):
             # criterion contains only digits
             if len(criterion) > 5:
                 # SIREN is longer than 5
@@ -231,7 +233,9 @@ def carrier_search(request):
        - partial enseigne or SIRET
        - type of the license (LC heavy or LTI light)
     """
-    carriers = models.Carrier.objects.filter(deleted_at=None, sirene_closed_at=None)
+    carriers = carriers_models.Carrier.objects.filter(
+        deleted_at=None, sirene_closed_at=None
+    )
     q = request.GET.get("q")
     if q:
         carriers = carrier_search_q(carriers, q)
@@ -249,7 +253,7 @@ def carrier_search(request):
     for field in ("departement-depart", "departement-arrivee"):
         departement = request.GET.get(field)
         if departement:
-            if validators.is_french_departement(departement):
+            if carriers_validators.is_french_departement(departement):
                 departements.append(departement)
             else:
                 message = (
@@ -260,12 +264,12 @@ def carrier_search(request):
 
     if departements:
         carriers = carriers.filter(
-            Q(editable__working_area=models.WORKING_AREA_INTERNATIONAL)
-            | Q(editable__working_area=models.WORKING_AREA_FRANCE)
+            Q(editable__working_area=carriers_models.WORKING_AREA_INTERNATIONAL)
+            | Q(editable__working_area=carriers_models.WORKING_AREA_FRANCE)
             | Q(
                 editable__working_area__in=(
-                    models.WORKING_AREA_DEPARTEMENT,
-                    models.WORKING_AREA_REGION,
+                    carriers_models.WORKING_AREA_DEPARTEMENT,
+                    carriers_models.WORKING_AREA_REGION,
                 ),
                 editable__working_area_departements__contains=departements,
             )
@@ -388,7 +392,7 @@ def carrier_detail_apply_changes(user, carrier, editable_serialized):
         )
 
         if should_notify_old_email:
-            mails.mail_carrier_to_old_email(
+            carriers_mails.mail_carrier_to_old_email(
                 changed_fields, carrier.editable, new_carrier_editable
             )
 
@@ -400,11 +404,11 @@ def carrier_detail_apply_changes(user, carrier, editable_serialized):
             should_mail_user = False
         else:
             # Send only an email for carrier changes
-            mails.mail_carrier_editable_to_confirm(
+            carriers_mails.mail_carrier_editable_to_confirm(
                 changed_fields, carrier.editable, new_carrier_editable
             )
 
-        mails.mail_managers_carrier_changes(
+        carriers_mails.mail_managers_carrier_changes(
             changed_fields, carrier.editable, new_carrier_editable
         )
 
@@ -420,7 +424,7 @@ def carrier_detail(request, carrier_siret):
     # Access to deleted carriers is allowed.
     # Get existing carrier if any
     carrier = get_object_or_404(
-        models.Carrier.objects.select_related("editable"), siret=carrier_siret
+        carriers_models.Carrier.objects.select_related("editable"), siret=carrier_siret
     )
 
     if request.method == "POST":
@@ -459,23 +463,26 @@ def carrier_detail(request, carrier_siret):
 def carrier_editable_confirm(request, carrier_editable_id, token):
     if settings.ENVIRONMENT == "E2E":
         carrier_editable = (
-            models.CarrierEditable.objects.select_related("carrier")
+            carriers_models.CarrierEditable.objects.select_related("carrier")
             .filter(carrier__pk="80005226884728")
             .latest()
         )
     else:
         # Production
         carrier_editable = get_object_or_404(
-            models.CarrierEditable.objects.select_related("carrier"),
+            carriers_models.CarrierEditable.objects.select_related("carrier"),
             pk=carrier_editable_id,
         )
-        if not tokens.carrier_editable_token_generator.check_token(
+        if not carriers_tokens.carrier_editable_token_generator.check_token(
             carrier_editable, token
         ):
-            return JsonResponse({
-                "siret": carrier_editable.carrier_id,
-                "message": "Impossible de confirmer les modifications de la fiche transporteur."
-            }, status=400)
+            return JsonResponse(
+                {
+                    "siret": carrier_editable.carrier_id,
+                    "message": "Impossible de confirmer les modifications de la fiche transporteur.",
+                },
+                status=400,
+            )
 
     with transaction.atomic(savepoint=False):
         carrier_editable.confirmed_at = timezone.now()
@@ -483,10 +490,10 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
         carrier_editable.carrier.editable = carrier_editable
         carrier_editable.carrier.save()
 
-    mails.mail_managers_carrier_confirmed(carrier_editable)
+    carriers_mails.mail_managers_carrier_confirmed(carrier_editable)
     data = {
         "siret": carrier_editable.carrier_id,
-        "message": "Les modifications de la fiche sont confirmées."
+        "message": "Les modifications de la fiche sont confirmées.",
     }
     return JsonResponse(data)
 
@@ -508,14 +515,14 @@ def _certificate_sign(request, carrier):
         )
 
     kind = serializer.validated_data.pop("kind")
-    certificate = models.CarrierCertificate.objects.create(
+    certificate = carriers_models.CarrierCertificate.objects.create(
         carrier=carrier,
         created_by=request.user,
         data=serializer.validated_data,
         kind=kind,
     )
-    mails.mail_carrier_certificate_to_confirm(carrier, certificate)
-    mails.mail_managers_new_certificate(certificate)
+    carriers_mails.mail_carrier_certificate_to_confirm(carrier, certificate)
+    carriers_mails.mail_managers_new_certificate(certificate)
     return JsonResponse({"carrier": get_carrier_as_json(carrier)})
 
 
@@ -530,7 +537,7 @@ def _certificate_get(request, carrier, as_pdf=True):
 
     template_name = (
         "certificate_workers.html"
-        if certificate.kind == models.CERTIFICATE_WORKERS
+        if certificate.kind == carriers_models.CERTIFICATE_WORKERS
         else "certificate_no_workers.html"
     )
     qr_code = core_pdf.get_qr_code(
@@ -559,7 +566,7 @@ def _certificate_get(request, carrier, as_pdf=True):
 
 
 def certificate_detail(request, carrier_siret, as_pdf=True):
-    carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
+    carrier = get_object_or_404(carriers_models.Carrier, siret=carrier_siret)
 
     if request.method == "POST":
         response = check_user_is_anonmyous(request.user) or check_user_has_accepted_cgu(
@@ -576,16 +583,18 @@ def certificate_detail(request, carrier_siret, as_pdf=True):
 def certificate_confirm(request, certificate_id, token):
     if settings.ENVIRONMENT == "E2E":
         certificate = (
-            models.CarrierCertificate.objects.select_related("carrier")
+            carriers_models.CarrierCertificate.objects.select_related("carrier")
             .filter(carrier__siret="80005226884728")
             .latest("pk")
         )
     else:
         certificate = get_object_or_404(
-            models.CarrierCertificate.objects.select_related("carrier"),
+            carriers_models.CarrierCertificate.objects.select_related("carrier"),
             pk=certificate_id,
         )
-        if not tokens.certificate_token_generator.check_token(certificate, token):
+        if not carriers_tokens.certificate_token_generator.check_token(
+            certificate, token
+        ):
             return JsonResponse(
                 {
                     "siret": certificate.carrier_id,
@@ -596,7 +605,7 @@ def certificate_confirm(request, certificate_id, token):
 
     certificate.confirmed_at = timezone.now()
     certificate.save()
-    mails.mail_managers_certificate_confirmed(certificate)
+    carriers_mails.mail_managers_certificate_confirmed(certificate)
     return JsonResponse(
         {"siret": certificate.carrier_id, "message": "L'attestation est confirmée"}
     )
@@ -604,7 +613,7 @@ def certificate_confirm(request, certificate_id, token):
 
 @require_POST
 def license_renewal_ask(request, carrier_siret):
-    carrier = get_object_or_404(models.Carrier, siret=carrier_siret)
+    carrier = get_object_or_404(carriers_models.Carrier, siret=carrier_siret)
 
     # Only possible if the email is set
     if not carrier.editable.email:
@@ -625,23 +634,25 @@ def license_renewal_ask(request, carrier_siret):
     if response:
         return response
 
-    license_renewal = models.CarrierLicenseRenewal.objects.create(
+    license_renewal = carriers_models.CarrierLicenseRenewal.objects.create(
         carrier=carrier,
         created_by=request.user,
         lti_nombre=serializer.validated_data["lti_nombre"],
         lc_nombre=serializer.validated_data["lc_nombre"],
     )
-    mails.mail_carrier_license_renewal_to_confirm(carrier, license_renewal)
-    mails.mail_managers_new_license_renewal(license_renewal)
+    carriers_mails.mail_carrier_license_renewal_to_confirm(carrier, license_renewal)
+    carriers_mails.mail_managers_new_license_renewal(license_renewal)
     return JsonResponse({"carrier": get_carrier_as_json(carrier)})
 
 
 def license_renewal_confirm(request, license_renewal_id, token):
     license_renewal = get_object_or_404(
-        models.CarrierLicenseRenewal.objects.select_related("carrier"),
+        carriers_models.CarrierLicenseRenewal.objects.select_related("carrier"),
         pk=license_renewal_id,
     )
-    if not tokens.license_renewal_token_generator.check_token(license_renewal, token):
+    if not carriers_tokens.license_renewal_token_generator.check_token(
+        license_renewal, token
+    ):
         return JsonResponse(
             {
                 "siret": license_renewal.carrier_id,
@@ -652,8 +663,8 @@ def license_renewal_confirm(request, license_renewal_id, token):
 
     license_renewal.confirmed_at = timezone.now()
     license_renewal.save()
-    mails.mail_dreal_license_renewal(license_renewal)
-    mails.mail_managers_license_renewal_confirmed(license_renewal)
+    carriers_mails.mail_dreal_license_renewal(license_renewal)
+    carriers_mails.mail_managers_license_renewal_confirmed(license_renewal)
     return JsonResponse(
         {
             "siret": license_renewal.carrier_id,
