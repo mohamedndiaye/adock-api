@@ -45,8 +45,9 @@ def mail_user_to_activate_with_carrier_editable(
         % settings.EMAIL_SUBJECT_PREFIX
     )
     message = """
-Merci d'avoir créé votre compte utilisateur et renseigné votre fiche transporteur sur A Dock,
-il suffit maintenant de cliquer sur ce lien pour les activer :
+Merci d'avoir créé votre compte utilisateur sur A Dock.
+Il suffit maintenant de cliquer sur ce lien pour activer et confirmer les modifications
+de la fiche transporteur :
 
 {http_client_url}utilisateur/{user_id}/activer/{user_token}/transporteur/changement/{new_carrier_editable_id}/confirmer/{carrier_editable_token}/
 

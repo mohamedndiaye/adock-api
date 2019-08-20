@@ -183,26 +183,26 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
         self.assertNotIn("working", body)
 
         # Confirm changes by extracting the token provided to the UI in #2 mail
-        url_search = re.search(
+        confirm_url_search = re.search(
             r"%stransporteur/changement/(?P<carrier_editable_id>\d+)/confirmer/(?P<token>.+)/"
             % settings.HTTP_CLIENT_URL,
             mail.outbox[1].body,
         )
-        self.assertIsNotNone(url_search)
+        self.assertIsNotNone(confirm_url_search)
 
-        results = url_search.groupdict()
+        results = confirm_url_search.groupdict()
 
         # The mail refers to the new editable
         self.assertEqual(latest_editable.pk, int(results["carrier_editable_id"]))
 
-        url_carrier_editable_confirm = reverse(
+        carrier_editable_confirm_url = reverse(
             "carriers_carrier_editable_confirm",
             kwargs={
                 "carrier_editable_id": results["carrier_editable_id"],
                 "token": results["token"],
             },
         )
-        response = self.client.get(url_carrier_editable_confirm)
+        response = self.client.get(carrier_editable_confirm_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["siret"], self.carrier.siret)
 
