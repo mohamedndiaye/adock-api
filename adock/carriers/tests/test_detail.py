@@ -61,6 +61,7 @@ class CarrierDetailTestCase(test.CarrierTestCaseMixin):
         self.assertEqual(carrier_data["is_confirmed"], False)
         self.assertEqual(carrier_data["other_facilities"], [])
         self.assertEqual(carrier_data["latest_certificate"], None)
+        self.assertEqual(carrier_data["user_is_owner"], False)
 
     def test_get_other_facilities(self):
         for i in range(3):
@@ -146,9 +147,10 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
         self.assertEqual(models.CarrierEditable.objects.count(), 2)
 
         # Not confirmed yet
-        carrier = data["carrier"]
-        self.assertEqual(carrier["telephone"], self.carrier.editable.telephone)
-        self.assertEqual(carrier["email"], self.carrier.editable.email)
+        carrier_data = data["carrier"]
+        self.assertEqual(carrier_data["telephone"], self.carrier.editable.telephone)
+        self.assertEqual(carrier_data["email"], self.carrier.editable.email)
+        self.assertEqual(carrier_data["user_is_owner"], False)
 
         # Check CarrierEditable to confirm
         latest_editable = models.CarrierEditable.objects.latest()
@@ -208,6 +210,13 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
 
         self.carrier.refresh_from_db()
         self.assertEqual(self.carrier.editable, latest_editable)
+
+        # Get from server
+        response = self.client.get(
+            self.detail_url, HTTP_AUTHORIZATION=self.http_authorization
+        )
+        carrier_data = response.json()["carrier"]
+        self.assertEqual(carrier_data["user_is_owner"], True)
 
         mail.outbox = []
 

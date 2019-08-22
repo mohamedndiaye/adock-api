@@ -97,7 +97,7 @@ def format_telephone(phonenumber):
     )
 
 
-def get_carrier_as_json(carrier):
+def get_carrier_as_json(user, carrier):
     carrier_json = {}
 
     for field in CARRIER_DETAIL_FIELDS:
@@ -110,6 +110,8 @@ def get_carrier_as_json(carrier):
 
     for field in CARRIER_DETAIL_EDITABLE_FIELDS:
         carrier_json[field] = getattr(editable, field)
+
+    carrier_json["user_is_owner"] = (not user.is_anonymous) and user.id == editable.created_by_id
 
     return carrier_json
 
@@ -460,7 +462,7 @@ def carrier_detail(request, carrier_siret):
         )
         data_json["confirmation_sent_to"] = confirmation_sent_to
 
-    carrier_json = get_carrier_as_json(carrier)
+    carrier_json = get_carrier_as_json(request.user, carrier)
     carrier_json["other_facilities"] = get_other_facilities_as_json(carrier)
     carrier_json["latest_certificate"] = get_latest_certificate_as_json(carrier)
     data_json["carrier"] = carrier_json
@@ -533,7 +535,7 @@ def _certificate_sign(request, carrier):
     )
     carriers_mails.mail_carrier_certificate_to_confirm(carrier, certificate)
     carriers_mails.mail_managers_new_certificate(certificate)
-    return JsonResponse({"carrier": get_carrier_as_json(carrier)})
+    return JsonResponse({"carrier": get_carrier_as_json(request.user, carrier)})
 
 
 def _certificate_get(request, carrier, as_pdf=True):
@@ -652,7 +654,7 @@ def license_renewal_ask(request, carrier_siret):
     )
     carriers_mails.mail_carrier_license_renewal_to_confirm(carrier, license_renewal)
     carriers_mails.mail_managers_new_license_renewal(license_renewal)
-    return JsonResponse({"carrier": get_carrier_as_json(carrier)})
+    return JsonResponse({"carrier": get_carrier_as_json(request.user, carrier)})
 
 
 def license_renewal_confirm(request, license_renewal_id, token):
