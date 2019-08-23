@@ -189,7 +189,9 @@ def account_profile(request, extended=False):
 
     if extended:
         carriers = (
-            carriers_models.Carrier.objects.filter(changes__created_by=request.user)
+            carriers_models.Carrier.objects.filter(
+                changes__confirmed_at__isnull=False, changes__created_by=request.user
+            )
             .select_related("editable")
             .distinct()
         )
