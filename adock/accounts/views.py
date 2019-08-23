@@ -63,7 +63,6 @@ def account_activate(
     if settings.ENVIRONMENT == "E2E":
         # Used only by E2E tests to confirm account
         user = accounts_models.User.objects.get(email="joemartin@example.com")
-        user.has_accepted_cgu = False
     else:
         try:
             user = accounts_models.User.objects.get(pk=user_id)
