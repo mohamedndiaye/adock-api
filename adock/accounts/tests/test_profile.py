@@ -2,6 +2,7 @@ import json
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse
+from django.utils import timezone
 
 from adock.accounts.test import AuthTestCase
 from adock.carriers import factories as carriers_factories
@@ -18,7 +19,7 @@ class ProfileTestCase(AuthTestCase):
 
     def test_profile(self):
         carrier = carriers_factories.CarrierFactory(
-            with_editable={"created_by": self.user}
+            with_editable={"created_by": self.user, "confirmed_at": timezone.now()}
         )
         http_authorization = self.log_in()
         response = self.client.get(self.url, HTTP_AUTHORIZATION=http_authorization)
