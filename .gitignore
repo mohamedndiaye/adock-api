@@ -1,6 +1,7 @@
 __pycache__/
 _build/
 *.pyc
+yarn.lock
 .DS_Store
 /.coverage
 /.pytest_cache/
