@@ -75,6 +75,11 @@ class LicenseRenewalTestCase(AuthTestCase):
             kwargs={"license_renewal_id": renewal.id, "token": token},
         )
         self.assertEqual(len(mail.outbox), 2)
+        subject = (
+            "[A Dock] Confirmez la demande de renouvellement de licences pour %s"
+            % (self.carrier.raison_sociale)
+        )
+        self.assertEqual(mail.outbox[0].subject, subject)
         mail.outbox = []
 
         # Click on confirm link
@@ -87,7 +92,7 @@ class LicenseRenewalTestCase(AuthTestCase):
         # 1 - ask for new license to DREAL
         # 2 - log to managers
         self.assertEqual(len(mail.outbox), 2)
-        message = "[A Dock] Demande de renouvellement de licence de %s n° SIREN %s" % (
+        message = "[A Dock] Demande de renouvellement de licences de %s n° SIREN %s" % (
             self.carrier.raison_sociale,
             self.carrier.get_siren(),
         )
@@ -95,7 +100,7 @@ class LicenseRenewalTestCase(AuthTestCase):
         self.assertIn(self.carrier.get_siren(), mail.outbox[0].body)
 
         message = (
-            "[A Dock] Demande de renouvellement de licence %s du transporteur %s confirmée"
+            "[A Dock] log - Demande de renouvellement de licences %s du transporteur %s confirmée"
             % (renewal.pk, self.carrier.siret)
         )
         self.assertEqual(mail.outbox[1].subject, message)
