@@ -100,7 +100,7 @@ class LicenseRenewalTestCase(AuthTestCase):
         self.assertIn(self.carrier.get_siren(), mail.outbox[0].body)
 
         message = (
-            "[A Dock] log - Demande de renouvellement de licences %s du transporteur %s confirmée"
+            "[A Dock] log - Demande de renouvellement de licence %s du transporteur %s confirmée"
             % (renewal.pk, self.carrier.siret)
         )
         self.assertEqual(mail.outbox[1].subject, message)

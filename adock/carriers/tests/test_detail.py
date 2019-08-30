@@ -177,7 +177,7 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
         )
 
         # 3
-        message = "[A Dock] Modification du transporteur %s" % self.carrier.siret
+        message = "[A Dock] log - Modification du transporteur %s" % self.carrier.siret
         self.assertEqual(mail.outbox[2].subject, message)
         body = mail.outbox[2].body
         self.assertIn("telephone", body)

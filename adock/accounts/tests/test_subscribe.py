@@ -105,7 +105,7 @@ class SubscribeWorkflowTestCase(TestCase):
         # iii
         self.assertEqual(
             mail.outbox[2].subject,
-            "[A Dock] Modification du transporteur %s" % self.carrier.siret,
+            "[A Dock] log - Modification du transporteur %s" % self.carrier.siret,
         )
 
         # Resolve server URL

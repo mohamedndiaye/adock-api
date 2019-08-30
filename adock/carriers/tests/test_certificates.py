@@ -97,9 +97,9 @@ class SignCarrierCertificateTestCase(AuthTestCase):
         self.assertEqual(certificate, latest_certificate)
         self.assertIsNotNone(latest_certificate.confirmed_at)
 
-        message = "[A Dock] L'attestation %s du transporteur %s a été confirmée." % (
-            certificate.pk,
-            self.carrier.siret,
+        message = (
+            "[A Dock] log - L'attestation %s du transporteur %s a été confirmée."
+            % (certificate.pk, self.carrier.siret)
         )
         self.assertEqual(mail.outbox[0].subject, message)
 

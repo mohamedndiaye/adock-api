@@ -104,7 +104,7 @@ def mail_managers_carrier_changes(
     # Send a mail to managers to track changes
     # The URL is detail view of the front application
     carrier = current_carrier_editable.carrier
-    subject = "Modification du transporteur %s" % carrier.siret
+    subject = "log - Modification du transporteur %s" % carrier.siret
     message = """
 Modification en cours du transporteur : {enseigne}
 SIRET : {siret}
@@ -125,7 +125,7 @@ Informations modifiées :
 
 def mail_managers_carrier_confirmed(carrier_editable):
     carrier = carrier_editable.carrier
-    subject = "La modification du transporteur %s est confirmée." % carrier.siret
+    subject = "log - La modification du transporteur %s est confirmée." % carrier.siret
     message = """
         Transporteur modifié : {enseigne}
         SIRET : {siret}
@@ -170,7 +170,7 @@ L'équipe A Dock
 
 def mail_managers_new_certificate(certificate):
     carrier = certificate.carrier
-    subject = "Nouvelle attestation %s pour le transporteur %s" % (
+    subject = "log - Nouvelle attestation %s pour le transporteur %s" % (
         certificate.pk,
         carrier.siret,
     )
@@ -195,7 +195,7 @@ Données :
 
 def mail_managers_certificate_confirmed(certificate):
     carrier = certificate.carrier
-    subject = "L'attestation %s du transporteur %s a été confirmée." % (
+    subject = "log - L'attestation %s du transporteur %s a été confirmée." % (
         certificate.pk,
         carrier.siret,
     )
@@ -296,7 +296,7 @@ Bien cordialement,
 def mail_managers_new_license_renewal(license_renewal):
     carrier = license_renewal.carrier
     subject = (
-        "log - Demande de renouvellement de licences %s pour le transporteur %s"
+        "log - Demande de renouvellement de licence %s pour le transporteur %s"
         % (license_renewal.pk, carrier.siret)
     )
     message = """
@@ -375,7 +375,7 @@ Bien cordialement,
 def mail_managers_license_renewal_confirmed(license_renewal):
     carrier = license_renewal.carrier
     subject = (
-        "log - Demande de renouvellement de licences %s du transporteur %s confirmée"
+        "log - Demande de renouvellement de licence %s du transporteur %s confirmée"
         % (license_renewal.pk, carrier.siret)
     )
     message = """
