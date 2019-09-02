@@ -111,7 +111,9 @@ def get_carrier_as_json(user, carrier):
     for field in CARRIER_DETAIL_EDITABLE_FIELDS:
         carrier_json[field] = getattr(editable, field)
 
-    carrier_json["user_is_owner"] = (not user.is_anonymous) and user.id == editable.created_by_id
+    carrier_json["user_is_owner"] = (
+        not user.is_anonymous
+    ) and user.id == editable.created_by_id
 
     return carrier_json
 
@@ -340,7 +342,7 @@ def get_carrier_changes(carrier, cleaned_payload):
 RE_MANY_COMMAS = re.compile(r",+")
 
 
-def check_user_is_anonmyous(user):
+def check_user_is_not_anonymous(user):
     if not user or user.is_anonymous:
         return JsonResponse(
             {
@@ -449,7 +451,7 @@ def carrier_detail(request, carrier_siret):
                     return response
                 user = created_by_email_serialized.created_by
 
-        response = check_user_is_anonmyous(user)
+        response = check_user_is_not_anonymous(user)
         if response:
             return response
 
@@ -581,9 +583,9 @@ def certificate_detail(request, carrier_siret, as_pdf=True):
     carrier = get_object_or_404(carriers_models.Carrier, siret=carrier_siret)
 
     if request.method == "POST":
-        response = check_user_is_anonmyous(request.user) or check_user_has_accepted_cgu(
+        response = check_user_is_not_anonymous(
             request.user
-        )
+        ) or check_user_has_accepted_cgu(request.user)
         if response:
             return response
 
@@ -634,7 +636,7 @@ def license_renewal_ask(request, carrier_siret):
             status=401,
         )
 
-    response = check_user_is_anonmyous(request.user) or check_user_has_accepted_cgu(
+    response = check_user_is_not_anonymous(request.user) or check_user_has_accepted_cgu(
         request.user
     )
     if response:
