@@ -80,7 +80,7 @@ def account_activate(
     user.is_active = True
     user.save()
 
-    message = "Le compte utilisateur est activé."
+    message = "Le compte utilisateur « %s » a été activé." % (user.email)
 
     # Confirm linked carrier editable if provided
     if carrier_editable_id and carrier_editable_token:
@@ -98,9 +98,12 @@ def account_activate(
 
         if not carrier_editable:
             # Unable to confirm the carrier changes
-            message += " Les changements associés de la fiche transporteur n'ont pas pu être appliqués."
+            message += (
+                " . Impossible d'appliquer les changements de la fiche transporteur."
+            )
         else:
             carriers_views.carrier_editable_save(carrier_editable)
+            message += " Les changements de la fiche transporteur ont été appliqué avec succès."
 
     json_web_token = jwt_auth_views.jwt_encode_token(user)
     json_data = jwt_auth_views.jwt_get_json_with_token(json_web_token)

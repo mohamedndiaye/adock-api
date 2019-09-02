@@ -11,7 +11,7 @@ urlpatterns = [
         name="accounts_activate",
     ),
     path(
-        "<int:user_id>/activate/<str:user_token>/transporteur/changement/<int:carrier_editable_id>/confirmer/<str:carrier_editable_token>/",
+        "<int:user_id>/activate/<str:user_token>/carrier/editable/<int:carrier_editable_id>/confirm/<str:carrier_editable_token>/",
         views.account_activate,
         name="accounts_activate_with_carrier_editable",
     ),

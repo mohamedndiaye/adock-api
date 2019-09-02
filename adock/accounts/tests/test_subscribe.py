@@ -121,7 +121,12 @@ class SubscribeWorkflowTestCase(TestCase):
         response = self.client.get(confirm_url)
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        self.assertEqual(data["message"], "Le compte utilisateur est activé.")
+        self.assertEqual(
+            data["message"],
+            "Le compte utilisateur « {email} » a été activé. Les changements de la fiche transporteur ont été appliqué avec succès.".format(
+                email=EMAIL
+            ),
+        )
 
         user.refresh_from_db()
         self.assertTrue(user.is_active)

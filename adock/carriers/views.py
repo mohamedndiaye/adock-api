@@ -507,7 +507,8 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
     carriers_mails.mail_managers_carrier_confirmed(carrier_editable)
     data = {
         "siret": carrier_editable.carrier_id,
-        "message": "Les modifications de la fiche sont confirmées.",
+        "message": "Les modifications de la fiche transporteur « %s » sont confirmées."
+        % (carrier_editable.carrier.enseigne),
     }
     return JsonResponse(data)
 
@@ -621,7 +622,11 @@ def certificate_confirm(request, certificate_id, token):
     certificate.save()
     carriers_mails.mail_managers_certificate_confirmed(certificate)
     return JsonResponse(
-        {"siret": certificate.carrier_id, "message": "L'attestation est confirmée"}
+        {
+            "siret": certificate.carrier_id,
+            "message": "L'attestation pour l'entreprise « %s » est confirmée."
+            % certificate.carrier.enseigne,
+        }
     )
 
 

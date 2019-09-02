@@ -132,7 +132,8 @@ class ActivateUserTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            response.json()["message"], "Le compte utilisateur est activé."
+            response.json()["message"],
+            "Le compte utilisateur « %s » a été activé." % self.user.email,
         )
 
 
