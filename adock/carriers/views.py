@@ -682,6 +682,6 @@ def license_renewal_confirm(request, license_renewal_id, token):
     return JsonResponse(
         {
             "siret": license_renewal.carrier_id,
-            "message": "La demande de renouvellement de license est renouvellée.",
+            "message": "La demande de renouvellement de license est confirmée.",
         }
     )
