@@ -83,6 +83,8 @@ def account_activate(
     message = "Le compte utilisateur « %s » a été activé." % (user.email)
 
     # Confirm linked carrier editable if provided
+    # FIXME(2019-09-02) This code isn't clean but we aren't sure it will last.
+    # Else the UI could do two distinct requests to avoid duplicate.
     if carrier_editable_id and carrier_editable_token:
         try:
             carrier_editable = carriers_models.CarrierEditable.objects.select_related(
