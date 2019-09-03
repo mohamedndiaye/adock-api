@@ -637,7 +637,7 @@ def certificate_confirm(request, certificate_id, token):
     return JsonResponse(
         {
             "siret": certificate.carrier_id,
-            "message": "L'attestation pour l'entreprise « %s » est confirmée."
+            "message": "L'attestation pour l'entreprise « %s » est confirmée."
             % certificate.carrier.enseigne,
         }
     )
