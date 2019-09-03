@@ -363,7 +363,12 @@ def check_user_has_accepted_cgu(user):
 def carrier_detail_apply_changes(
     user, carrier, editable_serialized, created_by_email_serialized
 ):
-    """Returns True if changes detected"""
+    """
+    Returns a dict with the following fields:
+    - confirmation_sent_to: email or None if no changes
+    - account_confirmation_sent_to: email of user who create the changes if account not enabled yet
+    - old_account_sent_to: email of previous user who edit the carrier if any
+    """
     should_notify_old_email = False
 
     validated_data = editable_serialized.validated_data
@@ -416,7 +421,11 @@ def carrier_detail_apply_changes(
     if should_mail_user:
         accounts_mails.mail_user_to_activate(user)
 
-    return new_carrier_editable.email if new_editable_to_create else ""
+    return {
+        "confirmation_sent_to": new_carrier_editable.email if new_editable_to_create else None,
+        "account_confirmation_sent_to": user.email if should_mail_user else None,
+        "old_account_sent_to": carrier.editable.email if should_notify_old_email else None
+    }
 
 
 def carrier_detail(request, carrier_siret):
@@ -434,10 +443,13 @@ def carrier_detail(request, carrier_siret):
         if response:
             return response
 
-        # The request user is used if not anonymous
+        # If not anonymous, the request user is used.
         user = request.user
         created_by_email_serialized = None
         if user.is_anonymous:
+            # Else it's allowed to used a not yet enabled user which
+            # the created_by_email is provided in request.
+            # The current subscribe process of UI uses that.
             payload, response = core_views.request_load(request)
             if response:
                 return response
@@ -459,10 +471,11 @@ def carrier_detail(request, carrier_siret):
         if response:
             return response
 
-        confirmation_sent_to = carrier_detail_apply_changes(
+        mails_sent_to = carrier_detail_apply_changes(
             user, carrier, editable_serialized, created_by_email_serialized
         )
-        data_json["confirmation_sent_to"] = confirmation_sent_to
+        data_json["confirmation_sent_to"] = mails_sent_to["confirmation_sent_to"]
+        data_json["account_confirmation_sent_to"] = mails_sent_to["account_confirmation_sent_to"]
 
     carrier_json = get_carrier_as_json(request.user, carrier)
     carrier_json["other_facilities"] = get_other_facilities_as_json(carrier)

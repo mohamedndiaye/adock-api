@@ -6,25 +6,27 @@ from django.test import TestCase
 from django.urls import reverse
 
 from adock.accounts import models as accounts_models
-from adock.carriers import models as carriers_models
+from adock.accounts import test as accounts_test
 from adock.carriers import factories as carriers_factories
+from adock.carriers import models as carriers_models
+from adock.carriers.tests import test as carriers_test
 
 
-class SubscribeWorkflowTestCase(TestCase):
+class CreateAccountSubscribeWorkflowTestCase(TestCase):
     def setUp(self):
         self.carrier = carriers_factories.CarrierFactory(
             enseigne="MA PETITE ENTREPRISE", with_editable=True
         )
 
     def test_workflow(self):
-        # 1 - select a carrier
+        # Step 1 - select a carrier
         search_url = reverse("carriers_search")
         response = self.client.get(search_url, {"q": "Petite"})
         self.assertEqual(response.status_code, 200)
         carrier_data = response.json()["carriers"][0]
         self.assertEqual(carrier_data["enseigne"], self.carrier.enseigne)
 
-        # 2 - create an account
+        # Step 2 - create an account
         create_account_url = reverse("accounts_create")
         EMAIL = "foo@example.com"
         response = self.client.post(
@@ -35,6 +37,7 @@ class SubscribeWorkflowTestCase(TestCase):
                 "last_name": "Ménard",
                 "password": "secret1234",
                 "has_accepted_cgu": True,
+                # No confirmation mail
                 "send_activation_link": False,
             },
             content_type="application/json",
@@ -58,7 +61,7 @@ class SubscribeWorkflowTestCase(TestCase):
 
         mail.outbox = []
 
-        # 3 - edit the carrier (same email address as user)
+        # Step 3 - edit the carrier (same email address as user)
         carrier_url = reverse(
             "carriers_detail", kwargs={"carrier_siret": self.carrier.siret}
         )
@@ -70,6 +73,7 @@ class SubscribeWorkflowTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data["confirmation_sent_to"], EMAIL)
+        self.assertIsNone(data["account_confirmation_sent_to"])
         carrier_editable = carriers_models.CarrierEditable.objects.get(email=EMAIL)
         self.assertEqual(carrier_editable.created_by.email, EMAIL)
 
@@ -133,3 +137,55 @@ class SubscribeWorkflowTestCase(TestCase):
 
         self.carrier.refresh_from_db()
         self.assertEqual(self.carrier.editable, carrier_editable)
+
+
+class LoggedSubscribeWorkflowTestCase(
+    accounts_test.AuthTestCase, carriers_test.CarrierTestCaseMixin
+):
+    def setUp(self):
+        super().setUp()
+        self.carrier = carriers_factories.CarrierFactory(
+            enseigne="MA PETITE ENTREPRISE", with_editable=True
+        )
+        self.http_authorization = self.log_in()
+        self.carrier_detail_url = reverse(
+            "carriers_detail", kwargs={"carrier_siret": self.carrier.siret}
+        )
+
+    def test_workflow(self):
+        # Step 1 is identical to previous test
+        # Step 2 - Logged in with FC account
+        # step 3 - edit the carrier
+        data = self.post_carrier_logged(
+            {
+                "email": "carrier@example.com",
+                "telephone": "+33240424546",
+                # User is logged so the field will be ignored
+                "created_by_email": "user@example.com",
+            },
+            200,
+        )
+        self.assertEqual(data["confirmation_sent_to"], "carrier@example.com")
+        self.assertIsNone(data["account_confirmation_sent_to"])
+
+        # Mails
+        # i - old address
+        # ii - one for changes to carrier
+        # ii -  changes to managers
+        self.assertEqual(len(mail.outbox), 3)
+
+        # i - old
+        self.assertEqual(
+            mail.outbox[0].subject,
+            "[A Dock] Notification de modification de votre fiche transporteur",
+        )
+        # ii
+        self.assertEqual(
+            mail.outbox[1].subject,
+            "[A Dock] En attente de confirmation de votre fiche transporteur",
+        )
+        # iii
+        self.assertEqual(
+            mail.outbox[2].subject,
+            "[A Dock] log - Modification du transporteur %s" % self.carrier.siret,
+        )

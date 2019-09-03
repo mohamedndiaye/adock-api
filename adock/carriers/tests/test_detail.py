@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from adock.accounts.test import AuthTestCase
 
-from . import test
+from . import test as carriers_test
 from .. import factories, models, validators
 
 PHONE = "+33240424546"
@@ -14,22 +14,22 @@ PHONE_DISPLAY = "02 40 42 45 46"
 EMAIL = "foo@example.com"
 
 
-class CarrierDetailTestCase(test.CarrierTestCaseMixin):
+class CarrierDetailTestCase(carriers_test.CarrierTestCaseMixin):
     def setUp(self):
         self.carrier = factories.CarrierFactory(
-            siret=test.VALID_SIRET, with_editable=True
+            siret=carriers_test.VALID_SIRET, with_editable=True
         )
-        self.detail_url = reverse(
+        self.carrier_detail_url = reverse(
             "carriers_detail", kwargs={"carrier_siret": self.carrier.siret}
         )
 
     def test_get(self):
-        response = self.client.get(self.detail_url)
+        response = self.client.get(self.carrier_detail_url)
         data = response.json()
         carrier_data = data["carrier"]
         self.assertNotIn("confirmation_sent_to", data)
 
-        self.assertEqual(carrier_data["siret"], test.VALID_SIRET)
+        self.assertEqual(carrier_data["siret"], carriers_test.VALID_SIRET)
         self.assertEqual(carrier_data["raison_sociale"], self.carrier.raison_sociale)
         self.assertEqual(
             carrier_data["debut_activite"], str(self.carrier.debut_activite)
@@ -54,7 +54,7 @@ class CarrierDetailTestCase(test.CarrierTestCaseMixin):
         )
         self.carrier.save()
 
-        response = self.client.get(self.detail_url)
+        response = self.client.get(self.carrier_detail_url)
         carrier_data = response.json()["carrier"]
         self.assertEqual(carrier_data["debut_activite"], None)
         self.assertEqual(carrier_data["specialities"], None)
@@ -73,14 +73,14 @@ class CarrierDetailTestCase(test.CarrierTestCaseMixin):
             )
             factories.CarrierFactory(siret=siret)
 
-        response = self.client.get(self.detail_url)
+        response = self.client.get(self.carrier_detail_url)
         carrier_data = response.json()["carrier"]
         self.assertEqual(len(carrier_data["other_facilities"]), 3)
         self.assertIn("siret", carrier_data["other_facilities"][0])
 
     def test_latest_certificate(self):
         certificate = factories.CarrierCertificateFactory(carrier=self.carrier)
-        response = self.client.get(self.detail_url)
+        response = self.client.get(self.carrier_detail_url)
         carrier_data = response.json()["carrier"]
         self.assertEqual(
             carrier_data["latest_certificate"]["kind_display"],
@@ -125,13 +125,13 @@ class CarrierDetailTestCase(test.CarrierTestCaseMixin):
         self.post_carrier({"telephone": PHONE, "email": EMAIL}, 401)
 
 
-class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
+class CarrierDetailPostTestCase(AuthTestCase, carriers_test.CarrierTestCaseMixin):
     def setUp(self):
         super().setUp()
         self.carrier = factories.CarrierFactory(
-            siret=test.VALID_SIRET, with_editable=True
+            siret=carriers_test.VALID_SIRET, with_editable=True
         )
-        self.detail_url = reverse(
+        self.carrier_detail_url = reverse(
             "carriers_detail", kwargs={"carrier_siret": self.carrier.siret}
         )
         self.http_authorization = self.log_in()
@@ -213,7 +213,7 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
 
         # Get from server
         response = self.client.get(
-            self.detail_url, HTTP_AUTHORIZATION=self.http_authorization
+            self.carrier_detail_url, HTTP_AUTHORIZATION=self.http_authorization
         )
         carrier_data = response.json()["carrier"]
         self.assertEqual(carrier_data["user_is_owner"], True)
@@ -286,7 +286,7 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
             },
             200,
         )
-        self.assertFalse(data["confirmation_sent_to"])
+        self.assertIsNone(data["confirmation_sent_to"])
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(models.CarrierEditable.objects.count(), 1)
 
@@ -313,7 +313,9 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
 
     def test_post_invalid_mimetype(self):
         response = self.client.post(
-            self.detail_url, {"foo": "foo"}, HTTP_AUTHORIZATION=self.http_authorization
+            self.carrier_detail_url,
+            {"foo": "foo"},
+            HTTP_AUTHORIZATION=self.http_authorization,
         )
         self.assertEqual(response.status_code, 400)
         data = response.json()
@@ -321,7 +323,7 @@ class CarrierDetailPostTestCase(AuthTestCase, test.CarrierTestCaseMixin):
 
     def test_post_invalid_payload(self):
         response = self.client.post(
-            self.detail_url,
+            self.carrier_detail_url,
             "foo",
             "application/json",
             HTTP_AUTHORIZATION=self.http_authorization,
