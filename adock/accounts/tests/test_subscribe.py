@@ -45,7 +45,8 @@ class CreateAccountSubscribeWorkflowTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(
-            data["message"], "Le compte utilisateur « %s » a été créé." % EMAIL
+            data["message"],
+            "Jean-Yves Ménard, votre compte utilisateur A Dock est à présent actif !",
         )
 
         user = accounts_models.User.objects.get()
@@ -127,9 +128,10 @@ class CreateAccountSubscribeWorkflowTestCase(TestCase):
         data = response.json()
         self.assertEqual(
             data["message"],
-            "Le compte utilisateur « {email} » a été activé. Les changements de la fiche transporteur ont été appliqué avec succès.".format(
-                email=EMAIL
-            ),
+            (
+                "Jean-Yves Ménard, votre compte utilisateur A Dock est à présent actif ! ",
+                "Les changements de la fiche transporteur ont été appliqué avec succès.",
+            ).format(email=EMAIL),
         )
 
         user.refresh_from_db()

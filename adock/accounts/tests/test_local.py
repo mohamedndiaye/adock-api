@@ -133,7 +133,8 @@ class ActivateUserTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json()["message"],
-            "Le compte utilisateur « %s » a été activé." % self.user.email,
+            "%s %s, votre compte utilisateur A Dock est à présent actif !"
+            % (self.user.first_name, self.user.last_name),
         )
 
 

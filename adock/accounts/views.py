@@ -24,6 +24,10 @@ from . import models as accounts_models
 from . import serializers as accounts_serializers
 from . import tokens as accounts_tokens
 
+ACCOUNT_CREATED_MESSAGE = (
+    "{first_name} {last_name}, votre compte utilisateur A Dock est à présent actif !"
+)
+
 
 @require_POST
 def account_create(request):
@@ -53,7 +57,11 @@ def account_create(request):
         )
 
     return JsonResponse(
-        {"message": "Le compte utilisateur « %s » a été créé." % user.email}
+        {
+            "message": ACCOUNT_CREATED_MESSAGE.format(
+                first_name=user.first_name, last_name=user.last_name
+            )
+        }
     )
 
 
@@ -80,7 +88,9 @@ def account_activate(
     user.is_active = True
     user.save()
 
-    message = "Le compte utilisateur « %s » a été activé." % (user.email)
+    message = ACCOUNT_CREATED_MESSAGE.format(
+        first_name=user.first_name, last_name=user.last_name
+    )
 
     # Confirm linked carrier editable if provided
     # FIXME(2019-09-02) This code isn't clean but we aren't sure it will last.
