@@ -30,7 +30,7 @@ class NotAllowedLicenseRenewalTestCase(AuthTestCase):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(
             response.json()["message"],
-            "La fiche transporteur ne contient d'adresse électronique.",
+            "La fiche transporteur ne contient pas d'adresse électronique.",
         )
 
 

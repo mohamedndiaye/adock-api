@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 from ..core import pdf as core_pdf
 from ..core import views as core_views
 from ..accounts import mails as accounts_mails
+from ..accounts import views as accounts_views
 
 from . import mails as carriers_mails
 from . import models as carriers_models
@@ -421,10 +422,14 @@ def carrier_detail_apply_changes(
     if should_mail_user:
         accounts_mails.mail_user_to_activate(user)
 
+    confirmation_sent_to = new_carrier_editable.email if new_editable_to_create else None
+    account_confirmation_sent_to = user.email if should_mail_user else None
+    old_account_sent_to = carrier.editable.email if should_notify_old_email else None
+
     return {
-        "confirmation_sent_to": new_carrier_editable.email if new_editable_to_create else None,
-        "account_confirmation_sent_to": user.email if should_mail_user else None,
-        "old_account_sent_to": carrier.editable.email if should_notify_old_email else None
+        "confirmation_sent_to": confirmation_sent_to,
+        "account_confirmation_sent_to": account_confirmation_sent_to,
+        "old_account_sent_to": old_account_sent_to
     }
 
 
@@ -475,7 +480,16 @@ def carrier_detail(request, carrier_siret):
             user, carrier, editable_serialized, created_by_email_serialized
         )
         data_json["confirmation_sent_to"] = mails_sent_to["confirmation_sent_to"]
-        data_json["account_confirmation_sent_to"] = mails_sent_to["account_confirmation_sent_to"]
+        data_json["account_confirmation_sent_to"] = mails_sent_to[
+            "account_confirmation_sent_to"
+        ]
+        data_json["message"] = (
+            "Vous devez confirmer les changements de la fiche transporteur "
+            "en cliquant sur le lien envoyé à « %s »"
+        ) % mails_sent_to["confirmation_sent_to"]
+
+        if mails_sent_to["account_confirmation_sent_to"]:
+            data_json["account_message"] = accounts_views.ACCOUNT_CREATED_MESSAGE % mails_sent_to["account_confirmation_sent_to"]
 
     carrier_json = get_carrier_as_json(request.user, carrier)
     carrier_json["other_facilities"] = get_other_facilities_as_json(carrier)
@@ -506,13 +520,18 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
             pk=carrier_editable_id,
         )
 
-        error_message = "Impossible de confirmer les modifications de la fiche transporteur."
-        if carrier_editable.created_by is None or not carrier_editable.created_by.is_active:
+        error_message = (
+            "Impossible de confirmer les modifications de la fiche transporteur."
+        )
+        if (
+            carrier_editable.created_by is None
+            or not carrier_editable.created_by.is_active
+        ):
             return JsonResponse(
                 {
                     "siret": carrier_editable.carrier_id,
                     "message": error_message,
-                    "submessage": "L'utilisateur ayant effectué les changements n'a pas encore activé son compte."
+                    "submessage": "L'utilisateur ayant effectué les changements n'a pas encore activé son compte.",
                 },
                 status=400,
             )
@@ -524,7 +543,7 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
                 {
                     "siret": carrier_editable.carrier_id,
                     "message": error_message,
-                    "submessage": "Le jeton a peut être expiré ou a déjà été utilisé."
+                    "submessage": "Le jeton a peut être expiré ou a déjà été utilisé.",
                 },
                 status=400,
             )
@@ -564,7 +583,14 @@ def _certificate_sign(request, carrier):
     )
     carriers_mails.mail_carrier_certificate_to_confirm(carrier, certificate)
     carriers_mails.mail_managers_new_certificate(certificate)
-    return JsonResponse({"carrier": get_carrier_as_json(request.user, carrier)})
+    return JsonResponse({
+        "siret": carrier.siret,
+        "message": (
+            "Votre attestation a bien été générée ! "
+            "Pour la consulter, vous devez la confirmer grâce au lieu envoyé à l’adresse électronique "
+            "de votre entreprise « %s »."
+        ) % carrier.editable.email
+    })
 
 
 def _certificate_get(request, carrier, as_pdf=True):
@@ -650,7 +676,10 @@ def certificate_confirm(request, certificate_id, token):
     return JsonResponse(
         {
             "siret": certificate.carrier_id,
-            "message": "L'attestation pour l'entreprise « %s » est confirmée."
+            "message": (
+                "Votre attestation est confirmée ! "
+                "Vous pouvez désormais la consulter sur la fiche de votre entreprise « %s »."
+            )
             % certificate.carrier.enseigne,
         }
     )
@@ -663,7 +692,7 @@ def license_renewal_ask(request, carrier_siret):
     # Only possible if the email is set
     if not carrier.editable.email:
         return JsonResponse(
-            {"message": "La fiche transporteur ne contient d'adresse électronique."},
+            {"message": "La fiche transporteur ne contient pas d'adresse électronique."},
             status=401,
         )
 
@@ -687,10 +716,21 @@ def license_renewal_ask(request, carrier_siret):
     )
     carriers_mails.mail_carrier_license_renewal_to_confirm(carrier, license_renewal)
     carriers_mails.mail_managers_new_license_renewal(license_renewal)
-    return JsonResponse({"carrier": get_carrier_as_json(request.user, carrier)})
+    return JsonResponse(
+        {
+            "siret": carrier_siret,
+            "message": (
+                "Votre demande de renouvellement de licence est enregistrée ! "
+                "Pour la transmettre aux services de la DREAL, confirmez cette demande "
+                "grâce au lien envoyé à l’adresse électronique votre entreprise « %s »."
+            )
+            % carrier.editable.email,
+        }
+    )
 
 
 def license_renewal_confirm(request, license_renewal_id, token):
+    # Service available in DREAL Bretagne only
     license_renewal = get_object_or_404(
         carriers_models.CarrierLicenseRenewal.objects.select_related("carrier"),
         pk=license_renewal_id,
@@ -713,6 +753,11 @@ def license_renewal_confirm(request, license_renewal_id, token):
     return JsonResponse(
         {
             "siret": license_renewal.carrier_id,
-            "message": "La demande de renouvellement de license est confirmée.",
+            "message": (
+                "Votre demande de renouvellement de license pour l'entreprise de "
+                "transport %s est confirmée ! "
+                "Elle a été transmise et sera traitée par les services compétents de la DREAL Bretagne."
+            )
+            % license_renewal.carrier.siret,
         }
     )

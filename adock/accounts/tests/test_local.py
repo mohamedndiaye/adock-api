@@ -42,7 +42,12 @@ class CreateUserTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            response.json()["message"], "Un email vous a été envoyé à « %s »." % EMAIL
+            response.json()["message"],
+            (
+                "Le compte utilisateur A Dock a été créé. "
+                "Pour l'activer, cliquez sur le lien envoyé à votre adresse « %s »."
+                % EMAIL
+            ),
         )
         user = accounts_models.User.objects.get()
         self.assertEqual(len(mail.outbox), 2)

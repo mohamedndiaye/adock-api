@@ -24,10 +24,11 @@ from . import models as accounts_models
 from . import serializers as accounts_serializers
 from . import tokens as accounts_tokens
 
-ACCOUNT_CREATED_MESSAGE = (
-    "{first_name} {last_name}, votre compte utilisateur A Dock est à présent actif !"
-)
 
+ACCOUNT_CREATED_MESSAGE = (
+    "Le compte utilisateur A Dock a été créé. "
+    "Pour l'activer, cliquez sur le lien envoyé à votre adresse « %s »."
+)
 
 @require_POST
 def account_create(request):
@@ -52,17 +53,10 @@ def account_create(request):
     accounts_mails.mail_managers_new_account(user, send_activation_link)
     if send_activation_link:
         accounts_mails.mail_user_to_activate(user)
-        return JsonResponse(
-            {"message": "Un email vous a été envoyé à « %s »." % user.email}
-        )
+        return JsonResponse({"message": ACCOUNT_CREATED_MESSAGE % user.email})
 
-    return JsonResponse(
-        {
-            "message": ACCOUNT_CREATED_MESSAGE.format(
-                first_name=user.first_name, last_name=user.last_name
-            )
-        }
-    )
+    # Activation link not sent yet
+    return JsonResponse({"message": "Le compte utilisateur A Dock a été créé."})
 
 
 def account_activate(
@@ -88,7 +82,7 @@ def account_activate(
     user.is_active = True
     user.save()
 
-    message = ACCOUNT_CREATED_MESSAGE.format(
+    message = "{first_name} {last_name}, votre compte utilisateur A Dock est à présent actif !".format(
         first_name=user.first_name, last_name=user.last_name
     )
 
