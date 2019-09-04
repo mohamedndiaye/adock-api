@@ -90,7 +90,7 @@ L'équipe A Dock
 
 
 def mail_managers_new_account(user, send_activation_link=False):
-    subject = "Nouveau compte utilisateur %s" % user.email
+    subject = "log - Nouveau compte utilisateur %s" % user.email
     message_activation_link_sent = (
         "Un courriel d'activation a été envoyé au moment de la création."
     )

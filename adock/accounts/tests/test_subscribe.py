@@ -54,7 +54,7 @@ class CreateAccountSubscribeWorkflowTestCase(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            "[A Dock] Nouveau compte utilisateur %s" % user.email,
+            "[A Dock] log - Nouveau compte utilisateur %s" % user.email,
         )
 
         mail.outbox = []
