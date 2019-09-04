@@ -505,13 +505,26 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
             carriers_models.CarrierEditable.objects.select_related("carrier"),
             pk=carrier_editable_id,
         )
+
+        error_message = "Impossible de confirmer les modifications de la fiche transporteur."
+        if carrier_editable.created_by is None or not carrier_editable.created_by.is_active:
+            return JsonResponse(
+                {
+                    "siret": carrier_editable.carrier_id,
+                    "message": error_message,
+                    "submessage": "L'utilisateur ayant effectué les changements n'a pas encore activé son compte."
+                },
+                status=400,
+            )
+
         if not carriers_tokens.carrier_editable_token_generator.check_token(
             carrier_editable, token
         ):
             return JsonResponse(
                 {
                     "siret": carrier_editable.carrier_id,
-                    "message": "Impossible de confirmer les modifications de la fiche transporteur.",
+                    "message": error_message,
+                    "submessage": "Le jeton a peut être expiré ou a déjà été utilisé."
                 },
                 status=400,
             )
