@@ -485,7 +485,7 @@ def carrier_detail(request, carrier_siret):
         ]
         data_json["message"] = (
             "Vous devez confirmer les changements de la fiche transporteur "
-            "en cliquant sur le lien envoyé à « %s »"
+            "en cliquant sur le lien envoyé à « %s »."
         ) % mails_sent_to["confirmation_sent_to"]
 
         if mails_sent_to["account_confirmation_sent_to"]:
