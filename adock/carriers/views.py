@@ -697,6 +697,20 @@ def certificate_confirm(request, certificate_id, token):
 def license_renewal_ask(request, carrier_siret):
     carrier = get_object_or_404(carriers_models.Carrier, siret=carrier_siret)
 
+    # Only experimental in Ille-et-Vilaine
+    if carrier.departement != "35":
+        return JsonResponse(
+            {
+                "message": (
+                    "Cette fonctionnalité est en cours d’expérimentation. "
+                    "Son accès est actuellement limité aux établissements dépendants de la DREAL Bretagne."
+                    "Vous êtes intéressé par cette fonctionnalité ? Contactez %s ou votre DREAL."
+                )
+                % settings.SERVER_EMAIL
+            },
+            status=403,
+        )
+
     # Only possible if the email is set
     if not carrier.editable.email:
         return JsonResponse(

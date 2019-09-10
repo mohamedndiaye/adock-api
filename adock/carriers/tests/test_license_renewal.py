@@ -12,7 +12,7 @@ from .. import factories, models
 class NotAllowedLicenseRenewalTestCase(AuthTestCase):
     def setUp(self):
         super().setUp()
-        self.carrier = factories.CarrierFactory(with_editable=True)
+        self.carrier = factories.CarrierFactory(departement="35", with_editable=True)
         self.carrier.editable.email = ""
         self.carrier.editable.save()
         self.license_renewal_url = reverse(
@@ -20,7 +20,21 @@ class NotAllowedLicenseRenewalTestCase(AuthTestCase):
         )
         self.http_authorization = self.log_in()
 
-    def test_not_allowed(self):
+    def test_not_allowed_departement(self):
+        self.carrier.departement = "72"
+        self.carrier.save()
+        response = self.client.post(
+            self.license_renewal_url,
+            content_type="application/json",
+            HTTP_AUTHORIZATION=self.http_authorization,
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(
+            "Cette fonctionnalité est en cours d’expérimentation."
+            in response.json()["message"]
+        )
+
+    def test_not_allowed_wo_email(self):
         # Carrier without editable
         response = self.client.post(
             self.license_renewal_url,
@@ -37,7 +51,7 @@ class NotAllowedLicenseRenewalTestCase(AuthTestCase):
 class LicenseRenewalTestCase(AuthTestCase):
     def setUp(self):
         super().setUp()
-        self.carrier = factories.CarrierFactory(with_editable=True)
+        self.carrier = factories.CarrierFactory(departement="35", with_editable=True)
         self.license_renewal_url = reverse(
             "carriers_license_renewal", kwargs={"carrier_siret": self.carrier.siret}
         )
