@@ -12,5 +12,6 @@ yarn.lock
 /node_modules/
 /static/
 *.csv
+/*.sql
 # conf specific to the instance
 adock/settings_local.py
