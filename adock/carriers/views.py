@@ -422,14 +422,16 @@ def carrier_detail_apply_changes(
     if should_mail_user:
         accounts_mails.mail_user_to_activate(user)
 
-    confirmation_sent_to = new_carrier_editable.email if new_editable_to_create else None
+    confirmation_sent_to = (
+        new_carrier_editable.email if new_editable_to_create else None
+    )
     account_confirmation_sent_to = user.email if should_mail_user else None
     old_account_sent_to = carrier.editable.email if should_notify_old_email else None
 
     return {
         "confirmation_sent_to": confirmation_sent_to,
         "account_confirmation_sent_to": account_confirmation_sent_to,
-        "old_account_sent_to": old_account_sent_to
+        "old_account_sent_to": old_account_sent_to,
     }
 
 
@@ -489,7 +491,10 @@ def carrier_detail(request, carrier_siret):
         ) % mails_sent_to["confirmation_sent_to"]
 
         if mails_sent_to["account_confirmation_sent_to"]:
-            data_json["account_message"] = accounts_views.ACCOUNT_CREATED_MESSAGE % mails_sent_to["account_confirmation_sent_to"]
+            data_json["account_message"] = (
+                accounts_views.ACCOUNT_CREATED_MESSAGE
+                % mails_sent_to["account_confirmation_sent_to"]
+            )
 
     carrier_json = get_carrier_as_json(request.user, carrier)
     carrier_json["other_facilities"] = get_other_facilities_as_json(carrier)
@@ -583,14 +588,17 @@ def _certificate_sign(request, carrier):
     )
     carriers_mails.mail_carrier_certificate_to_confirm(carrier, certificate)
     carriers_mails.mail_managers_new_certificate(certificate)
-    return JsonResponse({
-        "siret": carrier.siret,
-        "message": (
-            "Votre attestation a bien été générée ! "
-            "Pour la consulter, vous devez la confirmer grâce au lieu envoyé à l’adresse électronique "
-            "de votre entreprise « %s »."
-        ) % carrier.editable.email
-    })
+    return JsonResponse(
+        {
+            "siret": carrier.siret,
+            "message": (
+                "Votre attestation a bien été générée ! "
+                "Pour l'activer, vous devez la confirmer grâce au lieu envoyé à l’adresse électronique "
+                "de votre entreprise « %s »."
+            )
+            % carrier.editable.email,
+        }
+    )
 
 
 def _certificate_get(request, carrier, as_pdf=True):
@@ -692,7 +700,9 @@ def license_renewal_ask(request, carrier_siret):
     # Only possible if the email is set
     if not carrier.editable.email:
         return JsonResponse(
-            {"message": "La fiche transporteur ne contient pas d'adresse électronique."},
+            {
+                "message": "La fiche transporteur ne contient pas d'adresse électronique."
+            },
             status=401,
         )
 
@@ -742,6 +752,7 @@ def license_renewal_confirm(request, license_renewal_id, token):
             {
                 "siret": license_renewal.carrier_id,
                 "message": "Impossible de confirmer la demande de renouvellement de license.",
+                "submessage": "Le jeton a peut être expiré ou a déjà été utilisé.",
             },
             status=400,
         )

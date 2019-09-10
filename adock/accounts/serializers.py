@@ -83,7 +83,7 @@ class ResetPasswordSerializer(serializers.Serializer):
             attrs["user"], attrs["token"]
         ):
             return serializers.ValidationError(
-                "Le jeton d'activation n'est pas valide."
+                "Le jeton d'activation n'est pas valide. Le jeton a peut être expiré ou a déjà été utilisé."
             )
 
         return attrs

@@ -120,8 +120,10 @@ class ActivateUserTestCase(TestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertEqual(data["message"], "Impossible d'activer le compte utilisateur")
         self.assertEqual(
-            response.json()["message"], "Le jeton d'activation n'est pas valide."
+            data["submessage"], "Le jeton a peut être expiré ou a déjà été utilisé."
         )
 
     def test_activate(self):

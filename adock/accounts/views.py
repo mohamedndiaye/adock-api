@@ -30,6 +30,7 @@ ACCOUNT_CREATED_MESSAGE = (
     "Pour l'activer, cliquez sur le lien envoyé à votre adresse « %s »."
 )
 
+
 @require_POST
 def account_create(request):
     """Create an A Dock user account (email as username)"""
@@ -76,7 +77,11 @@ def account_activate(
 
         if not accounts_tokens.account_token_generator.check_token(user, user_token):
             return JsonResponse(
-                {"message": "Le jeton d'activation n'est pas valide."}, status=400
+                {
+                    "message": "Impossible d'activer le compte utilisateur",
+                    "submessage": "Le jeton a peut être expiré ou a déjà été utilisé.",
+                },
+                status=400,
             )
 
     user.is_active = True
