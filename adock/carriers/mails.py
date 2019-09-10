@@ -1,3 +1,7 @@
+import smtplib
+
+import sentry_sdk
+
 from django.conf import settings
 from django.core.mail import mail_managers, send_mail
 
@@ -317,7 +321,7 @@ Nombre de LC : {lc_nombre}
     mail_managers(subject, message, fail_silently=True)
 
 
-def mail_dreal_license_renewal(license_renewal):
+def mail_dreal_license_renewal_with_fallback(license_renewal):
     carrier = license_renewal.carrier
     subject = "%sDemande de renouvellement de licences de %s n° SIREN %s" % (
         settings.EMAIL_SUBJECT_PREFIX,
@@ -363,13 +367,20 @@ Bien cordialement,
         email=license_renewal.carrier.editable.email, signature=get_adock_signature()
     )
     recipient_list = get_recipient_list_from_env(settings.DREAL_EMAIL)
-    send_mail(
-        subject,
-        message,
-        settings.SERVER_EMAIL,
-        recipient_list,
-        fail_silently=settings.DEBUG,
-    )
+    try:
+        send_mail(
+            subject,
+            message,
+            settings.SERVER_EMAIL,
+            recipient_list,
+            fail_silently=settings.DEBUG,
+        )
+        return True
+    except smtplib.SMTPException as e:
+        sentry_sdk.capture_exception(e)
+        subject = "log - ÉCHEC - %s" % subject
+        mail_managers(subject, message, fail_silently=True)
+        return False
 
 
 def mail_managers_license_renewal_confirmed(license_renewal):

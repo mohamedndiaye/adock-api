@@ -756,10 +756,10 @@ def license_renewal_confirm(request, license_renewal_id, token):
             },
             status=400,
         )
-
     license_renewal.confirmed_at = timezone.now()
     license_renewal.save()
-    carriers_mails.mail_dreal_license_renewal(license_renewal)
+
+    carriers_mails.mail_dreal_license_renewal_with_fallback(license_renewal)
     carriers_mails.mail_managers_license_renewal_confirmed(license_renewal)
     return JsonResponse(
         {
