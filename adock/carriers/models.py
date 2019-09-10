@@ -223,7 +223,7 @@ class Carrier(models.Model):
 
     def get_latest_certificate(self):
         try:
-            return self.certificates.exclude(confirmed_at__isnull=True).latest(
+            return self.certificates.filter(confirmed_at__isnull=False).latest(
                 "created_at"
             )
         except CarrierCertificate.DoesNotExist:
@@ -231,7 +231,7 @@ class Carrier(models.Model):
 
     def get_latest_license_renewal(self):
         try:
-            return self.license_renewals.exclude(confirmed_at__isnull=True).latest(
+            return self.license_renewals.filter(confirmed_at__isnull=False).latest(
                 "created_at"
             )
         except CarrierLicenseRenewal.DoesNotExist:
@@ -357,7 +357,9 @@ class CarrierUser(models.Model):
 
 
 class CarrierLicenseRenewal(models.Model):
-    carrier = models.ForeignKey(Carrier, on_delete=models.CASCADE)
+    carrier = models.ForeignKey(
+        Carrier, on_delete=models.CASCADE, related_name="license_renewals"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         accounts_models.User,
@@ -366,6 +368,8 @@ class CarrierLicenseRenewal(models.Model):
         related_name="carrier_license_renewals",
     )
     confirmed_at = models.DateTimeField(blank=True, null=True)
+    # When delivered by DREAL
+    delivered_at = models.DateTimeField(blank=True, null=True)
     lti_nombre = models.PositiveSmallIntegerField(default=0)
     lc_nombre = models.PositiveSmallIntegerField(default=0)
 

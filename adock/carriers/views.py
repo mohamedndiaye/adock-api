@@ -112,9 +112,13 @@ def get_carrier_as_json(user, carrier):
     for field in CARRIER_DETAIL_EDITABLE_FIELDS:
         carrier_json[field] = getattr(editable, field)
 
-    carrier_json["user_is_owner"] = (
-        not user.is_anonymous
-    ) and user.id == editable.created_by_id
+    carrier_json["user_is_owner"] = (not user.is_anonymous) and (user.id == editable.created_by_id)
+
+    # License renewal on going, we don't set the field if we don't have the
+    # information (paper process for example)
+    latest_license_renewal = carrier.get_latest_license_renewal()
+    if latest_license_renewal is not None and latest_license_renewal.delivered_at is None:
+        carrier_json["license_renewal_on_going"] = latest_license_renewal.confirmed_at.date()
 
     return carrier_json
 

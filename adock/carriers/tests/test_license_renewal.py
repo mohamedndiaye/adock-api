@@ -67,6 +67,16 @@ class LicenseRenewalTestCase(AuthTestCase):
         return url_search.groupdict()["token"]
 
     def test_ask_license_renewal(self):
+        # Not license renewal for now
+        carrier_detail_url = reverse(
+            "carriers_detail", kwargs={"carrier_siret": self.carrier.siret}
+        )
+        response = self.client.get(
+            carrier_detail_url, HTTP_AUTHORIZATION=self.http_authorization
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("license_renewal_on_going", response.json()["carrier"])
+
         response = self.client.post(
             self.license_renewal_url,
             {"lti_nombre": 0, "lc_nombre": 20},
@@ -118,6 +128,12 @@ class LicenseRenewalTestCase(AuthTestCase):
             % (renewal.pk, self.carrier.siret)
         )
         self.assertEqual(mail.outbox[1].subject, message)
+
+        response = self.client.get(
+            carrier_detail_url, HTTP_AUTHORIZATION=self.http_authorization
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("license_renewal_on_going", response.json()["carrier"])
 
     def test_invalid_license_renewal(self):
         response = self.client.post(
