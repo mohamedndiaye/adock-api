@@ -701,8 +701,9 @@ def certificate_confirm(request, certificate_id, token):
 def license_renewal_ask(request, carrier_siret):
     carrier = get_object_or_404(carriers_models.Carrier, siret=carrier_siret)
 
-    # Only experimental in Ille-et-Vilaine
-    if carrier.departement != "35":
+    # Only experimental in Bretagne (will be replaced by nice dict with
+    # departement number and email when extended)
+    if carrier.departement not in ["22", "29", "35", "56"]:
         return JsonResponse(
             {
                 "message": (
