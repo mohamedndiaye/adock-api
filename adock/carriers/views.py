@@ -375,6 +375,7 @@ def carrier_detail_apply_changes(
     - old_account_sent_to: email of previous user who edit the carrier if any
     """
     should_notify_old_email = False
+    old_email_notified = False
 
     validated_data = editable_serialized.validated_data
 
@@ -406,6 +407,8 @@ def carrier_detail_apply_changes(
             carriers_mails.mail_carrier_to_old_email(
                 changed_fields, carrier.editable, new_carrier_editable
             )
+            # Done
+            old_email_notified = True
 
         if should_mail_user and new_carrier_editable.email == user.email:
             # Send a common mail for user account and carrier changes
@@ -430,12 +433,11 @@ def carrier_detail_apply_changes(
         new_carrier_editable.email if new_editable_to_create else None
     )
     account_confirmation_sent_to = user.email if should_mail_user else None
-    old_account_sent_to = carrier.editable.email if should_notify_old_email else None
-
+    notification_sent_to = carrier.editable.email if old_email_notified else None
     return {
         "confirmation_sent_to": confirmation_sent_to,
         "account_confirmation_sent_to": account_confirmation_sent_to,
-        "old_account_sent_to": old_account_sent_to,
+        "notification_sent_to": notification_sent_to
     }
 
 
@@ -485,10 +487,8 @@ def carrier_detail(request, carrier_siret):
         mails_sent_to = carrier_detail_apply_changes(
             user, carrier, editable_serialized, created_by_email_serialized
         )
-        data_json["confirmation_sent_to"] = mails_sent_to["confirmation_sent_to"]
-        data_json["account_confirmation_sent_to"] = mails_sent_to[
-            "account_confirmation_sent_to"
-        ]
+        # Add them to the response
+        data_json.update(mails_sent_to)
         data_json["message"] = (
             "Vous devez confirmer les changements de la fiche transporteur "
             "en cliquant sur le lien envoyé à « %s »."
