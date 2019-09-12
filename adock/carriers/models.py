@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
@@ -251,15 +253,17 @@ class CarrierEditable(models.Model):
     The history of changes on carriers are set by the list of CarrierEditable.
     """
 
-    INPUT_FIELDS = {
-        "description": "Description",
-        "email": "Adresse e-mail",
-        "specialities": "Spécialités",
-        "telephone": "Téléphone",
-        "website": "Site Web",
-        "working_area_departements": "Départements livrés",
-        "working_area": "Aire de travail",
-    }
+    INPUT_FIELDS = OrderedDict(
+        [
+            ("description", "Description"),
+            ("email", "Adresse e-mail"),
+            ("specialities", "Spécialités"),
+            ("telephone", "Téléphone"),
+            ("website", "Site Web"),
+            ("working_area_departements", "Départements livrés"),
+            ("working_area", "Aire de travail"),
+        ]
+    )
 
     carrier = models.ForeignKey(
         Carrier, on_delete=models.CASCADE, related_name="changes"
