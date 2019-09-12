@@ -5,6 +5,8 @@ USE_SENTRY = False
 
 # PRODUCTION, PREPRODUCTION or DEVELOPMENT
 ENVIRONMENT = "DEVELOPMENT"
+if ENVIRONMENT == "E2E":
+    print("WARNING: Running with environment set to E2E.")
 
 HOSTNAME = "localhost"
 HTTP_SERVER_URL = "http://" + HOSTNAME + ":8000/"
