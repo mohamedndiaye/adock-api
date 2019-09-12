@@ -21,6 +21,17 @@ class ProfileTestCase(AuthTestCase):
         carrier = carriers_factories.CarrierFactory(
             with_editable={"created_by": self.user, "confirmed_at": timezone.now()}
         )
+        # Add one waiting confirmation for each model
+        carriers_factories.CarrierEditableFactory(
+            carrier=carrier, created_by=self.user, confirmed_at=None
+        )
+        carriers_factories.CarrierCertificateFactory(
+            carrier=carrier, created_by=self.user, confirmed_at=None
+        )
+        carriers_factories.CarrierLicenseRenewalFactory(
+            carrier=carrier, created_by=self.user, confirmed_at=None
+        )
+
         http_authorization = self.log_in()
         response = self.client.get(self.url, HTTP_AUTHORIZATION=http_authorization)
         self.assertEqual(response.status_code, 200)
@@ -41,6 +52,11 @@ class ProfileTestCase(AuthTestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(carrier.siret, data["user"]["carriers"][0]["siret"])
+        confirmations = data["user"]["confirmations"]
+        self.assertEqual(len(confirmations), 3)
+        self.assertEqual(confirmations[0]["type"], "CARRIER_EDITABLE")
+        self.assertEqual(confirmations[1]["type"], "CARRIER_CERTIFICATE")
+        self.assertEqual(confirmations[2]["type"], "CARRIER_LICENSE_RENEWAL")
 
     def test_accept_cgu(self):
         self.user.has_accepted_cgu = False

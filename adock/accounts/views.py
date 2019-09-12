@@ -171,6 +171,63 @@ def account_reset_password(request):
     return JsonResponse({"message": "Le mot de passe a été modifié avec succès."})
 
 
+def get_user_confirmations_as_json(user):
+    confirmations = []
+
+    # Editable
+    editables = user.carrier_changes.select_related("carrier").filter(
+        confirmed_at__isnull=True
+    )
+    for editable in editables:
+        confirmations.append(
+            {
+                "type": "CARRIER_EDITABLE",
+                "id": editable.id,
+                "title": "Modification de fiche",
+                "created_at": editable.created_at,
+                "carrier_siret": editable.carrier_id,
+                "carrier_enseigne": editable.carrier.enseigne,
+                "description": editable.get_description_of_changes(),
+            }
+        )
+
+    # Certificates
+    certificates = user.carrier_certificates.select_related("carrier").filter(
+        confirmed_at__isnull=True
+    )
+    for certificate in certificates:
+        confirmations.append(
+            {
+                "type": "CARRIER_CERTIFICATE",
+                "id": certificate.id,
+                "title": certificate.get_kind_display(),
+                "created_at": certificate.created_at,
+                "carrier_siret": certificate.carrier_id,
+                "carrier_enseigne": certificate.carrier.enseigne,
+                "description": "",
+            }
+        )
+
+    # License renewals
+    license_renewals = user.carrier_license_renewals.select_related("carrier").filter(
+        confirmed_at__isnull=True
+    )
+    for license_renewal in license_renewals:
+        confirmations.append(
+            {
+                "type": "CARRIER_LICENSE_RENEWAL",
+                "id": license_renewal.id,
+                "title": "Renouvellement de licence",
+                "created_at": license_renewal.created_at,
+                "carrier_siret": license_renewal.carrier_id,
+                "carrier_enseigne": license_renewal.carrier.enseigne,
+                "description": license_renewal.get_description(),
+            }
+        )
+
+    return confirmations
+
+
 def account_profile(request, extended=False):
     if request.user.is_anonymous or not request.user.is_active:
         return JsonResponse(
@@ -210,6 +267,7 @@ def account_profile(request, extended=False):
             .distinct()
         )
         user["carriers"] = carriers_views.get_carriers_as_json(carriers, ["enseigne"])
+        user["confirmations"] = get_user_confirmations_as_json(request.user)
 
     # Returns only informations not in JWT payload
     return JsonResponse({"user": user})

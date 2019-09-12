@@ -231,6 +231,10 @@ class CarrierDetailPostTestCase(AuthTestCase, carriers_test.CarrierTestCaseMixin
         self.assertEqual(self.carrier.editable.email, EMAIL)
         self.assertIsNotNone(self.carrier.editable.created_at)
         self.assertEqual(self.carrier.editable.created_by, self.user)
+        self.assertEqual(
+            self.carrier.editable.get_description_of_changes(),
+            "Adresse e-mail : foo@example.com, Téléphone : +33240424546, Aire de travail : DEPARTEMENT",
+        )
 
     def test_post_response(self):
         NEW_PHONE = "+33240424546"

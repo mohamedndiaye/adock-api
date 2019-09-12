@@ -97,8 +97,11 @@ class CarrierCertificateFactory(factory.DjangoModelFactory):
         model = models.CarrierCertificate
 
 
-class CarrierLicenseRenewal(factory.DjangoModelFactory):
+class CarrierLicenseRenewalFactory(factory.DjangoModelFactory):
     carrier = factory.SubFactory(CarrierFactory)
     created_by = factory.SubFactory(accounts_factories.UserFactory)
     lti_nombre = fuzzy.FuzzyInteger(1, 20)
     lc_nombre = fuzzy.FuzzyInteger(1, 20)
+
+    class Meta:
+        model = models.CarrierLicenseRenewal

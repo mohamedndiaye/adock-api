@@ -251,6 +251,16 @@ class CarrierEditable(models.Model):
     The history of changes on carriers are set by the list of CarrierEditable.
     """
 
+    INPUT_FIELDS = {
+        "description": "Description",
+        "email": "Adresse e-mail",
+        "specialities": "Spécialités",
+        "telephone": "Téléphone",
+        "website": "Site Web",
+        "working_area_departements": "Départements livrés",
+        "working_area": "Aire de travail",
+    }
+
     carrier = models.ForeignKey(
         Carrier, on_delete=models.CASCADE, related_name="changes"
     )
@@ -299,6 +309,14 @@ class CarrierEditable(models.Model):
 
     def __str__(self):
         return "SIRET %s - pk %s" % (self.carrier.siret, self.pk)
+
+    def get_description_of_changes(self):
+        changes = []
+        for (field, label) in self.INPUT_FIELDS.items():
+            value = getattr(self, field)
+            if value:
+                changes.append("%s : %s" % (label, value))
+        return ", ".join(changes)
 
 
 class CarrierFeed(models.Model):
@@ -378,3 +396,6 @@ class CarrierLicenseRenewal(models.Model):
 
     class Meta:
         db_table = "carrier_license_renewal"
+
+    def get_description(self):
+        return "LTI : %d, LC : %d" % (self.lti_nombre, self.lc_nombre)

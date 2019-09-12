@@ -33,15 +33,7 @@ class CreatedByEmailSerializer(serializers.Serializer):
 class CarrierEditableSerializer(serializers.ModelSerializer):
     class Meta:
         model = carriers_models.CarrierEditable
-        fields = (
-            "description",
-            "email",
-            "specialities",
-            "telephone",
-            "website",
-            "working_area_departements",
-            "working_area",
-        )
+        fields = list(carriers_models.CarrierEditable.INPUT_FIELDS.keys())
 
     def validate_telephone(self, value):
         # Validated by phonenumber before
