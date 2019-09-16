@@ -80,7 +80,7 @@ sur le service A Dock.
 {http_client_url}transporteur/{siret}
 
 Pour des raisons de sécurité, toutes modifications ou démarches réalisées par l’utilisateur
-devront être confirmées via l’adresse électronique de votre entreprise.
+devront être confirmées via l’adresse e-mail de votre entreprise.
 
 Si c’est une erreur ou que cette personne n’est pas habilitée à faire des modifications
 pour votre entreprise, signalez-le nous à l’adresse contact@adock.beta.gouv.fr

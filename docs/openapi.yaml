@@ -192,7 +192,7 @@ paths:
     get:
       tags:
         - carrier
-      summary: confirme l'adresse électronique d'un transporteur
+      summary: confirme l'adresse e-mail d'un transporteur
       operationId: confirmCarrierEmail
       parameters:
         - name: siret
@@ -523,19 +523,19 @@ components:
       properties:
         confirmation_sent_to:
           type: string
-          description: indique l'adresse électronique utilisée si une confirmation a été envoyé
+          description: indique l'adresse e-mail utilisée si une confirmation a été envoyé
     inline_response_200_3:
       type: object
       properties:
         message:
           type: string
-          example: L'adresse électronique est confirmée.
+          example: L'adresse e-mail est confirmée.
     inline_response_400_1:
       type: object
       properties:
         message:
           type: string
-          example: Impossible de confirmer l'adresse électronique.
+          example: Impossible de confirmer l'adresse e-mail.
     inline_response_200_4:
       type: object
       properties:

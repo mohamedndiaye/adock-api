@@ -81,7 +81,7 @@ des commandes Django :
   registre sont marqués comme supprimés. La table carrier est la table
   socle de l'application A Dock. Elle est l'agrégation des tables `registre` et
   `sirene` et permet aux utilisateurs d'y ajouter des informations
-  complémentaires (téléphone, adresse électronique, aire de travail,
+  complémentaires (téléphone, adresse e-mail, aire de travail,
   départements couverts, etc).
 
 - `import_objectif_co2` (Django) reçoit en argument le fichier Excel de la liste

@@ -11,7 +11,7 @@ def mail_user_to_activate(user):
     token = accounts_tokens.account_token_generator.make_token(user)
 
     subject = (
-        "%sConfirmation de votre adresse électronique" % settings.EMAIL_SUBJECT_PREFIX
+        "%sConfirmation de votre adresse e-mail" % settings.EMAIL_SUBJECT_PREFIX
     )
     message = """
 Vous venez de créer un compte utilisateur sur A Dock, il suffit maintenant de cliquer sur ce lien

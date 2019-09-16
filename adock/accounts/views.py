@@ -143,7 +143,7 @@ def account_recover_password(request):
         )
     except accounts_models.User.DoesNotExist:
         return JsonResponse(
-            {"message": "L'adresse électronique est introuvable."}, status=400
+            {"message": "L'adresse e-mail est introuvable."}, status=400
         )
 
     token = accounts_tokens.account_token_generator.make_token(user)

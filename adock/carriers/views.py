@@ -617,7 +617,7 @@ def _certificate_sign(request, carrier):
             "siret": carrier.siret,
             "message": (
                 "Votre attestation a bien été générée ! "
-                "Pour l'activer, vous devez la confirmer grâce au lieu envoyé à l’adresse électronique "
+                "Pour l'activer, vous devez la confirmer grâce au lieu envoyé à l’adresse e-mail "
                 "de votre entreprise « %s »."
             )
             % carrier.editable.email,
@@ -740,7 +740,7 @@ def license_renewal_ask(request, carrier_siret):
     if not carrier.editable.email:
         return JsonResponse(
             {
-                "message": "La fiche transporteur ne contient pas d'adresse électronique."
+                "message": "La fiche transporteur ne contient pas d'adresse e-mail."
             },
             status=401,
         )
@@ -771,7 +771,7 @@ def license_renewal_ask(request, carrier_siret):
             "message": (
                 "Votre demande de renouvellement de licence est enregistrée ! "
                 "Pour la transmettre aux services de la DREAL, confirmez cette demande "
-                "grâce au lien envoyé à l’adresse électronique votre entreprise « %s »."
+                "grâce au lien envoyé à l’adresse e-mail votre entreprise « %s »."
             )
             % carrier.editable.email,
         }

@@ -57,7 +57,7 @@ class CreateUserTestCase(TestCase):
         )
         self.assertEqual(
             mail.outbox[1].subject,
-            "[A Dock] Confirmation de votre adresse électronique",
+            "[A Dock] Confirmation de votre adresse e-mail",
         )
 
         self.assertEqual(user.email, EMAIL)
@@ -169,5 +169,5 @@ class RecoverPasswordTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            response.json()["message"], "L'adresse électronique est introuvable."
+            response.json()["message"], "L'adresse e-mail est introuvable."
         )

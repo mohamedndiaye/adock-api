@@ -24,7 +24,7 @@ class CreatedByEmailSerializer(serializers.Serializer):
                 )
             except accounts_models.User.DoesNotExist:
                 raise serializers.ValidationError(
-                    "L'adresse électronique n'est pas valide."
+                    "L'adresse e-mail n'est pas valide."
                 )
 
         return value
