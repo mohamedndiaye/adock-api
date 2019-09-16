@@ -88,7 +88,6 @@ class User(AbstractBaseUser):
             "Indique si l'utilisateur souhaite recevoir la lettre d'information."
         ),
     )
-
     objects = UserManager()
 
     USERNAME_FIELD = "username"

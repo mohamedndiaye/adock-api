@@ -21,6 +21,8 @@ class ProfileTestCase(AuthTestCase):
         carrier = carriers_factories.CarrierFactory(
             with_editable={"created_by": self.user, "confirmed_at": timezone.now()}
         )
+        carriers_factories.CarrierUserFactory(carrier=carrier, user=self.user)
+
         # Add one waiting confirmation for each model
         carriers_factories.CarrierEditableFactory(
             carrier=carrier, created_by=self.user, confirmed_at=None

@@ -171,6 +171,9 @@ class Carrier(models.Model):
         null=True,
         related_name="+",
     )
+    users = models.ManyToManyField(
+        accounts_models.User, through="CarrierUser", related_name="carriers"
+    )
 
     class Meta:
         db_table = "carrier"
@@ -246,6 +249,37 @@ class Carrier(models.Model):
             kwargs["update_fields"] = list(kwargs["update_fields"])
             kwargs["update_fields"].append("completeness")
         super().save(*args, **kwargs)
+
+
+CERTIFICATE_NO_WORKERS = "NO_WORKERS"
+CERTIFICATE_WORKERS = "WORKERS"
+CERTIFICATE_CHOICES = (
+    (CERTIFICATE_NO_WORKERS, "Attestation de non emploi de travailleurs étrangers"),
+    (CERTIFICATE_WORKERS, "Attestation d'emploi de travailleurs étrangers"),
+)
+CERTIFICATE_DICT = dict(CERTIFICATE_CHOICES)
+
+
+class CarrierCertificate(models.Model):
+    carrier = models.ForeignKey(
+        Carrier, on_delete=models.CASCADE, related_name="certificates"
+    )
+    kind = models.CharField(max_length=32, choices=CERTIFICATE_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(
+        accounts_models.User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="carrier_certificates",
+    )
+    confirmed_at = models.DateTimeField(blank=True, null=True)
+    data = JSONField()
+
+    def __str__(self):
+        return "%s: %s" % (self.carrier.siret, self.get_kind_display())
+
+    class Meta:
+        db_table = "carrier_certificate"
 
 
 class CarrierEditable(models.Model):
@@ -337,47 +371,6 @@ class CarrierFeed(models.Model):
         db_table = "carrier_feed"
 
 
-CERTIFICATE_NO_WORKERS = "NO_WORKERS"
-CERTIFICATE_WORKERS = "WORKERS"
-CERTIFICATE_CHOICES = (
-    (CERTIFICATE_NO_WORKERS, "Attestation de non emploi de travailleurs étrangers"),
-    (CERTIFICATE_WORKERS, "Attestation d'emploi de travailleurs étrangers"),
-)
-CERTIFICATE_DICT = dict(CERTIFICATE_CHOICES)
-
-
-class CarrierCertificate(models.Model):
-    carrier = models.ForeignKey(
-        Carrier, on_delete=models.CASCADE, related_name="certificates"
-    )
-    kind = models.CharField(max_length=32, choices=CERTIFICATE_CHOICES)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(
-        accounts_models.User,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="carrier_certificates",
-    )
-    confirmed_at = models.DateTimeField(blank=True, null=True)
-    data = JSONField()
-
-    def __str__(self):
-        return "%s: %s" % (self.carrier.siret, self.get_kind_display())
-
-    class Meta:
-        db_table = "carrier_certificate"
-
-
-class CarrierUser(models.Model):
-    carrier = models.ForeignKey(Carrier, on_delete=models.CASCADE)
-    user = models.ForeignKey(accounts_models.User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = "carrier_user"
-        unique_together = ("carrier", "user")
-
-
 class CarrierLicenseRenewal(models.Model):
     carrier = models.ForeignKey(
         Carrier, on_delete=models.CASCADE, related_name="license_renewals"
@@ -403,3 +396,13 @@ class CarrierLicenseRenewal(models.Model):
 
     def get_description(self):
         return "LTI : %d, LC : %d" % (self.lti_nombre, self.lc_nombre)
+
+
+class CarrierUser(models.Model):
+    carrier = models.ForeignKey(Carrier, on_delete=models.CASCADE)
+    user = models.ForeignKey(accounts_models.User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "carrier_user"
+        unique_together = ("carrier", "user")

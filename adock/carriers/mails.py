@@ -61,6 +61,58 @@ L'équipe A Dock""".format(
     )
 
 
+def mail_carrier_to_old_email_for_new_user(current_carrier_editable, user):
+    carrier = current_carrier_editable.carrier
+    user_full_name = user.get_full_name()
+    subject = "%sVotre fiche entreprise est associée à l’utilisateur %s" % (
+        settings.EMAIL_SUBJECT_PREFIX,
+        user.get_full_name(),
+    )
+    message = """
+Bonjour,
+
+Votre entreprise {enseigne} est désormais associée à l’utilisateur {user_full_name}.
+
+Cet utilisateur peut à présent mettre à jour les informations professionnelles présentées sur
+la fiche de votre entreprise, ainsi que réaliser des démarches administratives pour votre entreprise
+sur le service A Dock.
+
+{http_client_url}transporteur/{siret}
+
+Pour des raisons de sécurité, toutes modifications ou démarches réalisées par l’utilisateur
+devront être confirmées via l’adresse électronique de votre entreprise.
+
+Si c’est une erreur ou que cette personne n’est pas habilitée à faire des modifications
+pour votre entreprise, signalez-le nous à l’adresse contact@adock.beta.gouv.fr
+
+
+Bien cordialement,
+
+
+L’équipe A Dock
+
+Pour toutes questions, nous sommes à votre écoute à l’adresse : contact@adock.beta.gouv.fr.
+
+
+
+www.adock.beta.gouv.fr - un service numérique développé par la Direction générale des infrastructures, des transports et de la mer -
+Ministère de la Transition écologique et solidaire.
+""".format(
+        enseigne=carrier.enseigne,
+        http_client_url=settings.HTTP_CLIENT_URL,
+        siret=carrier.siret,
+        user_full_name=user_full_name,
+    )
+    recipient_list = get_recipient_list_from_env(current_carrier_editable.email)
+    send_mail(
+        subject,
+        message,
+        settings.SERVER_EMAIL,
+        recipient_list,
+        fail_silently=settings.DEBUG,
+    )
+
+
 def mail_carrier_editable_to_confirm(
     changed_fields, current_carrier_editable, new_carrier_editable
 ):

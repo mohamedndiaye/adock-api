@@ -70,18 +70,6 @@ class CarrierFactory(factory.django.DjangoModelFactory):
         model = models.Carrier
 
 
-class CarrierEditableFactory(factory.DjangoModelFactory):
-    carrier = factory.SubFactory(CarrierFactory)
-    telephone = factory.Faker("phone_number", locale="fr_FR")
-    email = factory.Faker("email", locale="fr_FR")
-    working_area = models.WORKING_AREA_DEPARTEMENT
-    working_area_departements = ["35", "44"]
-    specialities = ["TEMPERATURE", "URBAIN"]
-
-    class Meta:
-        model = models.CarrierEditable
-
-
 class CarrierCertificateFactory(factory.DjangoModelFactory):
     carrier = factory.SubFactory(CarrierFactory)
     kind = models.CERTIFICATE_NO_WORKERS
@@ -97,6 +85,18 @@ class CarrierCertificateFactory(factory.DjangoModelFactory):
         model = models.CarrierCertificate
 
 
+class CarrierEditableFactory(factory.DjangoModelFactory):
+    carrier = factory.SubFactory(CarrierFactory)
+    telephone = factory.Faker("phone_number", locale="fr_FR")
+    email = factory.Faker("email", locale="fr_FR")
+    working_area = models.WORKING_AREA_DEPARTEMENT
+    working_area_departements = ["35", "44"]
+    specialities = ["TEMPERATURE", "URBAIN"]
+
+    class Meta:
+        model = models.CarrierEditable
+
+
 class CarrierLicenseRenewalFactory(factory.DjangoModelFactory):
     carrier = factory.SubFactory(CarrierFactory)
     created_by = factory.SubFactory(accounts_factories.UserFactory)
@@ -105,3 +105,11 @@ class CarrierLicenseRenewalFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.CarrierLicenseRenewal
+
+
+class CarrierUserFactory(factory.DjangoModelFactory):
+    carrier = factory.SubFactory(CarrierFactory)
+    user = factory.SubFactory(accounts_factories.UserFactory)
+
+    class Meta:
+        model = models.CarrierUser

@@ -1,7 +1,7 @@
 import re
 
 from django.conf import settings
-from django.db import transaction
+from django.db import connection, transaction
 from django.db.models import F, Q
 from django.db.models.expressions import OrderBy, RawSQL
 from django.http import JsonResponse
@@ -373,13 +373,18 @@ def carrier_detail_apply_changes(
     - confirmation_sent_to: email or None if no changes
     - account_confirmation_sent_to: email of user who create the changes if account not enabled yet
     - old_account_sent_to: email of previous user who edit the carrier if any
+
+    This function is a bit complex for two reasons:
+    - to reduce the number of mails sent in subscription, only one mail is sent to
+      user account to confirm account creation and carrier changes on same email address
+    - a link carrier_user is created on POST to that ressource...
     """
     should_notify_old_email = False
     old_email_notified = False
 
     validated_data = editable_serialized.validated_data
 
-    # DB inconsistency
+    # Detect DB inconsistency
     assert carrier.editable
 
     # Do we need to create a new editable? Only if changes are detected.
@@ -397,8 +402,8 @@ def carrier_detail_apply_changes(
     # Not done on account creation so we should do that now
     should_mail_user = bool(created_by_email_serialized)
 
-    # Changes detected.
     if new_editable_to_create:
+        # Changes detected
         new_carrier_editable = editable_serialized.save(
             carrier=carrier, created_by=user
         )
@@ -425,6 +430,21 @@ def carrier_detail_apply_changes(
         carriers_mails.mail_managers_carrier_changes(
             changed_fields, carrier.editable, new_carrier_editable
         )
+
+    # Changes or not, a relation should be created between the carrier and the user
+    # but only if this relation doesn't exist yet. Raw SQL for upsert.
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            insert into carrier_user (carrier_id, user_id, created_at) values (%s, %s, now())
+            on conflict do nothing returning id""",
+            [carrier.pk, user.pk]
+        )
+        carrier_user_is_created = cursor.fetchone()
+
+    if not old_email_notified and carrier_user_is_created:
+        # Only if the old email address hasn't been notified yet
+        carriers_mails.mail_carrier_to_old_email_for_new_user(carrier.editable, user)
+        old_email_notified = True
 
     if should_mail_user:
         accounts_mails.mail_user_to_activate(user)

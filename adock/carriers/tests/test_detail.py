@@ -154,11 +154,12 @@ class CarrierDetailPostTestCase(AuthTestCase, carriers_test.CarrierTestCaseMixin
         self.assertEqual(carrier_data["email"], self.carrier.editable.email)
         self.assertEqual(carrier_data["user_is_owner"], False)
 
-        # Check CarrierEditable to confirm
+        # Check content of the CarrierEditable to confirm
         latest_editable = models.CarrierEditable.objects.latest()
         self.assertIsNone(latest_editable.confirmed_at)
         self.assertEqual(str(latest_editable.telephone), PHONE)
         self.assertEqual(latest_editable.email, EMAIL)
+        self.assertEqual(latest_editable.created_by, self.user)
 
         # Mails:
         # 1. to notify previous user
@@ -212,6 +213,11 @@ class CarrierDetailPostTestCase(AuthTestCase, carriers_test.CarrierTestCaseMixin
 
         self.carrier.refresh_from_db()
         self.assertEqual(self.carrier.editable, latest_editable)
+
+        # A new relation has been created between the user and the carrier
+        carriers = self.user.carriers.all()
+        self.assertEqual(len(carriers), 1)
+        self.assertEqual(carriers.first(), self.carrier)
 
         # Get from server
         response = self.client.get(
@@ -293,8 +299,16 @@ class CarrierDetailPostTestCase(AuthTestCase, carriers_test.CarrierTestCaseMixin
             200,
         )
         self.assertIsNone(data["confirmation_sent_to"])
-        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(data["notification_sent_to"], self.carrier.editable.email)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            "[A Dock] Votre fiche entreprise est associée à l’utilisateur %s" % self.user.get_full_name()
+        )
+        # No new editable
         self.assertEqual(models.CarrierEditable.objects.count(), 1)
+        # A new carrier/user relation
+        self.assertIn(self.user, self.carrier.users.all())
 
     def test_post_website(self):
         WEBSITE = "http://www.example.com"

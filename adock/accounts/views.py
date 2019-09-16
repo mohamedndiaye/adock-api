@@ -229,7 +229,8 @@ def get_user_confirmations_as_json(user):
 
 
 def account_profile(request, extended=False):
-    if request.user.is_anonymous or not request.user.is_active:
+    user = request.user
+    if user.is_anonymous or not user.is_active:
         return JsonResponse(
             {"message": "Impossible d'obtenir les informations de l'utilisateur."},
             status=401,
@@ -237,40 +238,35 @@ def account_profile(request, extended=False):
 
     if request.method == "PATCH":
         serializer, response = core_views.request_validate(
-            request, accounts_serializers.EditUserSerializer, instance=request.user
+            request, accounts_serializers.EditUserSerializer, instance=user
         )
         if response:
             return response
 
-        request.user = serializer.save()
+        user = serializer.save()
 
-    user = {
-        "first_name": request.user.first_name,
-        "last_name": request.user.last_name,
-        "email": request.user.email,
-        "last_login": request.user.last_login,
-        "date_joined": request.user.date_joined.isoformat(),
-        "provider": request.user.provider,
-        "provider_display": request.user.get_provider_display(),
-        "provider_data": request.user.provider_data,
-        "is_staff": request.user.is_staff,
-        "has_accepted_cgu": request.user.has_accepted_cgu,
-        "has_subscribed_newsletter": request.user.has_subscribed_newsletter,
+    user_json = {
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email": user.email,
+        "last_login": user.last_login,
+        "date_joined": user.date_joined.isoformat(),
+        "provider": user.provider,
+        "provider_display": user.get_provider_display(),
+        "provider_data": user.provider_data,
+        "is_staff": user.is_staff,
+        "has_accepted_cgu": user.has_accepted_cgu,
+        "has_subscribed_newsletter": user.has_subscribed_newsletter,
     }
 
     if extended:
-        carriers = (
-            carriers_models.Carrier.objects.filter(
-                changes__confirmed_at__isnull=False, changes__created_by=request.user
-            )
-            .select_related("editable")
-            .distinct()
+        user_json["carriers"] = carriers_views.get_carriers_as_json(
+            user.carriers.all(), ["enseigne"]
         )
-        user["carriers"] = carriers_views.get_carriers_as_json(carriers, ["enseigne"])
-        user["confirmations"] = get_user_confirmations_as_json(request.user)
+        user_json["confirmations"] = get_user_confirmations_as_json(user)
 
     # Returns only informations not in JWT payload
-    return JsonResponse({"user": user})
+    return JsonResponse({"user": user_json})
 
 
 def get_callback_redirect_uri(request):
