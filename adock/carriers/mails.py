@@ -5,6 +5,7 @@ import sentry_sdk
 from django.conf import settings
 from django.core.mail import mail_managers, send_mail
 
+from . import models as carriers_models
 from . import tokens as carriers_tokens
 
 
@@ -20,8 +21,8 @@ def get_message_of_changes(
 ):
     message = ""
     for field in changed_fields:
-        message += "- {field} : {current_value} => {new_value}\n".format(
-            field=field,
+        message += "- {field_label} : {current_value} => {new_value}\n".format(
+            field_label=carriers_models.CarrierEditable.INPUT_FIELDS[field],
             current_value=getattr(current_carrier_editable, field),
             new_value=getattr(new_carrier_editable, field),
         )

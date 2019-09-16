@@ -183,9 +183,9 @@ class CarrierDetailPostTestCase(AuthTestCase, carriers_test.CarrierTestCaseMixin
         message = "[A Dock] log - Modification du transporteur %s" % self.carrier.siret
         self.assertEqual(mail.outbox[2].subject, message)
         body = mail.outbox[2].body
-        self.assertIn("telephone", body)
-        self.assertIn("email", body)
-        self.assertNotIn("working", body)
+        self.assertIn("Téléphone", body)
+        self.assertIn("Adresse e-mail", body)
+        self.assertNotIn("Aire de travail", body)
 
         # Confirm changes by extracting the token provided to the UI in #2 mail
         confirm_url_search = re.search(
