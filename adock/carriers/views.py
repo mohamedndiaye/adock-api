@@ -112,7 +112,7 @@ def get_carrier_as_json(user, carrier):
     for field in CARRIER_DETAIL_EDITABLE_FIELDS:
         carrier_json[field] = getattr(editable, field)
 
-    carrier_json["user_is_owner"] = (not user.is_anonymous) and (user.id == editable.created_by_id)
+    carrier_json["user_is_owner"] = (not user.is_anonymous) and (user.carriers.filter(siret=carrier.siret).exists())
 
     # License renewal on going, we don't set the field if we don't have the
     # information (paper process for example)

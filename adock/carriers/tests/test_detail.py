@@ -152,7 +152,9 @@ class CarrierDetailPostTestCase(AuthTestCase, carriers_test.CarrierTestCaseMixin
         carrier_data = data["carrier"]
         self.assertEqual(carrier_data["telephone"], self.carrier.editable.telephone)
         self.assertEqual(carrier_data["email"], self.carrier.editable.email)
-        self.assertEqual(carrier_data["user_is_owner"], False)
+
+        # but user is already linked to the carrier
+        self.assertEqual(carrier_data["user_is_owner"], True)
 
         # Check content of the CarrierEditable to confirm
         latest_editable = models.CarrierEditable.objects.latest()
