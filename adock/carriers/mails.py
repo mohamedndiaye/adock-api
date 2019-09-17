@@ -5,6 +5,7 @@ import sentry_sdk
 from django.conf import settings
 from django.core.mail import mail_managers, send_mail
 
+from ..core import mails as core_mails
 from . import models as carriers_models
 from . import tokens as carriers_tokens
 
@@ -114,29 +115,35 @@ def mail_carrier_editable_to_confirm(
         new_carrier_editable
     )
     subject = (
-        "%sEn attente de confirmation de votre fiche transporteur"
+        "%sConfirmez la mise à jour de votre fiche entreprise"
         % settings.EMAIL_SUBJECT_PREFIX
     )
     message = """
-Merci d'avoir renseigné votre fiche sur A Dock, l'application
-qui facilite la relation chargeur et transporteur.
+Bonjour,
 
-Pour confirmer les changements suivant sur votre fiche :
+Votre fiche entreprise sur adock.beta.gouv.fr vient d’être mise à jour par {user_full_name}.
+
+Pour confirmer les changements suivants :
 
 {changes}
-Cliquez sur ce lien :
+Cliquez sur le lien :
 
 {http_client_url}transporteur/changement/{new_carrier_editable_id}/confirmer/{token}/
 
-Cordialement,
-L'équipe A Dock
+Si c’est une erreur ou que cette personne n’est pas habilitée à faire des modifications pour votre entreprise, signalez-le nous à l’adresse contact@adock.beta.gouv.fr.
+
+En vous remerciant de l’intérêt que vous portez pour A Dock, l’outil de simplification des relations dans le transport de marchandises par route !
+
+{signature}
     """.format(
-        http_client_url=settings.HTTP_CLIENT_URL,
-        new_carrier_editable_id=new_carrier_editable.id,
-        token=token,
         changes=get_message_of_changes(
             changed_fields, current_carrier_editable, new_carrier_editable
         ),
+        http_client_url=settings.HTTP_CLIENT_URL,
+        new_carrier_editable_id=new_carrier_editable.id,
+        token=token,
+        signature=core_mails.SIGNATURE,
+        user_full_name=new_carrier_editable.created_by.get_full_name(),
     )
     recipient_list = get_recipient_list_from_env(new_carrier_editable.email)
     send_mail(
