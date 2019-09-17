@@ -351,7 +351,7 @@ def check_user_is_not_anonymous(user):
     if not user or user.is_anonymous:
         return JsonResponse(
             {
-                "message": "Vous devez être connecté pour modifier une fiche transporteur."
+                "message": "Vous devez être connecté pour modifier une fiche entreprise."
             },
             status=401,
         )
@@ -510,7 +510,7 @@ def carrier_detail(request, carrier_siret):
         # Add them to the response
         data_json.update(mails_sent_to)
         data_json["message"] = (
-            "Vous devez confirmer les changements de la fiche transporteur "
+            "Vous devez confirmer les changements de la fiche entreprise "
             "en cliquant sur le lien envoyé à « %s »."
         ) % mails_sent_to["confirmation_sent_to"]
 
@@ -550,7 +550,7 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
         )
 
         error_message = (
-            "Impossible de confirmer les modifications de la fiche transporteur."
+            "Impossible de confirmer les modifications de la fiche entreprise."
         )
         if (
             carrier_editable.created_by is None
@@ -581,7 +581,7 @@ def carrier_editable_confirm(request, carrier_editable_id, token):
     carriers_mails.mail_managers_carrier_confirmed(carrier_editable)
     data = {
         "siret": carrier_editable.carrier_id,
-        "message": "Les modifications de la fiche transporteur « %s » sont confirmées."
+        "message": "Les modifications de la fiche entreprise « %s » sont confirmées."
         % (carrier_editable.carrier.enseigne),
     }
     return JsonResponse(data)
@@ -598,7 +598,7 @@ def _certificate_sign(request, carrier):
     if not carrier.editable.email:
         return JsonResponse(
             {
-                "message": "Vous devez d'abord confirmer la fiche transporteur avant de générer l'attestation."
+                "message": "Vous devez d'abord confirmer la fiche entreprise avant de générer l'attestation."
             },
             status=400,
         )
@@ -740,7 +740,7 @@ def license_renewal_ask(request, carrier_siret):
     if not carrier.editable.email:
         return JsonResponse(
             {
-                "message": "La fiche transporteur ne contient pas d'adresse e-mail."
+                "message": "La fiche entreprise ne contient pas d'adresse e-mail."
             },
             status=401,
         )

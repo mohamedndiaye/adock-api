@@ -162,7 +162,7 @@ class SignCarrierCertificateTestCase(AuthTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.json()["message"],
-            "Vous devez d'abord confirmer la fiche transporteur avant de générer l'attestation.",
+            "Vous devez d'abord confirmer la fiche entreprise avant de générer l'attestation.",
         )
 
 

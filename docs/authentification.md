@@ -8,7 +8,7 @@ l'authentification :
 - création de compte (interne à A Dock)
 - identification via FranceConnect
 - récupération de mot de passe
-- association d'un utilisateur comme titulaire d'une fiche transporteur
+- association d'un utilisateur comme titulaire d'une fiche entreprise
 
 L'application A Dock offre deux méthodes d'identification soit via les comptes
 utilisateurs internes à l'application ou via FranceConnect. Une fois que

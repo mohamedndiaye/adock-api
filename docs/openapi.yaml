@@ -263,7 +263,7 @@ components:
           type: string
         completeness:
           type: integer
-          description: niveau de complétude en pourcentage des informations de la fiche transporteur
+          description: niveau de complétude en pourcentage des informations de la fiche entreprise
           format: int32
         lti_nombre:
           type: integer
@@ -328,7 +328,7 @@ components:
           type: string
         completeness:
           type: integer
-          description: niveau de complétude en pourcentage des informations de la fiche transporteur
+          description: niveau de complétude en pourcentage des informations de la fiche entreprise
           format: int32
         lti_numero:
           maxLength: 16

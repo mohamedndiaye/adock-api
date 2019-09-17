@@ -84,7 +84,7 @@ class CreateAccountSubscribeWorkflowTestCase(TestCase):
         # i - old
         self.assertEqual(
             mail.outbox[0].subject,
-            "[A Dock] Notification de modification de votre fiche transporteur",
+            "[A Dock] Notification de modification de votre fiche entreprise",
         )
         # ii
         self.assertEqual(
@@ -127,7 +127,7 @@ class CreateAccountSubscribeWorkflowTestCase(TestCase):
             data["message"],
             (
                 "Jean-Yves Ménard, votre compte utilisateur A Dock est à présent actif ! "
-                "Les changements de la fiche transporteur ont été appliqué avec succès."
+                "Les changements de la fiche entreprise ont été appliqué avec succès."
             ).format(email=EMAIL),
         )
 
@@ -176,7 +176,7 @@ class LoggedSubscribeWorkflowTestCase(
         # i - old
         self.assertEqual(
             mail.outbox[0].subject,
-            "[A Dock] Notification de modification de votre fiche transporteur",
+            "[A Dock] Notification de modification de votre fiche entreprise",
         )
         # ii
         self.assertEqual(
