@@ -7,19 +7,51 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('carriers', '0009_auto_20190502_1316'),
-    ]
+    dependencies = [("carriers", "0009_auto_20190502_1316")]
 
     operations = [
         migrations.AlterField(
-            model_name='carriereditable',
-            name='specialities',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(choices=[('ANIMAL', 'Animaux vivants'), ('AUTRE', 'Autre'), ('BOIS', 'Bois'), ('DECHETS', 'Déchets'), ('DEMENAGEMENT', 'Déménagement'), ('LOCATION', 'Location'), ('LOT', 'Lots'), ('MATIERE_DANGEREUSE', 'Matière dangereuse'), ('MESSAGERIE', 'Messagerie express'), ('MULTIMODAL', 'Multimodal'), ('PALETTE', 'Palettes / Messagerie palettisée'), ('PLATEAU', 'Plateau bachés et spécifiques'), ('TEMPERATURE', 'Température dirigée'), ('URBAIN', 'Urbain / Dernier kilomètre'), ('VEHICULE', 'Véhicules'), ('VRAC_LIQUIDE', 'Vrac liquide'), ('VRAC_SOLIDE', 'Vrac solide')], max_length=63), blank=True, null=True, size=None),
+            model_name="carriereditable",
+            name="specialities",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(
+                    choices=[
+                        ("ANIMAL", "Animaux vivants"),
+                        ("AUTRE", "Autre"),
+                        ("BOIS", "Bois"),
+                        ("DECHETS", "Déchets"),
+                        ("DEMENAGEMENT", "Déménagement"),
+                        ("LOCATION", "Location"),
+                        ("LOT", "Lots"),
+                        ("MATIERE_DANGEREUSE", "Matière dangereuse"),
+                        ("MESSAGERIE", "Messagerie express"),
+                        ("MULTIMODAL", "Multimodal"),
+                        ("PALETTE", "Palettes / Messagerie palettisée"),
+                        ("PLATEAU", "Plateau bachés et spécifiques"),
+                        ("TEMPERATURE", "Température dirigée"),
+                        ("URBAIN", "Urbain / Dernier kilomètre"),
+                        ("VEHICULE", "Véhicules"),
+                        ("VRAC_LIQUIDE", "Vrac liquide"),
+                        ("VRAC_SOLIDE", "Vrac solide"),
+                    ],
+                    max_length=63,
+                ),
+                blank=True,
+                null=True,
+                size=None,
+            ),
         ),
         migrations.AlterField(
-            model_name='carriereditable',
-            name='website',
-            field=models.CharField(blank=True, max_length=200, validators=[adock.carriers.validators.LooseURLValidator(schemes=['http', 'https'])]),
+            model_name="carriereditable",
+            name="website",
+            field=models.CharField(
+                blank=True,
+                max_length=200,
+                validators=[
+                    adock.carriers.validators.LooseURLValidator(
+                        schemes=["http", "https"]
+                    )
+                ],
+            ),
         ),
     ]

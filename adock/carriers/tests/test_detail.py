@@ -305,7 +305,8 @@ class CarrierDetailPostTestCase(AuthTestCase, carriers_test.CarrierTestCaseMixin
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            "[A Dock] Votre fiche entreprise est associée à l’utilisateur %s" % self.user.get_full_name()
+            "[A Dock] Votre fiche entreprise est associée à l’utilisateur %s"
+            % self.user.get_full_name(),
         )
         # No new editable
         self.assertEqual(models.CarrierEditable.objects.count(), 1)

@@ -8,13 +8,17 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('carriers', '0015_add_relations_carrier_user'),
+        ("carriers", "0015_add_relations_carrier_user"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='carrier',
-            name='users',
-            field=models.ManyToManyField(related_name='carriers', through='carriers.CarrierUser', to=settings.AUTH_USER_MODEL),
-        ),
+            model_name="carrier",
+            name="users",
+            field=models.ManyToManyField(
+                related_name="carriers",
+                through="carriers.CarrierUser",
+                to=settings.AUTH_USER_MODEL,
+            ),
+        )
     ]

@@ -112,13 +112,20 @@ def get_carrier_as_json(user, carrier):
     for field in CARRIER_DETAIL_EDITABLE_FIELDS:
         carrier_json[field] = getattr(editable, field)
 
-    carrier_json["user_is_owner"] = (not user.is_anonymous) and (user.carriers.filter(siret=carrier.siret).exists())
+    carrier_json["user_is_owner"] = (not user.is_anonymous) and (
+        user.carriers.filter(siret=carrier.siret).exists()
+    )
 
     # License renewal on going, we don't set the field if we don't have the
     # information (paper process for example)
     latest_license_renewal = carrier.get_latest_license_renewal()
-    if latest_license_renewal is not None and latest_license_renewal.delivered_at is None:
-        carrier_json["license_renewal_on_going"] = latest_license_renewal.confirmed_at.date()
+    if (
+        latest_license_renewal is not None
+        and latest_license_renewal.delivered_at is None
+    ):
+        carrier_json[
+            "license_renewal_on_going"
+        ] = latest_license_renewal.confirmed_at.date()
 
     return carrier_json
 
@@ -350,9 +357,7 @@ RE_MANY_COMMAS = re.compile(r",+")
 def check_user_is_not_anonymous(user):
     if not user or user.is_anonymous:
         return JsonResponse(
-            {
-                "message": "Vous devez être connecté pour modifier une fiche entreprise."
-            },
+            {"message": "Vous devez être connecté pour modifier une fiche entreprise."},
             status=401,
         )
 
@@ -434,10 +439,11 @@ def carrier_detail_apply_changes(
     # Changes or not, a relation should be created between the carrier and the user
     # but only if this relation doesn't exist yet. Raw SQL for upsert.
     with connection.cursor() as cursor:
-        cursor.execute("""
+        cursor.execute(
+            """
             insert into carrier_user (carrier_id, user_id, created_at) values (%s, %s, now())
             on conflict do nothing returning id""",
-            [carrier.pk, user.pk]
+            [carrier.pk, user.pk],
         )
         carrier_user_is_created = cursor.fetchone()
 
@@ -457,7 +463,7 @@ def carrier_detail_apply_changes(
     return {
         "confirmation_sent_to": confirmation_sent_to,
         "account_confirmation_sent_to": account_confirmation_sent_to,
-        "notification_sent_to": notification_sent_to
+        "notification_sent_to": notification_sent_to,
     }
 
 
@@ -739,9 +745,7 @@ def license_renewal_ask(request, carrier_siret):
     # Only possible if the email is set
     if not carrier.editable.email:
         return JsonResponse(
-            {
-                "message": "La fiche entreprise ne contient pas d'adresse e-mail."
-            },
+            {"message": "La fiche entreprise ne contient pas d'adresse e-mail."},
             status=401,
         )
 

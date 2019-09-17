@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('carriers', '0012_remove_dots_from_enseigne_unaccent'),
-    ]
+    dependencies = [("carriers", "0012_remove_dots_from_enseigne_unaccent")]
 
     operations = [
         migrations.AddField(
-            model_name='carrierlicenserenewal',
-            name='delivered_at',
+            model_name="carrierlicenserenewal",
+            name="delivered_at",
             field=models.DateTimeField(blank=True, null=True),
-        ),
+        )
     ]

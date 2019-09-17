@@ -9,23 +9,43 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('carriers', '0010_auto_20190521_1901'),
+        ("carriers", "0010_auto_20190521_1901"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CarrierLicenseRenewal',
+            name="CarrierLicenseRenewal",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('confirmed_at', models.DateTimeField(blank=True, null=True)),
-                ('lti_nombre', models.PositiveSmallIntegerField(default=0)),
-                ('lc_nombre', models.PositiveSmallIntegerField(default=0)),
-                ('carrier', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='carriers.Carrier')),
-                ('created_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='carrier_license_renewals', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("confirmed_at", models.DateTimeField(blank=True, null=True)),
+                ("lti_nombre", models.PositiveSmallIntegerField(default=0)),
+                ("lc_nombre", models.PositiveSmallIntegerField(default=0)),
+                (
+                    "carrier",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="carriers.Carrier",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="carrier_license_renewals",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
-            options={
-                'db_table': 'carrier_license_renewal',
-            },
-        ),
+            options={"db_table": "carrier_license_renewal"},
+        )
     ]

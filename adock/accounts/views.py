@@ -114,7 +114,9 @@ def account_activate(
             )
         else:
             carriers_views.carrier_editable_save(carrier_editable)
-            message += " Les changements de la fiche entreprise ont été appliqué avec succès."
+            message += (
+                " Les changements de la fiche entreprise ont été appliqué avec succès."
+            )
 
     json_web_token = jwt_auth_views.jwt_encode_token(user)
     json_data = jwt_auth_views.jwt_get_json_with_token(json_web_token)

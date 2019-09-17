@@ -13,6 +13,7 @@ RE_ONLY_DIGITS = re.compile(r"\d")
 SEARCH_DELETED_CHARS = ".,"
 SEARCH_Q_TRANS_TABLE = str.maketrans(dict.fromkeys(SEARCH_DELETED_CHARS))
 
+
 def is_french_departement(departement):
     if departement in ("2A", "2B"):
         return True
