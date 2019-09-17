@@ -11,17 +11,27 @@ def mail_user_to_activate(user):
     token = accounts_tokens.account_token_generator.make_token(user)
 
     subject = (
-        "%sConfirmation de votre adresse e-mail" % settings.EMAIL_SUBJECT_PREFIX
+        "%sActivez votre compte utilisateur A Dock" % settings.EMAIL_SUBJECT_PREFIX
     )
     message = """
-Vous venez de créer un compte utilisateur sur A Dock, il suffit maintenant de cliquer sur ce lien
-pour l'activer :
+Bonjour,
+
+Vous venez de créer un compte utilisateur sur A Dock, il suffit maintenant de cliquer sur ce lien pour l'activer :
 
 {http_client_url}utilisateur/{user_id}/activer/{token}/
 
-Cordialement,
+Un message de notification a également été envoyé à l’entreprise à laquelle vous êtes associé.
+
+En vous remerciant de l’intérêt que vous portez pour A Dock, l’outil de simplification des relations dans le transport de marchandises par route !
+
+Bien cordialement,
+
 L'équipe A Dock
-    """.format(
+
+Pour toutes questions, nous sommes à votre écoute à l’adresse : contact@adock.beta.gouv.fr
+
+adock.beta.gouv.fr - un service numérique développé par la Direction générale des infrastructures, des transports et de la mer - Ministère de la Transition écologique et solidaire.
+""".format(
         http_client_url=settings.HTTP_CLIENT_URL, user_id=user.pk, token=token
     )
 
