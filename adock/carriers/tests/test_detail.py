@@ -176,7 +176,7 @@ class CarrierDetailPostTestCase(AuthTestCase, carriers_test.CarrierTestCaseMixin
         # 2
         self.assertEqual(
             mail.outbox[1].subject,
-            "[A Dock] En attente de confirmation de votre fiche transporteur",
+            "[A Dock] Confirmez la mise à jour de votre fiche entreprise",
         )
 
         # 3

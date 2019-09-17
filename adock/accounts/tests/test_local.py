@@ -56,8 +56,7 @@ class CreateUserTestCase(TestCase):
             "[A Dock] log - Nouveau compte utilisateur %s" % user.email,
         )
         self.assertEqual(
-            mail.outbox[1].subject,
-            "[A Dock] Confirmation de votre adresse e-mail",
+            mail.outbox[1].subject, "[A Dock] Activez votre compte utilisateur"
         )
 
         self.assertEqual(user.email, EMAIL)

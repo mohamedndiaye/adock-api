@@ -112,6 +112,8 @@ def mail_carrier_editable_to_confirm(
         "%sConfirmez la mise à jour de votre fiche entreprise"
         % settings.EMAIL_SUBJECT_PREFIX
     )
+
+    assert new_carrier_editable.created_by
     message = """
 Bonjour,
 

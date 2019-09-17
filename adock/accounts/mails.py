@@ -11,9 +11,7 @@ def mail_user_to_activate(user):
     # the user.
     token = accounts_tokens.account_token_generator.make_token(user)
 
-    subject = (
-        "%sActivez votre compte utilisateur A Dock" % settings.EMAIL_SUBJECT_PREFIX
-    )
+    subject = "%sActivez votre compte utilisateur" % settings.EMAIL_SUBJECT_PREFIX
     message = """
 Bonjour,
 
