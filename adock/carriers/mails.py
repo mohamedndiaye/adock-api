@@ -45,13 +45,14 @@ est en cours de modification avec les changements suivants :
 {changes}
 Si vous n'êtes pas d'accord avec ces changements, veuillez contacter les responsables du site A Dock.
 
-Cordialement,
-L'équipe A Dock""".format(
-        http_client_url=settings.HTTP_CLIENT_URL,
-        siret=carrier.siret,
+{signature}
+""".format(
         changes=get_message_of_changes(
             changed_fields, current_carrier_editable, new_carrier_editable
         ),
+        http_client_url=settings.HTTP_CLIENT_URL,
+        siret=carrier.siret,
+        signature=core_mails.SIGNATURE,
     )
     recipient_list = get_recipient_list_from_env(current_carrier_editable.email)
     send_mail(
@@ -83,20 +84,13 @@ Pour des raisons de sécurité, toutes modifications ou démarches réalisées p
 
 Si c’est une erreur ou que cette personne n’est pas habilitée à faire des modifications pour votre entreprise, signalez-le nous à l’adresse contact@adock.beta.gouv.fr
 
-Bien cordialement,
-
-L’équipe A Dock
-
-Pour toutes questions, nous sommes à votre écoute à l’adresse : contact@adock.beta.gouv.fr.
-
-
-www.adock.beta.gouv.fr - un service numérique développé par la Direction générale des infrastructures, des transports et de la mer -
-Ministère de la Transition écologique et solidaire.
-""".format(
+{signature}
+    """.format(
         enseigne=carrier.enseigne,
         http_client_url=settings.HTTP_CLIENT_URL,
         siret=carrier.siret,
         user_full_name=user_full_name,
+        signature=core_mails.SIGNATURE,
     )
     recipient_list = get_recipient_list_from_env(current_carrier_editable.email)
     send_mail(
@@ -168,7 +162,7 @@ SIRET : {siret}
 {http_client_url}transporteur/{siret}
 
 Informations modifiées :
-""".format(
+    """.format(
         enseigne=carrier.enseigne,
         siret=carrier.siret,
         http_client_url=settings.HTTP_CLIENT_URL,
@@ -184,10 +178,10 @@ def mail_managers_carrier_confirmed(carrier_editable):
     carrier = carrier_editable.carrier
     subject = "log - La modification du transporteur %s est confirmée." % carrier.siret
     message = """
-        Transporteur modifié : {enseigne}
-        SIRET : {siret}
-        {http_client_url}transporteur/{siret}
-    """.format(
+Transporteur modifié : {enseigne}
+SIRET : {siret}
+{http_client_url}transporteur/{siret}
+""".format(
         enseigne=carrier.enseigne,
         siret=carrier.siret,
         http_client_url=settings.HTTP_CLIENT_URL,
@@ -208,12 +202,12 @@ Pour la confirmer, cliquez sur ce lien :
 
 {http_client_url}transporteur/attestation/{certificate_id}/confirmer/{token}/
 
-Cordialement,
-L'équipe A Dock
+{signature}
     """.format(
         http_client_url=settings.HTTP_CLIENT_URL,
         certificate_id=certificate.id,
         token=token,
+        signature=core_mails.SIGNATURE,
     )
     recipient_list = get_recipient_list_from_env(carrier.editable.email)
     send_mail(
@@ -281,16 +275,6 @@ def get_license_message(label, numero, date_fin, new_nombre):
     )
 
 
-def get_adock_signature():
-    return """
-L’équipe A Dock
-
-Pour toutes questions, nous sommes à votre écoute à l’adresse : contact@adock.beta.gouv.fr
-
-adock.beta.gouv.fr - un service numérique développé par la Direction générale des infrastructures, des transports et de la mer - Ministère de la transition écologique et solidaire.
-"""
-
-
 def mail_carrier_license_renewal_to_confirm(carrier, license_renewal):
     token = carriers_tokens.license_renewal_token_generator.make_token(license_renewal)
     subject = "%sConfirmez la demande de renouvellement de licences pour %s" % (
@@ -338,7 +322,7 @@ Bien cordialement,
         http_client_url=settings.HTTP_CLIENT_URL,
         license_renewal_id=license_renewal.id,
         token=token,
-        signature=get_adock_signature(),
+        signature=core_mails.SIGNATURE,
     )
     recipient_list = get_recipient_list_from_env(carrier.editable.email)
     send_mail(
@@ -413,11 +397,9 @@ L'entreprise {raison_sociale} n° SIREN {siren} a fait, par l'intermédiaire de
 Merci de bien vouloir instruire cette demande et, le cas échéant, de demander les
 pièces justificatives à l’adresse {email}.
 
-Bien cordialement,
-
 {signature}
-""".format(
-        email=license_renewal.carrier.editable.email, signature=get_adock_signature()
+    """.format(
+        email=license_renewal.carrier.editable.email, signature=core_mails.SIGNATURE
     )
     recipient_list = get_recipient_list_from_env(settings.DREAL_EMAIL)
     try:

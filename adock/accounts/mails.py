@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.mail import mail_managers
 
+from ..core import mails as core_mails
 from . import tokens as accounts_tokens
 from ..carriers import tokens as carriers_tokens
 
@@ -24,15 +25,12 @@ Un message de notification a également été envoyé à l’entreprise à laque
 
 En vous remerciant de l’intérêt que vous portez pour A Dock, l’outil de simplification des relations dans le transport de marchandises par route !
 
-Bien cordialement,
-
-L'équipe A Dock
-
-Pour toutes questions, nous sommes à votre écoute à l’adresse : contact@adock.beta.gouv.fr
-
-adock.beta.gouv.fr - un service numérique développé par la Direction générale des infrastructures, des transports et de la mer - Ministère de la Transition écologique et solidaire.
+{signature}
 """.format(
-        http_client_url=settings.HTTP_CLIENT_URL, user_id=user.pk, token=token
+        http_client_url=settings.HTTP_CLIENT_URL,
+        signature=core_mails.SIGNATURE,
+        token=token,
+        user_id=user.pk,
     )
 
     user.email_user(
@@ -61,14 +59,14 @@ de la fiche transporteur :
 
 {http_client_url}utilisateur/{user_id}/activer/{user_token}/transporteur/changement/{new_carrier_editable_id}/confirmer/{carrier_editable_token}/
 
-Cordialement,
-L'équipe A Dock
+{signature}
 """.format(
+        carrier_editable_token=carrier_editable_token,
         http_client_url=settings.HTTP_CLIENT_URL,
+        new_carrier_editable_id=new_carrier_editable.id,
+        signature=core_mails.SIGNATURE,
         user_id=user.pk,
         user_token=user_token,
-        new_carrier_editable_id=new_carrier_editable.id,
-        carrier_editable_token=carrier_editable_token,
     )
     user.email_user(
         subject=subject,
@@ -86,10 +84,12 @@ de la demande vous pouvez ignorer ce message sinon vous pouvez cliquer sur le li
 
 {http_client_url}utilisateur/{email}/reinitialiser/{token}/
 
-Cordialement,
-L'équipe A Dock
+{signature}
 """.format(
-        http_client_url=settings.HTTP_CLIENT_URL, email=user.email, token=token
+        http_client_url=settings.HTTP_CLIENT_URL,
+        email=user.email,
+        token=token,
+        signature=core_mails.SIGNATURE,
     )
     user.email_user(
         subject=subject,
