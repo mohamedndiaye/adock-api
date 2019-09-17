@@ -89,7 +89,7 @@ class CreateAccountSubscribeWorkflowTestCase(TestCase):
         # ii
         self.assertEqual(
             mail.outbox[1].subject,
-            "[A Dock] En attente de confirmation de votre compte et vos modifications",
+            "[A Dock] Activez votre compte utilisateur et confirmez votre fiche entreprise",
         )
 
         # Search UI URL

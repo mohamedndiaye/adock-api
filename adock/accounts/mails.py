@@ -47,15 +47,17 @@ def mail_user_to_activate_with_carrier_editable(
         new_carrier_editable
     )
     subject = (
-        "%sEn attente de confirmation de votre compte et vos modifications"
+        "%sActivez votre compte utilisateur et confirmez votre fiche entreprise"
         % settings.EMAIL_SUBJECT_PREFIX
     )
     message = """
-Merci d'avoir créé votre compte utilisateur sur A Dock.
-Il suffit maintenant de cliquer sur ce lien pour activer et confirmer les modifications
-de la fiche transporteur :
+Bonjour,
+
+Vous venez de créer un compte utilisateur et de renseigner une fiche entreprise sur A Dock, il suffit maintenant de cliquer sur ce lien pour l'activer :
 
 {http_client_url}utilisateur/{user_id}/activer/{user_token}/transporteur/changement/{new_carrier_editable_id}/confirmer/{carrier_editable_token}/
+
+En vous remerciant de l’intérêt que vous portez pour A Dock, l’outil de simplification des relations dans le transport de marchandises par route !
 
 {signature}
 """.format(

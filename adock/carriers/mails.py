@@ -39,8 +39,7 @@ def mail_carrier_to_old_email(
         % settings.EMAIL_SUBJECT_PREFIX
     )
     message = """
-Votre fiche transporteur {http_client_url}transporteur/{siret}
-est en cours de modification avec les changements suivants :
+Votre fiche transporteur {http_client_url}transporteur/{siret} est en cours de modification avec les changements suivants :
 
 {changes}
 Si vous n'êtes pas d'accord avec ces changements, veuillez contacter les responsables du site A Dock.
