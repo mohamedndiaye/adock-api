@@ -193,23 +193,26 @@ SIRET : {siret}
 
 def mail_carrier_certificate_to_confirm(carrier, certificate):
     token = carriers_tokens.certificate_token_generator.make_token(certificate)
-    subject = (
-        "%sEn attente de confirmation d'une attestation" % settings.EMAIL_SUBJECT_PREFIX
-    )
+    subject = "%sConfirmez la création de l'attestation" % settings.EMAIL_SUBJECT_PREFIX
     message = """
-Merci d'avoir créé une attestation sur A Dock, l'application
-qui facilite la relation chargeur et transporteur.
+Bonjour,
 
-Pour la confirmer, cliquez sur ce lien :
+Une {certificate_label} vient d’être créée pour votre entreprise sur A Dock par {user_full_name}.
+
+Pour la confirmer, la consulter et la rendre visible sur la fiche de votre entreprise, cliquez sur le lien suivant :
 
 {http_client_url}transporteur/attestation/{certificate_id}/confirmer/{token}/
 
+En vous remerciant de l’intérêt que vous portez pour A Dock, l’outil de simplification des relations dans le transport de marchandises par route !
+
 {signature}
     """.format(
-        http_client_url=settings.HTTP_CLIENT_URL,
         certificate_id=certificate.id,
-        token=token,
+        certificate_label=certificate.get_kind_display().lower(),
+        http_client_url=settings.HTTP_CLIENT_URL,
         signature=core_mails.SIGNATURE,
+        token=token,
+        user_full_name=certificate.created_by.get_full_name(),
     )
     recipient_list = get_recipient_list_from_env(carrier.editable.email)
     send_mail(

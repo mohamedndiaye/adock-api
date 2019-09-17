@@ -88,6 +88,15 @@ class SignCarrierCertificateTestCase(AuthTestCase):
             kwargs={"certificate_id": certificate.id, "token": token},
         )
         self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(
+            mail.outbox[0].subject, "[A Dock] Confirmez la création de l'attestation"
+        )
+        self.assertEqual(
+            mail.outbox[1].subject,
+            "[A Dock] log - Nouvelle attestation %s pour le transporteur %s"
+            % (certificate.id, certificate.carrier_id),
+        )
+
         mail.outbox = []
 
         response = self.client.get(confirm_url)
